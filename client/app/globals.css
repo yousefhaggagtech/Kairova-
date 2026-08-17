@@ -32,7 +32,35 @@
 
   /* Max widths */
   --max-content: 1280px;
+
+  /* Font families */
+  --font-display-en: var(--font-fraunces), serif;
+  --font-display-ar: var(--font-plex-arabic), sans-serif;
+  --font-body-en: var(--font-inter), sans-serif;
+  --font-body-ar: var(--font-plex-arabic), sans-serif;
 }
 
 html { background: var(--color-bg-secondary); color: var(--color-fg-secondary); }
 html.dark { background: var(--color-bg-primary); color: var(--color-fg-primary); }
+
+html[lang="ar"] {
+  font-family: var(--font-body-ar);
+}
+
+html[lang="en"] {
+  font-family: var(--font-body-en);
+}
+
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3 {
+  font-family: var(--font-display-ar);
+  font-weight: 700;
+}
+
+html[lang="en"] h1,
+html[lang="en"] h2,
+html[lang="en"] h3 {
+  font-family: var(--font-display-en);
+  font-weight: 600;
+}

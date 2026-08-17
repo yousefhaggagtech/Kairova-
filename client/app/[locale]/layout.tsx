@@ -1,21 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import "../globals.css";
+import Footer from "../../src/components/layout/Footer";
+import Navbar from "../../src/components/layout/Navbar";
 import { locales } from "../../src/i18n/config";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { fraunces, inter, plexArabic } from "../../src/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Kairova",
@@ -44,11 +36,15 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html
       lang={locale}
       dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${fraunces.variable} ${plexArabic.variable} ${inter.variable}`}
     >
-      <body>
+      <body className="min-h-screen">
         <NextIntlClientProvider locale={locale}>
-          {children}
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>

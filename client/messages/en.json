@@ -2,5 +2,13 @@
   "site": {
     "title": "Kairova",
     "tagline": "Luxury Accessories from Egypt"
+  },
+  "nav": {
+    "men": "Men",
+    "women": "Women",
+    "about": "About"
+  },
+  "footer": {
+    "rights": "All rights reserved"
   }
 }
