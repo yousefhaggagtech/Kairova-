@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors - luxury grayscale from logo */
+  --color-bg-primary: #0A0A0A;
+  --color-bg-secondary: #FFFFFF;
+  --color-surface-dark: #141414;
+  --color-surface-light: #F8F8F8;
+  --color-fg-primary: #FFFFFF;
+  --color-fg-secondary: #0A0A0A;
+  --color-fg-muted: #8A8A8A;
+  --color-border-subtle: #2A2A2A;
+  --color-border-light: #E5E5E5;
+
+  /* Spacing - generous, luxury feel */
+  --spacing-section: 8rem;
+  --spacing-section-sm: 5rem;
+
+  /* Typography scale */
+  --text-display: 6rem;
+  --text-h1: 4rem;
+  --text-h2: 3rem;
+  --text-h3: 2.25rem;
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-caption: 0.875rem;
+
+  /* Line heights */
+  --leading-display: 1.05;
+  --leading-heading: 1.2;
+  --leading-body: 1.6;
+
+  /* Max widths */
+  --max-content: 1280px;
+}
+
+html { background: var(--color-bg-secondary); color: var(--color-fg-secondary); }
+html.dark { background: var(--color-bg-primary); color: var(--color-fg-primary); }
