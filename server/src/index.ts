@@ -6,6 +6,7 @@ import express, { Request, Response } from "express";
 import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 
+import connectDB from "./config/db.js";
 import categoryRoutes from "./features/categories/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
@@ -34,9 +35,16 @@ app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
+  connectDB()
+    .then(() => {
+      app.listen(port, () => {
+        console.log(`Server listening on port ${port}`);
+      });
+    })
+    .catch((err) => {
+      console.error("Failed to start server:", err);
+      process.exit(1);
+    });
 }
 
 export default app;
