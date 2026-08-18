@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -8,11 +7,6 @@ import Footer from "../../src/components/layout/Footer";
 import Navbar from "../../src/components/layout/Navbar";
 import { locales } from "../../src/i18n/config";
 import { fraunces, inter, plexArabic } from "../../src/lib/fonts";
-
-export const metadata: Metadata = {
-  title: "Kairova",
-  description: "Luxury Accessories from Egypt",
-};
 
 type Props = {
   children: ReactNode;

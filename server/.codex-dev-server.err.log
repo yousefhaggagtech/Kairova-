@@ -1,0 +1,13 @@
+[0818/141713.883:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:108] CreateFile: Access is denied. (0x5)
+(node:1088) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
+--import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
+(Use `Code --trace-warnings ...` to show where the warning was created)
+
+node:internal/modules/run_main:122
+    triggerUncaughtException(
+    ^
+[Object: null prototype] {
+  Symbol(nodejs.util.inspect.custom): [Function: [nodejs.util.inspect.custom]]
+}
+
+Node.js v24.18.0

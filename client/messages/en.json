@@ -3,10 +3,18 @@
     "title": "Kairova",
     "tagline": "Luxury Accessories from Egypt"
   },
+  "metadata": {
+    "title": "Kairova | Luxury Accessories",
+    "description": "Kairova | Luxury Accessories from Egypt"
+  },
   "nav": {
     "men": "Men",
     "women": "Women",
     "about": "About"
+  },
+  "home": {
+    "featuredMen": "Coming Soon: Men's Collection",
+    "featuredWomen": "Coming Soon: Women's Collection"
   },
   "footer": {
     "rights": "All rights reserved"

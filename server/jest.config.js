@@ -1,7 +1,12 @@
-/** @type {import("jest").Config} */
-module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  testMatch: ["**/*.test.ts"],
-  moduleFileExtensions: ["ts", "js"],
+export default {
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'node',
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1'
+  },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', { useESM: true }]
+  },
+  extensionsToTreatAsEsm: ['.ts'],
+  testMatch: ['**/*.test.ts']
 };
