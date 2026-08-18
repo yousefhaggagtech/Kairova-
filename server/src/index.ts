@@ -6,6 +6,7 @@ import express, { Request, Response } from "express";
 import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 
+import categoryRoutes from "./features/categories/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
 
@@ -26,6 +27,8 @@ app.use(cookieParser());
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
+
+app.use("/api/categories", categoryRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
