@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { env } from "./config/env.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -7,14 +7,15 @@ import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 
 import connectDB from "./config/db.js";
+import authRoutes from "./features/auth/routes.js";
 import categoryRoutes from "./features/categories/routes.js";
 import productRoutes from "./features/products/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
 
 const app = express();
-const port = Number(process.env.PORT) || 4000;
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+const port = env.port;
+const clientUrl = env.clientUrl;
 
 app.use(helmet());
 app.use(
@@ -32,6 +33,7 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);

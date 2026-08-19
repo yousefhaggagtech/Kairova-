@@ -2,3 +2,11 @@
 .env.local
 .env.*.local
 node_modules/
+
+# Local API request/cookie scratch files
+login.json
+admin-login.json
+register.json
+cookies.txt
+admin-cookies.txt
+*-cookies.txt

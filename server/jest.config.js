@@ -5,8 +5,32 @@ export default {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true }]
+    '^.+test[\\\\/]setup\\.ts$': [
+      'ts-jest',
+      {
+        useESM: false,
+        tsconfig: {
+          module: 'CommonJS'
+        },
+        diagnostics: {
+          ignoreCodes: [151002]
+        }
+      }
+    ],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        diagnostics: {
+          ignoreCodes: [151002]
+        }
+      }
+    ]
   },
   extensionsToTreatAsEsm: ['.ts'],
-  testMatch: ['**/*.test.ts']
+  testMatch: ['**/*.test.ts'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  globalSetup: '<rootDir>/test/globalSetup.ts',
+  globalTeardown: '<rootDir>/test/globalTeardown.ts',
+  maxWorkers: 2
 };

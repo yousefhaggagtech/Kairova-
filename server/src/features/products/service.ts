@@ -324,7 +324,7 @@ export const updateProduct = async (
     { _id: id, deletedAt: null },
     update,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   ).populate(productPopulate);
@@ -445,7 +445,7 @@ export const softDeleteProduct = async (id: string): Promise<IProduct> => {
     { _id: id, deletedAt: null },
     { deletedAt },
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

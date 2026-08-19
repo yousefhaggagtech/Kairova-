@@ -11,6 +11,7 @@ import {
   setPrimaryImageController,
   updateProductController,
 } from "./controller.js";
+import { protect, restrictTo } from "../auth/middleware.js";
 
 const router = Router();
 
@@ -18,19 +19,20 @@ router.get("/", listProductsController);
 router.get("/slug/:slug", getProductBySlugController);
 router.get("/:id", getProductController);
 
-// TODO: add auth middleware
-router.post("/", createProductController);
-// TODO: add auth middleware
-router.patch("/:id", updateProductController);
-// TODO: add auth middleware
-router.delete("/:id", deleteProductController);
-// TODO: add auth middleware
-router.post("/:id/images", addImageController);
-// TODO: add auth middleware
-router.delete("/:productId/images/:imageId", removeImageController);
-// TODO: add auth middleware
+router.post("/", protect, restrictTo("admin"), createProductController);
+router.patch("/:id", protect, restrictTo("admin"), updateProductController);
+router.delete("/:id", protect, restrictTo("admin"), deleteProductController);
+router.post("/:id/images", protect, restrictTo("admin"), addImageController);
+router.delete(
+  "/:productId/images/:imageId",
+  protect,
+  restrictTo("admin"),
+  removeImageController,
+);
 router.patch(
   "/:productId/images/:imageId/primary",
+  protect,
+  restrictTo("admin"),
   setPrimaryImageController,
 );
 

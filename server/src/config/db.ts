@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+import { env } from "./env.js";
 import AppError from "../utils/AppError.js";
 
 const getMongoHosts = (uri: string): string => {
@@ -22,12 +23,8 @@ const getMongoHosts = (uri: string): string => {
   return hosts ? "connected" : "unknown host";
 };
 
-export default async function connectDB() {
-  const uri = process.env.MONGODB_URI;
-
-  if (!uri) {
-    throw new AppError("MONGODB_URI is not set", 500);
-  }
+export async function connectDB() {
+  const uri = env.mongodbUri;
 
   try {
     await mongoose.connect(uri, {
@@ -44,3 +41,5 @@ export default async function connectDB() {
     throw new AppError(`MongoDB connection failed: ${message}`, 500);
   }
 }
+
+export default connectDB;

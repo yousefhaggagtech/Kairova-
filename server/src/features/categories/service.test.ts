@@ -133,7 +133,7 @@ describe("category service", () => {
         slug: "evening-dresses",
       },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );
@@ -172,7 +172,7 @@ describe("category service", () => {
       { _id: id, deletedAt: null },
       { deletedAt: expect.any(Date) },
       {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       },
     );

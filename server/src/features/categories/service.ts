@@ -132,7 +132,7 @@ export const updateCategory = async (
     { _id: id, deletedAt: null },
     update,
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );
@@ -149,7 +149,7 @@ export const softDeleteCategory = async (id: string): Promise<ICategory> => {
     { _id: id, deletedAt: null },
     { deletedAt: new Date() },
     {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     },
   );

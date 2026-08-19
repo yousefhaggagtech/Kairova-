@@ -1,7 +1,4 @@
-import { existsSync } from "node:fs";
-
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 import Category, { type ICategory } from "../../models/Category.js";
 import Product, { type IProduct } from "../../models/Product.js";
@@ -15,26 +12,6 @@ import {
   softDeleteProduct,
   updateStock,
 } from "./service.js";
-
-jest.setTimeout(300_000);
-
-let mongoServer: MongoMemoryServer | undefined;
-
-const localMongoBinary = "C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe";
-
-const getMongoMemoryServerOptions = () => {
-  const systemBinary = process.env.MONGOMS_SYSTEM_BINARY;
-
-  if (systemBinary) {
-    return { binary: { systemBinary } };
-  }
-
-  if (process.platform === "win32" && existsSync(localMongoBinary)) {
-    return { binary: { systemBinary: localMongoBinary } };
-  }
-
-  return {};
-};
 
 interface SeededCategories {
   menWatches: ICategory;
@@ -101,22 +78,6 @@ const createSeedProduct = async (
   );
 
 describe("product service", () => {
-  beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create(getMongoMemoryServerOptions());
-    await mongoose.connect(mongoServer.getUri());
-  });
-
-  afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer?.stop();
-  });
-
-  beforeEach(async () => {
-    await ProductImage.deleteMany({});
-    await Product.deleteMany({});
-    await Category.deleteMany({});
-  });
-
   it("createProduct validates category gender match", async () => {
     const categories = await seedCategories();
 
