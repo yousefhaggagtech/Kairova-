@@ -1,25 +1,39 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const cors_1 = __importDefault(require("cors"));
-const express_1 = __importDefault(require("express"));
-const helmet_1 = __importDefault(require("helmet"));
-const app = (0, express_1.default)();
+import "dotenv/config";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
+import { fileURLToPath } from "node:url";
+import connectDB from "./config/db.js";
+import categoryRoutes from "./features/categories/routes.js";
+import globalErrorHandler from "./middleware/globalErrorHandler.js";
+import notFoundHandler from "./middleware/notFoundHandler.js";
+const app = express();
 const port = Number(process.env.PORT) || 4000;
-app.use((0, helmet_1.default)());
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-app.use((0, cookie_parser_1.default)());
+const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+app.use(helmet());
+app.use(cors({
+    origin: clientUrl,
+    credentials: true,
+}));
+app.use(express.json());
+app.use(cookieParser());
 app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
 });
-if (require.main === module) {
-    app.listen(port, () => {
-        console.log(`Server listening on port ${port}`);
+app.use("/api/categories", categoryRoutes);
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    connectDB()
+        .then(() => {
+        app.listen(port, () => {
+            console.log(`Server listening on port ${port}`);
+        });
+    })
+        .catch((err) => {
+        console.error("Failed to start server:", err);
+        process.exit(1);
     });
 }
-exports.default = app;
+export default app;

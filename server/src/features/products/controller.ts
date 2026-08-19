@@ -1,0 +1,114 @@
+import type { Request, Response } from "express";
+
+import { catchError } from "../../utils/catchError.js";
+import {
+  addImage,
+  createProduct,
+  getProductById,
+  getProductBySlug,
+  listProducts,
+  removeImage,
+  setPrimaryImage,
+  softDeleteProduct,
+  updateProduct,
+} from "./service.js";
+
+export const createProductController = catchError(
+  async (req: Request, res: Response) => {
+    const product = await createProduct(req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: { product },
+    });
+  },
+);
+
+export const listProductsController = catchError(
+  async (req: Request, res: Response) => {
+    const products = await listProducts({
+      gender: req.query.gender as never,
+      categoryId: req.query.categoryId as string | undefined,
+      subcategoryId: req.query.subcategoryId as string | undefined,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: { products },
+    });
+  },
+);
+
+export const getProductController = catchError(
+  async (req: Request, res: Response) => {
+    const product = await getProductById(String(req.params.id));
+
+    res.status(200).json({
+      status: "success",
+      data: { product },
+    });
+  },
+);
+
+export const getProductBySlugController = catchError(
+  async (req: Request, res: Response) => {
+    const product = await getProductBySlug(String(req.params.slug));
+
+    res.status(200).json({
+      status: "success",
+      data: { product },
+    });
+  },
+);
+
+export const updateProductController = catchError(
+  async (req: Request, res: Response) => {
+    const product = await updateProduct(String(req.params.id), req.body);
+
+    res.status(200).json({
+      status: "success",
+      data: { product },
+    });
+  },
+);
+
+export const deleteProductController = catchError(
+  async (req: Request, res: Response) => {
+    await softDeleteProduct(String(req.params.id));
+
+    res.status(204).send();
+  },
+);
+
+export const addImageController = catchError(
+  async (req: Request, res: Response) => {
+    const image = await addImage(String(req.params.id), req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: { image },
+    });
+  },
+);
+
+export const removeImageController = catchError(
+  async (req: Request, res: Response) => {
+    await removeImage(String(req.params.imageId));
+
+    res.status(204).send();
+  },
+);
+
+export const setPrimaryImageController = catchError(
+  async (req: Request, res: Response) => {
+    const product = await setPrimaryImage(
+      String(req.params.productId),
+      String(req.params.imageId),
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: { product },
+    });
+  },
+);

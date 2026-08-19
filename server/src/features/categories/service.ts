@@ -6,6 +6,7 @@ import Category, {
 } from "../../models/Category.js";
 import type { LocalizedString } from "../../types/localized.js";
 import AppError from "../../utils/AppError.js";
+import { generateSlug } from "../_shared/slug.js";
 
 interface CategoryInput {
   name: LocalizedString;
@@ -22,12 +23,6 @@ type CategoryUpdates = Partial<{
   name: LocalizedString;
   parentCategory: string | null;
 }>;
-
-export const generateSlug = (name: string): string =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 
 const validateParentCategory = async (
   parentCategory: string | null | undefined,
