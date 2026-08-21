@@ -9,6 +9,10 @@ import { fileURLToPath } from "node:url";
 import connectDB from "./config/db.js";
 import authRoutes from "./features/auth/routes.js";
 import categoryRoutes from "./features/categories/routes.js";
+import {
+  adminRouter as adminOrdersRouter,
+  customerRouter as customerOrdersRouter,
+} from "./features/orders/routes.js";
 import productRoutes from "./features/products/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
@@ -34,6 +38,8 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/orders", customerOrdersRouter);
+app.use("/api/admin/orders", adminOrdersRouter);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);

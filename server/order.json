@@ -1,0 +1,10 @@
+﻿{
+  "items": [{"productId": "6a85bb73d5219f78a076dfff", "quantity": 1}],
+  "shippingAddress": {
+    "label": "Home",
+    "street": "123 Tahrir St",
+    "city": "Cairo",
+    "governorate": "Cairo",
+    "phone": "01012345678"
+  }
+}
