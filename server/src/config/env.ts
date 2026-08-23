@@ -117,6 +117,11 @@ const adminEmail = process.env.ADMIN_EMAIL || "admin@kairova.com";
 const adminPassword = process.env.ADMIN_PASSWORD || "Kairova@Admin2026";
 const adminName = process.env.ADMIN_NAME || "Kairova Admin";
 const adminPhone = process.env.ADMIN_PHONE || "01000000000";
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME || "";
+const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY || "";
+const cloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET || "";
+const cloudinaryUploadPreset =
+  process.env.CLOUDINARY_UPLOAD_PRESET || "kairova_products";
 
 if (
   jwtAccessSecret &&
@@ -146,4 +151,8 @@ export const env = {
   adminPassword,
   adminName,
   adminPhone,
+  cloudinaryCloudName,
+  cloudinaryApiKey,
+  cloudinaryApiSecret,
+  cloudinaryUploadPreset,
 } as const;

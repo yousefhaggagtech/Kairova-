@@ -11,6 +11,7 @@ import ProductImage, {
 import type { LocalizedString } from "../../types/localized.js";
 import AppError from "../../utils/AppError.js";
 import { generateSlug } from "../_shared/slug.js";
+import { deleteImage } from "../uploads/service.js";
 
 interface CreateProductInput {
   name: LocalizedString;
@@ -57,7 +58,7 @@ const productPopulate = [
   {
     path: "images",
     match: { deletedAt: null },
-    select: "url isPrimary order alt",
+    select: "url publicId isPrimary order alt",
     options: { sort: { order: 1, createdAt: 1 } },
   },
 ];
@@ -406,6 +407,7 @@ export const removeImage = async (
 
   image.deletedAt = new Date();
   await image.save();
+  await deleteImage(image.publicId);
 
   return image;
 };
@@ -454,10 +456,17 @@ export const softDeleteProduct = async (id: string): Promise<IProduct> => {
     throw new AppError("Product not found", 404);
   }
 
+  const productObjectId = toObjectId(id, "Invalid product id");
+  const images = await ProductImage.find({
+    product: productObjectId,
+    deletedAt: null,
+  }).select("publicId");
+
   await ProductImage.updateMany(
-    { product: toObjectId(id, "Invalid product id"), deletedAt: null },
+    { product: productObjectId, deletedAt: null },
     { deletedAt },
   );
+  await Promise.all(images.map((image) => deleteImage(image.publicId)));
 
   return product;
 };
