@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import "../globals.css";
 import Footer from "../../src/components/layout/Footer";
 import Navbar from "../../src/components/layout/Navbar";
+import QueryProvider from "../../src/application/providers/QueryProvider";
 import { locales } from "../../src/i18n/config";
 import { fraunces, inter, plexArabic } from "../../src/lib/fonts";
 
@@ -34,11 +35,13 @@ export default async function LocaleLayout({ children, params }: Props) {
     >
       <body className="min-h-screen">
         <NextIntlClientProvider locale={locale}>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <QueryProvider>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
