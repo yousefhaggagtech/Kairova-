@@ -16,6 +16,28 @@
     "featuredMen": "Coming Soon: Men's Collection",
     "featuredWomen": "Coming Soon: Women's Collection"
   },
+  "catalog": {
+    "men": "Men",
+    "women": "Women",
+    "watches": "Watches",
+    "belts": "Belts",
+    "wallets": "Wallets",
+    "accessories": "Accessories",
+    "perfume": "Perfume",
+    "shopNow": "Shop Now",
+    "viewAll": "View All",
+    "noProducts": "No products in this category",
+    "addedToCart": "Added to cart",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "price": "Price",
+    "egp": "EGP",
+    "loading": "Loading...",
+    "categoryNotFound": "Category not found",
+    "menCollection": "Men's Collection",
+    "womenCollection": "Women's Collection",
+    "noImage": "No image"
+  },
   "footer": {
     "rights": "All rights reserved"
   }
