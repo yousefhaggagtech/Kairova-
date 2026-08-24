@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 
+import CartLink from "./CartLink";
 import LocaleSwitcher from "./LocaleSwitcher";
 import Logo from "./Logo";
 
@@ -40,12 +41,7 @@ export default async function Navbar() {
 
         <div className="flex flex-1 items-center justify-end gap-3">
           <LocaleSwitcher />
-          <span
-            className="inline-flex h-10 min-w-10 items-center justify-center border border-border-light ps-3 pe-3 text-caption font-medium"
-            aria-label="Cart"
-          >
-            0
-          </span>
+          <CartLink />
         </div>
       </div>
     </header>
