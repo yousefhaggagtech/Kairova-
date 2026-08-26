@@ -40,6 +40,9 @@ export default function AdminLayout({ children }: Props) {
             <Link href="/admin/orders" className="underline">
               {t("orders")}
             </Link>
+            <Link href="/admin/products" className="underline">
+              {t("products")}
+            </Link>
           </nav>
         </div>
       </header>

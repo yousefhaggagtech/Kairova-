@@ -8,6 +8,10 @@ import { useProducts } from "@/application/hooks/useProducts";
 import CategoryCard from "./CategoryCard";
 import ProductGrid from "./ProductGrid";
 
+function isParentCategory(category: { parentCategory?: unknown }) {
+  return !category.parentCategory;
+}
+
 function LoadingState() {
   const t = useTranslations("catalog");
   return <p className="py-8 text-body text-fg-muted">{t("loading")}</p>;
@@ -31,7 +35,7 @@ export default function CatalogHome() {
           <LoadingState />
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {menCategories?.map((category) => (
+            {menCategories?.filter(isParentCategory).map((category) => (
               <CategoryCard key={category._id} category={category} />
             ))}
           </div>
@@ -44,7 +48,7 @@ export default function CatalogHome() {
           <LoadingState />
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {womenCategories?.map((category) => (
+            {womenCategories?.filter(isParentCategory).map((category) => (
               <CategoryCard key={category._id} category={category} />
             ))}
           </div>

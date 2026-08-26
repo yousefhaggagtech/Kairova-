@@ -9,6 +9,18 @@ import ProductGrid from "@/components/catalog/ProductGrid";
 
 type SupportedLocale = "ar" | "en";
 
+function getParentCategoryId(
+  parentCategory: string | { _id: string } | null,
+) {
+  if (!parentCategory) {
+    return "";
+  }
+
+  return typeof parentCategory === "string"
+    ? parentCategory
+    : parentCategory._id;
+}
+
 export default function CategoryPage() {
   const params = useParams();
   const slugParam = params.slug;
@@ -21,9 +33,13 @@ export default function CategoryPage() {
     isError: categoryError,
     isLoading: categoryLoading,
   } = useCategory(slug);
-  const { data: products, isLoading: productsLoading } = useProducts({
-    categoryId: category?._id,
-  });
+  const productFilters = category
+    ? getParentCategoryId(category.parentCategory)
+      ? { subcategoryId: category._id }
+      : { categoryId: category._id }
+    : undefined;
+  const { data: products, isLoading: productsLoading } =
+    useProducts(productFilters);
 
   if (categoryLoading || (category && productsLoading)) {
     return (

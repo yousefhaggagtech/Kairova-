@@ -16,7 +16,7 @@ export interface Category {
   name: LocalizedString;
   slug: string;
   gender: "men" | "women";
-  parentCategory: string | null;
+  parentCategory: Category | string | null;
   deletedAt: string | null;
   createdAt?: string;
   updatedAt?: string;

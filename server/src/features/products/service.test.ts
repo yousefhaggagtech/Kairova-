@@ -15,9 +15,11 @@ import {
 
 interface SeededCategories {
   menWatches: ICategory;
+  menClassicWatches: ICategory;
   menAccessories: ICategory;
   menBracelets: ICategory;
   womenWatches: ICategory;
+  womenClassicWatches: ICategory;
 }
 
 const productInput = (
@@ -27,6 +29,7 @@ const productInput = (
   description: { ar: "Arabic description", en: "English description" },
   gender: "men",
   categoryId: new mongoose.Types.ObjectId().toString(),
+  subcategoryId: new mongoose.Types.ObjectId().toString(),
   price: 1200,
   stockQuantity: 10,
   ...overrides,
@@ -39,6 +42,12 @@ const seedCategories = async (): Promise<SeededCategories> => {
     gender: "men",
     parentCategory: null,
   });
+  const menClassicWatches = await Category.create({
+    name: { ar: "Men Classic Watches AR", en: "Men Classic Watches" },
+    slug: "men-classic-watches",
+    gender: "men",
+    parentCategory: menWatches._id.toString(),
+  } as unknown as ICategory);
   const menAccessories = await Category.create({
     name: { ar: "Men Accessories AR", en: "Men Accessories" },
     slug: "men-accessories",
@@ -57,12 +66,20 @@ const seedCategories = async (): Promise<SeededCategories> => {
     gender: "women",
     parentCategory: null,
   });
+  const womenClassicWatches = await Category.create({
+    name: { ar: "Women Classic Watches AR", en: "Women Classic Watches" },
+    slug: "women-classic-watches",
+    gender: "women",
+    parentCategory: womenWatches._id.toString(),
+  } as unknown as ICategory);
 
   return {
     menWatches,
+    menClassicWatches,
     menAccessories,
     menBracelets,
     womenWatches,
+    womenClassicWatches,
   };
 };
 
@@ -73,6 +90,7 @@ const createSeedProduct = async (
   createProduct(
     productInput({
       categoryId: categories.menWatches._id.toString(),
+      subcategoryId: categories.menClassicWatches._id.toString(),
       ...overrides,
     }),
   );
@@ -91,6 +109,22 @@ describe("product service", () => {
     ).rejects.toMatchObject({
       statusCode: 400,
       message: "Category gender must match product gender",
+    });
+  });
+
+  it("createProduct requires a subcategory", async () => {
+    const categories = await seedCategories();
+
+    await expect(
+      createProduct(
+        productInput({
+          categoryId: categories.menWatches._id.toString(),
+          subcategoryId: "",
+        }),
+      ),
+    ).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Subcategory is required",
     });
   });
 
@@ -140,6 +174,7 @@ describe("product service", () => {
         name: { ar: "Women Watch AR", en: "Women Watch" },
         gender: "women",
         categoryId: categories.womenWatches._id.toString(),
+        subcategoryId: categories.womenClassicWatches._id.toString(),
       }),
     );
 

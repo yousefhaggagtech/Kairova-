@@ -79,7 +79,7 @@ const productSchema = new Schema<
     subcategory: {
       type: Schema.Types.ObjectId,
       ref: Category.modelName,
-      default: null,
+      required: true,
     },
     price: {
       type: Number,

@@ -14,6 +14,7 @@ import {
 import { protect, restrictTo } from "../auth/middleware.js";
 
 const router = Router();
+export const adminRouter = Router();
 
 router.get("/", listProductsController);
 router.get("/slug/:slug", getProductBySlugController);
@@ -35,5 +36,11 @@ router.patch(
   restrictTo("admin"),
   setPrimaryImageController,
 );
+
+adminRouter.use(protect);
+adminRouter.use(restrictTo("admin"));
+adminRouter.post("/", createProductController);
+adminRouter.patch("/:id", updateProductController);
+adminRouter.delete("/:id", deleteProductController);
 
 export default router;

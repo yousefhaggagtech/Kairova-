@@ -13,7 +13,9 @@ import {
   adminRouter as adminOrdersRouter,
   customerRouter as customerOrdersRouter,
 } from "./features/orders/routes.js";
-import productRoutes from "./features/products/routes.js";
+import productRoutes, {
+  adminRouter as adminProductsRouter,
+} from "./features/products/routes.js";
 import uploadRoutes from "./features/uploads/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
@@ -41,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", customerOrdersRouter);
 app.use("/api/admin/orders", adminOrdersRouter);
+app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/uploads", uploadRoutes);
 
 app.use(notFoundHandler);

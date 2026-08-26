@@ -18,7 +18,7 @@ interface CreateProductInput {
   description: LocalizedString;
   gender: ProductGender;
   categoryId: string;
-  subcategoryId?: string | null;
+  subcategoryId: string;
   price: number;
   stockQuantity: number;
   lowStockThreshold?: number;
@@ -109,7 +109,7 @@ const validateSubcategory = async (
   categoryId: string,
 ): Promise<Types.ObjectId | null> => {
   if (!subcategoryId) {
-    return null;
+    throw new AppError("Subcategory is required", 400);
   }
 
   const subcategoryObjectId = toObjectId(
@@ -234,10 +234,7 @@ export const listProducts = async (
       : null;
   }
 
-  return Product.find(query)
-    .active()
-    .populate({ path: "category", select: categorySelect })
-    .populate({ path: "subcategory", select: categorySelect });
+  return Product.find(query).active().populate(productPopulate);
 };
 
 export const getProductById = async (id: string): Promise<IProduct> => {

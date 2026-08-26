@@ -5,6 +5,7 @@ import { productsApi } from "@/infrastructure/api/productsApi";
 type ProductFilters = {
   gender?: string;
   categoryId?: string;
+  subcategoryId?: string;
 };
 
 export function useProducts(filters?: ProductFilters) {
