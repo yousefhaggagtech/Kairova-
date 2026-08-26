@@ -30,7 +30,7 @@ interface OrderListFilters {
 }
 
 const orderPopulate = [
-  { path: "customer", select: "name email" },
+  { path: "customer", select: "name email phone" },
   { path: "items.product", select: "name slug images" },
 ];
 
@@ -264,6 +264,11 @@ export const shipOrder = async (
   const order = await getOrderDocumentById(orderId);
 
   assertTransition(order.status, "CONFIRMED_SHIPPED");
+
+  if (order.shippingStatus === "manual_required") {
+    throw new AppError("Shipping requires manual follow-up before retrying", 400);
+  }
+
   order.status = "CONFIRMED_SHIPPED";
   order.waybillNumber = waybillNumber;
   order.shippingStatus = "shipped";
@@ -281,13 +286,7 @@ export const cancelOrder = async (
 
   const order = await getOrderDocumentById(orderId);
 
-  if (order.status === "CONFIRMED_SHIPPED") {
-    throw new AppError("Cannot cancel shipped order", 400);
-  }
-
-  if (order.status === "CANCELLED") {
-    throw new AppError("Order already cancelled", 400);
-  }
+  assertTransition(order.status, "CANCELLED");
 
   const previousStatus = order.status;
 

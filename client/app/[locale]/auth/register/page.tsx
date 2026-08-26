@@ -18,31 +18,17 @@ function getErrorMessage(error: unknown, fallback: string) {
   return axiosError.response?.data?.message || fallback;
 }
 
-function getRedirectPath(redirect: string | null, locale: string) {
-  if (!redirect || !redirect.startsWith("/") || redirect.startsWith("//")) {
-    return `/${locale}`;
-  }
-
-  return redirect;
-}
-
-function getCurrentRedirect() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return new URL(window.location.href).searchParams.get("redirect");
-}
-
-export default function LoginPage() {
+export default function RegisterPage() {
   const locale = useLocale();
   const t = useTranslations("auth");
   const router = useRouter();
 
-  const login = useAuthStore((state) => state.login);
+  const registerUser = useAuthStore((state) => state.register);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -50,24 +36,33 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const user = await login(email, password);
-
-      if (user.role === "admin") {
-        router.push(`/${locale}/admin/orders`);
-        return;
-      }
-
-      router.push(getRedirectPath(getCurrentRedirect(), locale));
-    } catch (loginError) {
-      setError(getErrorMessage(loginError, t("loginFailed")));
+      await registerUser(name, email, password, phone);
+      router.push(`/${locale}`);
+    } catch (registerError) {
+      setError(getErrorMessage(registerError, t("registerFailed")));
     }
   };
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-12">
-      <h1 className="mb-8 text-h1 leading-heading">{t("login")}</h1>
+      <h1 className="mb-8 text-h1 leading-heading">{t("register")}</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="mb-2 block" htmlFor="name">
+            {t("name")}
+          </label>
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+            minLength={2}
+            maxLength={50}
+            className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
+          />
+        </div>
         <div>
           <label className="mb-2 block" htmlFor="email">
             {t("email")}
@@ -82,6 +77,20 @@ export default function LoginPage() {
           />
         </div>
         <div>
+          <label className="mb-2 block" htmlFor="phone">
+            {t("phone")}
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            required
+            pattern="^\+?[0-9]{10,15}$"
+            className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
+          />
+        </div>
+        <div>
           <label className="mb-2 block" htmlFor="password">
             {t("password")}
           </label>
@@ -91,6 +100,7 @@ export default function LoginPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
+            minLength={8}
             className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
           />
         </div>
@@ -102,14 +112,14 @@ export default function LoginPage() {
           disabled={isLoading}
           className="w-full bg-fg-secondary py-4 text-bg-secondary disabled:opacity-50 dark:bg-fg-primary dark:text-bg-primary"
         >
-          {isLoading ? t("loading") : t("loginButton")}
+          {isLoading ? t("loading") : t("registerButton")}
         </button>
       </form>
 
       <p className="mt-6 text-center text-body">
-        {t("noAccount")}{" "}
-        <Link href="/auth/register" className="underline">
-          {t("register")}
+        {t("alreadyAccount")}{" "}
+        <Link href="/auth/login" className="underline">
+          {t("login")}
         </Link>
       </p>
     </div>

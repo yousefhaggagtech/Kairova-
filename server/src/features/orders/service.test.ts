@@ -374,6 +374,20 @@ describe("order service", () => {
         statusCode: 400,
       });
     });
+
+    it("throws if shipping requires manual follow-up", async () => {
+      const order = await createFullyPaidOrder(seed);
+
+      order.shippingStatus = "manual_required";
+      await order.save();
+
+      await expect(
+        shipOrder(idOf(order), idOf(seed.admin), "WB-123"),
+      ).rejects.toMatchObject({
+        statusCode: 400,
+        message: "Shipping requires manual follow-up before retrying",
+      });
+    });
   });
 
   describe("cancelOrder", () => {
@@ -445,7 +459,7 @@ describe("order service", () => {
         cancelOrder(idOf(shippedOrder), idOf(seed.admin), "Too late"),
       ).rejects.toMatchObject({
         statusCode: 400,
-        message: "Cannot cancel shipped order",
+        message: "Cannot transition order from CONFIRMED_SHIPPED to CANCELLED",
       });
     });
 
@@ -461,7 +475,7 @@ describe("order service", () => {
         cancelOrder(idOf(cancelledOrder), idOf(seed.admin), "Again"),
       ).rejects.toMatchObject({
         statusCode: 400,
-        message: "Order already cancelled",
+        message: "Cannot transition order from CANCELLED to CANCELLED",
       });
     });
   });

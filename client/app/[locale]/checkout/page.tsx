@@ -69,7 +69,11 @@ export default function CheckoutPage() {
         }
       } catch {
         if (!cancelled) {
-          router.replace(`/${locale}/auth/login`);
+          router.replace(
+            `/${locale}/auth/login?redirect=${encodeURIComponent(
+              `/${locale}/checkout`,
+            )}`,
+          );
         }
       }
     }
