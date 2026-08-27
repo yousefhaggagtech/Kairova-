@@ -10,7 +10,11 @@
   "nav": {
     "men": "Men",
     "women": "Women",
-    "about": "About"
+    "about": "About",
+    "login": "Login",
+    "account": "My Orders",
+    "adminDashboard": "Admin Dashboard",
+    "logout": "Logout"
   },
   "home": {
     "featuredMen": "Coming Soon: Men's Collection",
@@ -68,9 +72,14 @@
     "orderNumber": "Order Number",
     "orderNotFound": "Order not found",
     "paymentInstructions": "Payment Instructions",
+    "paymentMethod": "Payment Method",
+    "vodafoneCash": "Vodafone Cash",
+    "instapay": "InstaPay",
     "depositAmount": "Deposit Amount",
     "transferTo": "Transfer to",
-    "afterTransfer": "After transferring, click the button below to contact us via WhatsApp",
+    "paymentNumberMissing": "Payment number is not configured yet",
+    "transferAfterOrder": "After placing the order, transfer the deposit amount to this number. You can upload the screenshot from the order page after the transfer.",
+    "afterTransfer": "After transferring, upload a screenshot here or contact us via WhatsApp.",
     "contactWhatsApp": "Contact via WhatsApp"
   },
   "auth": {
@@ -80,6 +89,10 @@
     "email": "Email",
     "phone": "Phone",
     "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "loginButton": "Login",
     "registerButton": "Create Account",
     "loginFailed": "Login failed",
@@ -95,8 +108,8 @@
     "settings": "Settings",
     "businessConfig": "Business Configuration",
     "depositPercentage": "Deposit Percentage (%)",
-    "walletNumber": "Wallet Number (Vodafone Cash)",
-    "vodafoneNumber": "Vodafone Cash Number (if different)",
+    "instapayNumber": "InstaPay Number",
+    "vodafoneCashNumber": "Vodafone Cash Number",
     "whatsappNumber": "WhatsApp Business Number",
     "saveSettings": "Save Settings",
     "settingsUpdated": "Settings updated successfully",
@@ -170,7 +183,13 @@
     "subtotal": "Subtotal",
     "deposit": "Deposit",
     "remaining": "Remaining",
+    "paymentMethod": "Payment Method",
+    "paymentProofs": "Payment Proofs",
+    "paymentProof": "Payment proof",
+    "noPaymentProofs": "No payment proofs uploaded yet.",
     "customerDetails": "Customer Details",
+    "customerWhatsApp": "Customer WhatsApp",
+    "contactCustomerWhatsApp": "Message customer on WhatsApp",
     "address": "Address",
     "waybill": "Waybill",
     "notSet": "Not set",
@@ -196,6 +215,24 @@
       "CONFIRMED_SHIPPED": "Confirmed Shipped",
       "CANCELLED": "Cancelled"
     }
+  },
+  "account": {
+    "myOrders": "My Orders",
+    "orderDetails": "Order Details",
+    "backToOrders": "Back to orders",
+    "loadOrdersFailed": "Failed to load orders",
+    "noOrders": "You have no orders yet.",
+    "paymentMethod": "Payment Method",
+    "remaining": "Remaining",
+    "items": "Items",
+    "paymentProofs": "Payment Proofs",
+    "paymentProof": "Payment proof",
+    "noPaymentProofs": "No payment proofs uploaded yet.",
+    "depositProof": "Deposit proof",
+    "remainingBalanceProof": "Remaining balance proof",
+    "uploadingProof": "Uploading proof...",
+    "uploadFailed": "Failed to upload payment proof",
+    "summary": "Summary"
   },
   "footer": {
     "rights": "All rights reserved"

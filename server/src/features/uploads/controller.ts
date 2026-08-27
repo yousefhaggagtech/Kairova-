@@ -13,3 +13,14 @@ export const getUploadSignatureController = catchError(
     });
   },
 );
+
+export const getPaymentProofUploadSignatureController = catchError(
+  async (_req: Request, res: Response) => {
+    const signatureData = generateUploadSignature("kairova/payment-proofs");
+
+    res.status(200).json({
+      status: "success",
+      data: signatureData,
+    });
+  },
+);

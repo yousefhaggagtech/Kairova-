@@ -2,7 +2,7 @@ import Settings, { type ISettings } from "../../models/Settings.js";
 
 export interface BusinessSettings {
   depositPercentage: number;
-  walletNumber: string;
+  instapayNumber: string;
   vodafoneCashNumber: string;
   whatsappNumber: string;
 }
@@ -16,7 +16,7 @@ export async function getSettings(): Promise<ISettings> {
 export function serializeBusinessSettings(settings: ISettings): BusinessSettings {
   return {
     depositPercentage: settings.depositPercentage,
-    walletNumber: settings.walletNumber,
+    instapayNumber: settings.instapayNumber,
     vodafoneCashNumber: settings.vodafoneCashNumber,
     whatsappNumber: settings.whatsappNumber,
   };
@@ -31,8 +31,8 @@ export async function updateSettings(
     settings.depositPercentage = updates.depositPercentage;
   }
 
-  if (updates.walletNumber !== undefined) {
-    settings.walletNumber = updates.walletNumber;
+  if (updates.instapayNumber !== undefined) {
+    settings.instapayNumber = updates.instapayNumber;
   }
 
   if (updates.vodafoneCashNumber !== undefined) {

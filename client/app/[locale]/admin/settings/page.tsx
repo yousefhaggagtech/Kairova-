@@ -16,14 +16,14 @@ type ErrorResponse = {
 
 type SettingsForm = {
   depositPercentage: string;
-  walletNumber: string;
+  instapayNumber: string;
   vodafoneCashNumber: string;
   whatsappNumber: string;
 };
 
 const emptyForm: SettingsForm = {
   depositPercentage: "50",
-  walletNumber: "",
+  instapayNumber: "",
   vodafoneCashNumber: "",
   whatsappNumber: "",
 };
@@ -37,7 +37,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 function settingsToForm(settings: AdminSettings): SettingsForm {
   return {
     depositPercentage: String(settings.depositPercentage),
-    walletNumber: settings.walletNumber,
+    instapayNumber: settings.instapayNumber,
     vodafoneCashNumber: settings.vodafoneCashNumber,
     whatsappNumber: settings.whatsappNumber,
   };
@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
     try {
       const updatedSettings = await updateSettings.mutateAsync({
         depositPercentage: Number(form.depositPercentage),
-        walletNumber: form.walletNumber,
+        instapayNumber: form.instapayNumber,
         vodafoneCashNumber: form.vodafoneCashNumber,
         whatsappNumber: form.whatsappNumber,
       });
@@ -124,15 +124,18 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-caption" htmlFor="wallet-number">
-                {t("walletNumber")}
+              <label
+                className="mb-2 block text-caption"
+                htmlFor="instapay-number"
+              >
+                {t("instapayNumber")}
               </label>
               <input
-                id="wallet-number"
+                id="instapay-number"
                 type="text"
-                value={form.walletNumber}
+                value={form.instapayNumber}
                 onChange={(event) =>
-                  updateField("walletNumber", event.target.value)
+                  updateField("instapayNumber", event.target.value)
                 }
                 className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
                 placeholder="01000000000"
@@ -144,7 +147,7 @@ export default function AdminSettingsPage() {
                 className="mb-2 block text-caption"
                 htmlFor="vodafone-cash-number"
               >
-                {t("vodafoneNumber")}
+                {t("vodafoneCashNumber")}
               </label>
               <input
                 id="vodafone-cash-number"

@@ -1,6 +1,7 @@
 "use client";
 
 import type { AxiosError } from "axios";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import type { FormEvent } from "react";
@@ -14,7 +15,6 @@ import {
   useMarkPacked,
   useShipOrder,
 } from "@/application/hooks/useAdminOrders";
-import { usePublicSettings } from "@/application/hooks/useSettings";
 import type {
   Order,
   OrderItem,
@@ -46,7 +46,7 @@ function getCustomerName(order: Order) {
 }
 
 function getCustomerPhone(order: Order) {
-  return getCustomer(order)?.phone ?? order.shippingAddress.phone;
+  return order.customerPhone || getCustomer(order)?.phone || order.shippingAddress.phone;
 }
 
 function getProductKey(item: OrderItem, index: number) {
@@ -77,6 +77,14 @@ function canCancel(status: OrderStatus) {
   return status !== "CONFIRMED_SHIPPED" && status !== "CANCELLED";
 }
 
+function getWhatsAppPhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
+function getProofKey(url: string, uploadedAt: string, index: number) {
+  return `${url}-${uploadedAt}-${index}`;
+}
+
 export default function AdminOrderDetailPage() {
   const params = useParams();
   const orderId = getId(params.id);
@@ -85,7 +93,6 @@ export default function AdminOrderDetailPage() {
   const tCatalog = useTranslations("catalog");
   const tCheckout = useTranslations("checkout");
   const { data: order, isError, isLoading } = useAdminOrder(orderId);
-  const { data: settings } = usePublicSettings();
   const confirmDeposit = useConfirmDeposit();
   const markPacked = useMarkPacked();
   const confirmPayment = useConfirmPayment();
@@ -159,11 +166,13 @@ export default function AdminOrderDetailPage() {
   const shippingRequiresManualCheck =
     order.status === "FULLY_PAID" &&
     order.shippingStatus === "manual_required";
-  const storeWhatsApp = settings?.whatsappNumber || "";
+  const customerPhone = getCustomerPhone(order);
+  const customerWhatsAppPhone = getWhatsAppPhone(customerPhone);
   const whatsappMessage = encodeURIComponent(
     `Hi, I'm contacting you about Order ${order.orderNumber}.`,
   );
-  const whatsappUrl = `https://wa.me/${storeWhatsApp}?text=${whatsappMessage}`;
+  const whatsappUrl = `https://wa.me/${customerWhatsAppPhone}?text=${whatsappMessage}`;
+  const paymentProofs = order.paymentProofs ?? [];
 
   return (
     <section>
@@ -379,12 +388,12 @@ export default function AdminOrderDetailPage() {
               </div>
               <div>
                 <dt className="text-caption text-fg-muted">{t("phone")}</dt>
-                <dd>{getCustomerPhone(order)}</dd>
+                <dd>{customerPhone}</dd>
               </div>
-              {storeWhatsApp && (
+              {customerWhatsAppPhone && (
                 <div>
                   <dt className="text-caption text-fg-muted">
-                    {t("whatsappNumber")}
+                    {t("customerWhatsApp")}
                   </dt>
                   <dd>
                     <a
@@ -393,7 +402,7 @@ export default function AdminOrderDetailPage() {
                       rel="noopener noreferrer"
                       className="underline"
                     >
-                      {tCheckout("contactWhatsApp")}
+                      {t("contactCustomerWhatsApp")}
                     </a>
                   </dd>
                 </div>
@@ -412,6 +421,14 @@ export default function AdminOrderDetailPage() {
           <section className="border border-border-light p-5 dark:border-border-subtle">
             <h3 className="mb-4 text-h3 leading-heading">{t("payments")}</h3>
             <dl className="space-y-3 text-body">
+              <div className="flex justify-between gap-4">
+                <dt>{t("paymentMethod")}</dt>
+                <dd>
+                  {order.paymentMethod === "instapay"
+                    ? tCheckout("instapay")
+                    : tCheckout("vodafoneCash")}
+                </dd>
+              </div>
               <div className="flex justify-between gap-4">
                 <dt>{t("subtotal")}</dt>
                 <dd>
@@ -435,6 +452,42 @@ export default function AdminOrderDetailPage() {
                 </dd>
               </div>
             </dl>
+          </section>
+
+          <section className="border border-border-light p-5 dark:border-border-subtle">
+            <h3 className="mb-4 text-h3 leading-heading">
+              {t("paymentProofs")}
+            </h3>
+            {paymentProofs.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {paymentProofs.map((proof, index) => (
+                  <a
+                    key={getProofKey(proof.url, proof.uploadedAt, index)}
+                    href={proof.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block border border-border-light p-2 transition-colors hover:bg-surface-light dark:border-border-subtle dark:hover:bg-surface-dark"
+                  >
+                    <div className="relative mb-2 h-28 w-full overflow-hidden bg-surface-light dark:bg-surface-dark">
+                      <Image
+                        src={proof.url}
+                        alt={proof.label || t("paymentProof")}
+                        fill
+                        unoptimized
+                        sizes="(min-width: 1024px) 300px, 50vw"
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="text-body">{proof.label || t("paymentProof")}</p>
+                    <p className="text-caption text-fg-muted">
+                      {new Date(proof.uploadedAt).toLocaleString(locale)}
+                    </p>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-body text-fg-muted">{t("noPaymentProofs")}</p>
+            )}
           </section>
         </aside>
       </div>

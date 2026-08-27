@@ -7,6 +7,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { useAuthStore } from "@/application/store/authStore";
+import PasswordInput from "@/components/form/PasswordInput";
 import { Link } from "@/src/i18n/navigation";
 
 type ErrorResponse = {
@@ -28,12 +29,18 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError(t("passwordMismatch"));
+      return;
+    }
 
     try {
       await registerUser(name, email, password, phone);
@@ -90,20 +97,26 @@ export default function RegisterPage() {
             className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
           />
         </div>
-        <div>
-          <label className="mb-2 block" htmlFor="password">
-            {t("password")}
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            minLength={8}
-            className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
-          />
-        </div>
+        <PasswordInput
+          id="password"
+          label={t("password")}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+          minLength={8}
+          revealLabel={t("showPassword")}
+          hideLabel={t("hidePassword")}
+        />
+        <PasswordInput
+          id="confirm-password"
+          label={t("confirmPassword")}
+          value={confirmPassword}
+          onChange={(event) => setConfirmPassword(event.target.value)}
+          required
+          minLength={8}
+          revealLabel={t("showPassword")}
+          hideLabel={t("hidePassword")}
+        />
 
         {error && <p className="text-body text-red-600">{error}</p>}
 

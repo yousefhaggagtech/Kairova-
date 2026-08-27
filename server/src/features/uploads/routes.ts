@@ -1,13 +1,24 @@
 import { Router } from "express";
 
 import { protect, restrictTo } from "../auth/middleware.js";
-import { getUploadSignatureController } from "./controller.js";
+import {
+  getPaymentProofUploadSignatureController,
+  getUploadSignatureController,
+} from "./controller.js";
 
-const router = Router();
+const adminRouter = Router();
 
-router.use(protect);
-router.use(restrictTo("admin"));
+adminRouter.use(protect);
+adminRouter.use(restrictTo("admin"));
 
-router.get("/sign", getUploadSignatureController);
+adminRouter.get("/sign", getUploadSignatureController);
 
-export default router;
+export const paymentProofRouter = Router();
+
+paymentProofRouter.use(protect);
+paymentProofRouter.get(
+  "/payment-proofs/sign",
+  getPaymentProofUploadSignatureController,
+);
+
+export default adminRouter;

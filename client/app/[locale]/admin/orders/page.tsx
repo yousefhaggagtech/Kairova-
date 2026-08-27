@@ -27,7 +27,7 @@ function getCustomerName(order: Order) {
 }
 
 function getCustomerPhone(order: Order) {
-  return getCustomer(order)?.phone ?? order.shippingAddress.phone;
+  return order.customerPhone || getCustomer(order)?.phone || order.shippingAddress.phone;
 }
 
 function getCustomerEmail(order: Order) {

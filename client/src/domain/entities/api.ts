@@ -80,10 +80,21 @@ export type ShippingStatus = "pending" | "shipped" | "manual_required" | null;
 
 export type RefundStatus = "not_required" | "pending" | "completed";
 
+export type PaymentMethod = "vodafone_cash" | "instapay";
+
+export interface PaymentProof {
+  url: string;
+  uploadedAt: string;
+  label?: string;
+}
+
 export interface Order {
   _id: string;
   orderNumber: string;
   customer: User | string;
+  paymentMethod?: PaymentMethod;
+  customerPhone?: string;
+  paymentProofs?: PaymentProof[];
   items: OrderItem[];
   subtotal: number;
   depositPercentage: number;

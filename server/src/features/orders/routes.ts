@@ -3,6 +3,7 @@ import { Router } from "express";
 import { validate } from "../../middleware/validate.js";
 import { protect, restrictTo } from "../auth/middleware.js";
 import {
+  addPaymentProofController,
   cancelOrderController,
   confirmDepositController,
   confirmPaymentController,
@@ -15,6 +16,7 @@ import {
   shipOrderController,
 } from "./controller.js";
 import {
+  addPaymentProofSchema,
   cancelOrderSchema,
   createOrderSchema,
   orderFiltersSchema,
@@ -26,6 +28,11 @@ export const customerRouter = Router();
 customerRouter.use(protect);
 customerRouter.post("/", validate(createOrderSchema), createOrderController);
 customerRouter.get("/me", getMyOrdersController);
+customerRouter.post(
+  "/:id/payment-proofs",
+  validate(addPaymentProofSchema),
+  addPaymentProofController,
+);
 customerRouter.get("/:id", getMyOrderByIdController);
 
 export const adminRouter = Router();

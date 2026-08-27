@@ -8,9 +8,9 @@ function getId(idParam: string | string[] | undefined) {
   return Array.isArray(idParam) ? idParam[0] : idParam || "";
 }
 
-export default function ConfirmationPage() {
+export default function CustomerOrderDetailPage() {
   const params = useParams();
   const orderId = getId(params.id);
 
-  return <CustomerOrderDetail orderId={orderId} showBackLink={false} />;
+  return <CustomerOrderDetail orderId={orderId} />;
 }

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const paymentMethodSchema = z.enum(["vodafone_cash", "instapay"]);
+
 export const addressSchema = z.object({
   label: z.string().min(1, "Label is required").max(30),
   street: z.string().min(1, "Street is required").max(200),
@@ -18,6 +20,13 @@ export const createOrderSchema = z.object({
     )
     .min(1, "At least one item is required"),
   shippingAddress: addressSchema,
+  paymentMethod: paymentMethodSchema,
+  customerPhone: z.string().regex(/^\+?[0-9]{10,15}$/, "Invalid phone format"),
+});
+
+export const addPaymentProofSchema = z.object({
+  url: z.string().trim().url("Invalid proof URL"),
+  label: z.string().trim().min(1).max(60).optional(),
 });
 
 export const cancelOrderSchema = z.object({
@@ -46,6 +55,7 @@ export const orderFiltersSchema = z.object({
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+export type AddPaymentProofInput = z.infer<typeof addPaymentProofSchema>;
 export type CancelOrderInput = z.infer<typeof cancelOrderSchema>;
 export type ShipOrderInput = z.infer<typeof shipOrderSchema>;
 export type OrderFiltersInput = z.infer<typeof orderFiltersSchema>;

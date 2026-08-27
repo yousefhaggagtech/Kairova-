@@ -4,7 +4,7 @@ import apiClient from "../http/apiClient";
 
 export interface PublicSettings {
   whatsappNumber: string;
-  walletNumber: string;
+  instapayNumber: string;
   vodafoneCashNumber: string;
   depositPercentage: number;
 }

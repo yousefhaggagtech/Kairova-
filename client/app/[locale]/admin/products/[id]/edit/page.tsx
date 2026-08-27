@@ -26,5 +26,5 @@ export default function EditProductPage() {
     );
   }
 
-  return <ProductForm mode="edit" product={product} />;
+  return <ProductForm key={product._id} mode="edit" product={product} />;
 }

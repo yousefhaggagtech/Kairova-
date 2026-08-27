@@ -18,6 +18,9 @@ const validOrderInput = (overrides: Record<string, unknown> = {}) => ({
   depositPercentage: 50,
   depositAmount: 500,
   remainingAmount: 500,
+  paymentMethod: "vodafone_cash" as const,
+  customerPhone: "+201001234567",
+  paymentProofs: [],
   shippingAddress: {
     label: "Home",
     street: "12 Nile Street",
@@ -72,6 +75,14 @@ describe("Order model", () => {
     expect(order.refundStatus).toBe("not_required");
   });
 
+  it("defaults paymentProofs to an empty array", async () => {
+    const order = await Order.create(
+      validOrderInput({ paymentProofs: undefined }),
+    );
+
+    expect(order.paymentProofs).toEqual([]);
+  });
+
   it("creates a unique index for orderNumber", async () => {
     await Order.syncIndexes();
 
@@ -91,6 +102,13 @@ describe("Order model", () => {
     await expectValidationError(
       new Order(validOrderInput({ status: "UNKNOWN_STATUS" })),
       "status",
+    );
+  });
+
+  it("rejects invalid payment method enum values", async () => {
+    await expectValidationError(
+      new Order(validOrderInput({ paymentMethod: "cash" })),
+      "paymentMethod",
     );
   });
 
@@ -123,7 +141,7 @@ describe("Settings model", () => {
     const settings = await Settings.getInstance();
 
     expect(settings.depositPercentage).toBe(50);
-    expect(settings.walletNumber).toBe("");
+    expect(settings.instapayNumber).toBe("");
     expect(settings.vodafoneCashNumber).toBe("");
     expect(settings.whatsappNumber).toBe("");
     expect(settings.jtApiUrl).toBeNull();
@@ -133,12 +151,12 @@ describe("Settings model", () => {
 
   it("getInstance returns the existing settings document on the second call", async () => {
     const firstSettings = await Settings.getInstance();
-    firstSettings.walletNumber = "01000000000";
+    firstSettings.instapayNumber = "01000000000";
     await firstSettings.save();
 
     const secondSettings = await Settings.getInstance();
 
     expect(secondSettings._id.toString()).toBe(firstSettings._id.toString());
-    expect(secondSettings.walletNumber).toBe("01000000000");
+    expect(secondSettings.instapayNumber).toBe("01000000000");
   });
 });

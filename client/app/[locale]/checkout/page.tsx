@@ -7,9 +7,10 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 
 import { useCreateOrder } from "@/application/hooks/useOrders";
+import { usePublicSettings } from "@/application/hooks/useSettings";
 import { useAuthStore } from "@/application/store/authStore";
 import { useCartStore } from "@/application/store/cartStore";
-import type { ShippingAddress } from "@/domain/entities/api";
+import type { PaymentMethod, ShippingAddress } from "@/domain/entities/api";
 
 type SupportedLocale = "ar" | "en";
 type ErrorResponse = {
@@ -39,8 +40,12 @@ export default function CheckoutPage() {
   const total = useCartStore((state) => state.getTotal());
 
   const createOrder = useCreateOrder();
+  const { data: settings, isLoading: isSettingsLoading } = usePublicSettings();
   const [authChecked, setAuthChecked] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState("");
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethod>("vodafone_cash");
   const [address, setAddress] = useState<ShippingAddress>({
     label: "Home",
     street: "",
@@ -93,14 +98,15 @@ export default function CheckoutPage() {
   ]);
 
   useEffect(() => {
-    if (authChecked && cartHydrated && items.length === 0) {
+    if (authChecked && cartHydrated && items.length === 0 && !isRedirecting) {
       router.replace(`/${locale}/cart`);
     }
-  }, [authChecked, cartHydrated, items.length, locale, router]);
+  }, [authChecked, cartHydrated, isRedirecting, items.length, locale, router]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setIsRedirecting(true);
 
     try {
       const order = await createOrder.mutateAsync({
@@ -109,17 +115,20 @@ export default function CheckoutPage() {
           quantity: item.quantity,
         })),
         shippingAddress: address,
+        paymentMethod,
+        customerPhone: address.phone,
       });
 
       setShippingAddress(address);
       clearCart();
-      router.push(`/${locale}/checkout/confirmation/${order._id}`);
+      router.push(`/${locale}/account/orders/${order._id}`);
     } catch (checkoutError) {
+      setIsRedirecting(false);
       setError(getErrorMessage(checkoutError, t("checkoutFailed")));
     }
   };
 
-  if (!authChecked || !cartHydrated || items.length === 0) {
+  if (!authChecked || !cartHydrated || isSettingsLoading || items.length === 0) {
     return (
       <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
         {tCatalog("loading")}
@@ -127,7 +136,12 @@ export default function CheckoutPage() {
     );
   }
 
-  const depositAmount = total * 0.5;
+  const depositPercentage = settings?.depositPercentage ?? 50;
+  const depositAmount = (total * depositPercentage) / 100;
+  const selectedPaymentNumber =
+    paymentMethod === "instapay"
+      ? settings?.instapayNumber
+      : settings?.vodafoneCashNumber;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-12">
@@ -215,6 +229,55 @@ export default function CheckoutPage() {
           />
         </div>
 
+        <fieldset className="border border-border-light p-5 dark:border-border-subtle">
+          <legend className="px-2 text-caption">{t("paymentMethod")}</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(["vodafone_cash", "instapay"] as PaymentMethod[]).map(
+              (method) => (
+                <label
+                  key={method}
+                  className={`cursor-pointer border px-4 py-3 text-body transition-colors ${
+                    paymentMethod === method
+                      ? "border-fg-secondary bg-surface-light dark:border-fg-primary dark:bg-surface-dark"
+                      : "border-border-light dark:border-border-subtle"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value={method}
+                    checked={paymentMethod === method}
+                    onChange={() => setPaymentMethod(method)}
+                    className="sr-only"
+                  />
+                  {method === "vodafone_cash"
+                    ? t("vodafoneCash")
+                    : t("instapay")}
+                </label>
+              ),
+            )}
+          </div>
+
+          <div className="mt-5 bg-surface-light p-4 dark:bg-surface-dark">
+            <h2 className="mb-3 text-body-lg font-medium">
+              {t("paymentInstructions")}
+            </h2>
+            <p className="mb-2 text-body">
+              {t("depositAmount")}:{" "}
+              <strong>
+                {depositAmount.toLocaleString(locale)} {tCatalog("egp")}
+              </strong>
+            </p>
+            <p className="mb-2 text-body">{t("transferTo")}:</p>
+            <p className="mb-3 font-mono text-body-lg">
+              {selectedPaymentNumber || t("paymentNumberMissing")}
+            </p>
+            <p className="text-caption text-fg-muted">
+              {t("transferAfterOrder")}
+            </p>
+          </div>
+        </fieldset>
+
         <div className="mt-8 bg-surface-light p-6 dark:bg-surface-dark">
           <h2 className="mb-4 text-h3 leading-heading">
             {t("orderSummary")}
@@ -241,7 +304,8 @@ export default function CheckoutPage() {
           <div className="flex justify-between text-body-lg font-medium">
             <span>{t("depositRequired")}</span>
             <span>
-              {depositAmount.toLocaleString(locale)} {tCatalog("egp")} (50%)
+              {depositAmount.toLocaleString(locale)} {tCatalog("egp")} (
+              {depositPercentage}%)
             </span>
           </div>
         </div>
@@ -250,10 +314,12 @@ export default function CheckoutPage() {
 
         <button
           type="submit"
-          disabled={createOrder.isPending}
+          disabled={createOrder.isPending || isRedirecting}
           className="w-full bg-fg-secondary py-4 text-bg-secondary disabled:opacity-50 dark:bg-fg-primary dark:text-bg-primary"
         >
-          {createOrder.isPending ? t("processing") : t("placeReservation")}
+          {createOrder.isPending || isRedirecting
+            ? t("processing")
+            : t("placeReservation")}
         </button>
       </form>
     </div>

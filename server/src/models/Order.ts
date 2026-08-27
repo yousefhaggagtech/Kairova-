@@ -22,11 +22,19 @@ export type ShippingStatus = "pending" | "shipped" | "manual_required" | null;
 
 export type RefundStatus = "not_required" | "pending" | "completed";
 
+export type PaymentMethod = "vodafone_cash" | "instapay";
+
 export interface IOrderItem {
   product: Types.ObjectId;
   name: LocalizedString;
   unitPrice: number;
   quantity: number;
+}
+
+export interface IPaymentProof {
+  url: string;
+  uploadedAt: Date;
+  label?: string;
 }
 
 export interface IShippingAddress {
@@ -40,6 +48,9 @@ export interface IShippingAddress {
 export interface IOrder extends Document {
   orderNumber: string;
   customer: Types.ObjectId;
+  paymentMethod: PaymentMethod;
+  customerPhone: string;
+  paymentProofs: IPaymentProof[];
   items: IOrderItem[];
   subtotal: number;
   depositPercentage: number;
@@ -116,6 +127,26 @@ const shippingAddressSchema = new Schema<IShippingAddress>(
   { _id: false },
 );
 
+const paymentProofSchema = new Schema<IPaymentProof>(
+  {
+    url: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    uploadedAt: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+    label: {
+      type: String,
+      trim: true,
+    },
+  },
+  { _id: false },
+);
+
 const orderSchema = new Schema<
   IOrder,
   OrderModel,
@@ -133,6 +164,22 @@ const orderSchema = new Schema<
       ref: "User",
       required: true,
       index: true,
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["vodafone_cash", "instapay"],
+      default: "vodafone_cash",
+      required: true,
+    },
+    customerPhone: {
+      type: String,
+      default: "",
+      required: true,
+      trim: true,
+    },
+    paymentProofs: {
+      type: [paymentProofSchema],
+      default: [],
     },
     items: {
       type: [orderItemSchema],

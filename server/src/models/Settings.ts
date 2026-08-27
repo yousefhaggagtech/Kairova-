@@ -2,7 +2,7 @@ import { Schema, model, Document, type Model } from "mongoose";
 
 export interface ISettings extends Document {
   depositPercentage: number;
-  walletNumber: string;
+  instapayNumber: string;
   vodafoneCashNumber: string;
   whatsappNumber: string;
   jtApiUrl: string | null;
@@ -25,7 +25,7 @@ const settingsSchema = new Schema<ISettings, SettingsModel>(
       max: 100,
       required: true,
     },
-    walletNumber: {
+    instapayNumber: {
       type: String,
       default: "",
       trim: true,
@@ -64,7 +64,7 @@ settingsSchema.statics.getInstance = async function getInstance(
   if (!settings) {
     settings = await this.create({
       depositPercentage: 50,
-      walletNumber: "",
+      instapayNumber: "",
       vodafoneCashNumber: "",
       whatsappNumber: "",
     });

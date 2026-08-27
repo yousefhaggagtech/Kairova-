@@ -107,7 +107,7 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
 
   await Settings.create({
     depositPercentage: 50,
-    walletNumber: "01000000000",
+    instapayNumber: "01000000000",
     vodafoneCashNumber: "01000000001",
     whatsappNumber: "01000000002",
   });
@@ -118,6 +118,8 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
 const orderPayload = (seed: SeedData, quantity = 2) => ({
   items: [{ productId: idOf(seed.product), quantity }],
   shippingAddress,
+  paymentMethod: "vodafone_cash" as const,
+  customerPhone: shippingAddress.phone,
 });
 
 const createPendingOrder = async (
@@ -165,6 +167,8 @@ describe("order controllers", () => {
 
       expect(response.body.data.order).toMatchObject({
         status: "PENDING_DEPOSIT",
+        paymentMethod: "vodafone_cash",
+        customerPhone: shippingAddress.phone,
         subtotal: 2000,
         depositAmount: 1000,
         refundStatus: "not_required",
@@ -216,6 +220,43 @@ describe("order controllers", () => {
         .expect(200);
 
       expect(response.body.data.order.orderNumber).toBe(order.orderNumber);
+    });
+
+    it("POST /api/orders/:id/payment-proofs appends proof for owner", async () => {
+      const order = await createPendingOrder(seed);
+
+      const response = await request(app)
+        .post(`/api/orders/${idOf(order)}/payment-proofs`)
+        .set("Cookie", authCookie(seed.customer))
+        .send({
+          url: "https://res.cloudinary.com/demo/image/upload/proof.jpg",
+          label: "Deposit",
+        })
+        .expect(200);
+
+      expect(response.body.data.order.paymentProofs).toHaveLength(1);
+      expect(response.body.data.order.paymentProofs[0]).toMatchObject({
+        url: "https://res.cloudinary.com/demo/image/upload/proof.jpg",
+        label: "Deposit",
+      });
+      expect(response.body.data.order.paymentProofs[0].uploadedAt).toBeTruthy();
+    });
+
+    it("POST /api/orders/:id/payment-proofs rejects non-owner", async () => {
+      const order = await createPendingOrder(seed, seed.otherCustomer);
+
+      const response = await request(app)
+        .post(`/api/orders/${idOf(order)}/payment-proofs`)
+        .set("Cookie", authCookie(seed.customer))
+        .send({
+          url: "https://res.cloudinary.com/demo/image/upload/proof.jpg",
+        })
+        .expect(403);
+
+      expect(response.body).toEqual({
+        status: "fail",
+        message: "Not authorized",
+      });
     });
 
     it("GET /api/orders/:id returns 403 if not owner", async () => {

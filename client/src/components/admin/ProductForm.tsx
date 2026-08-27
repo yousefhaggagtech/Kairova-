@@ -4,7 +4,7 @@ import type { AxiosError } from "axios";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import type { ChangeEvent, FormEvent } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   useAddProductImage,
@@ -40,11 +40,6 @@ type ProductFormProps = {
   product?: Product;
 };
 
-const emptyLocalizedString: LocalizedString = {
-  ar: "",
-  en: "",
-};
-
 function isProductImage(image: Product["images"][number]): image is ProductImage {
   return typeof image === "object" && image !== null && "url" in image;
 }
@@ -75,19 +70,31 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
   const locale = useLocale() as SupportedLocale;
   const router = useRouter();
   const t = useTranslations("admin");
-  const [name, setName] = useState<LocalizedString>(emptyLocalizedString);
-  const [description, setDescription] =
-    useState<LocalizedString>(emptyLocalizedString);
-  const [gender, setGender] = useState<ProductGender>("men");
-  const [categoryId, setCategoryId] = useState("");
-  const [subcategoryId, setSubcategoryId] = useState("");
-  const [price, setPrice] = useState("");
-  const [stockQuantity, setStockQuantity] = useState("");
+  const [name, setName] = useState<LocalizedString>(() => ({
+    ar: product?.name.ar || "",
+    en: product?.name.en || "",
+  }));
+  const [description, setDescription] = useState<LocalizedString>(() => ({
+    ar: product?.description.ar || "",
+    en: product?.description.en || "",
+  }));
+  const [gender, setGender] = useState<ProductGender>(
+    () => product?.gender ?? "men",
+  );
+  const [categoryId, setCategoryId] = useState(() =>
+    product ? getRelationId(product.category) : "",
+  );
+  const [subcategoryId, setSubcategoryId] = useState(() =>
+    product ? getRelationId(product.subcategory) : "",
+  );
+  const [price, setPrice] = useState(() =>
+    product ? String(product.price) : "",
+  );
+  const [stockQuantity, setStockQuantity] = useState(() =>
+    product ? String(product.stockQuantity) : "",
+  );
   const [newImages, setNewImages] = useState<UploadedImage[]>([]);
   const [formError, setFormError] = useState("");
-  const [initializedProductId, setInitializedProductId] = useState<
-    string | null
-  >(null);
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories({
     gender,
@@ -125,27 +132,6 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
     mode === "create" ? t("newProduct") : t("editProduct");
   const submitLabel =
     mode === "create" ? t("createProduct") : t("updateProduct");
-
-  useEffect(() => {
-    if (!product || initializedProductId === product._id) {
-      return;
-    }
-
-    setName({
-      ar: product.name.ar || "",
-      en: product.name.en || "",
-    });
-    setDescription({
-      ar: product.description.ar || "",
-      en: product.description.en || "",
-    });
-    setGender(product.gender);
-    setCategoryId(getRelationId(product.category));
-    setSubcategoryId(getRelationId(product.subcategory));
-    setPrice(String(product.price));
-    setStockQuantity(String(product.stockQuantity));
-    setInitializedProductId(product._id);
-  }, [initializedProductId, product]);
 
   const handleGenderChange = (nextGender: ProductGender) => {
     setGender(nextGender);

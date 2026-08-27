@@ -27,7 +27,7 @@ interface CloudinaryUploadResponse {
   };
 }
 
-export function useImageUpload() {
+export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +45,7 @@ export function useImageUpload() {
       }
 
       const sigResponse = await apiClient.get<ApiResponse<UploadSignature>>(
-        "/api/admin/uploads/sign",
+        signUrl,
       );
       const signatureData = sigResponse.data.data;
 
@@ -100,7 +100,7 @@ export function useImageUpload() {
     } finally {
       setUploading(false);
     }
-  }, []);
+  }, [signUrl]);
 
   return { upload, uploading, error };
 }

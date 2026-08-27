@@ -4,6 +4,7 @@ import type { IOrder } from "../../models/Order.js";
 import AppError from "../../utils/AppError.js";
 import { catchError } from "../../utils/catchError.js";
 import {
+  addPaymentProof,
   cancelOrder,
   confirmDeposit,
   confirmFullPayment,
@@ -15,6 +16,7 @@ import {
   shipOrder,
 } from "./service.js";
 import type {
+  AddPaymentProofInput,
   CancelOrderInput,
   CreateOrderInput,
   OrderFiltersInput,
@@ -47,6 +49,8 @@ export const createOrderController = catchError(
       customerId,
       items: input.items,
       shippingAddress: input.shippingAddress,
+      paymentMethod: input.paymentMethod,
+      customerPhone: input.customerPhone,
     });
 
     res.status(201).json({
@@ -76,6 +80,22 @@ export const getMyOrderByIdController = catchError(
     if (getOrderCustomerId(order) !== customerId) {
       throw new AppError("Not authorized", 403);
     }
+
+    res.status(200).json({
+      status: "success",
+      data: { order },
+    });
+  },
+);
+
+export const addPaymentProofController = catchError(
+  async (req: Request, res: Response) => {
+    const customerId = requireUserId(req);
+    const input = req.body as AddPaymentProofInput;
+    const order = await addPaymentProof(String(req.params.id), customerId, {
+      url: input.url,
+      label: input.label,
+    });
 
     res.status(200).json({
       status: "success",

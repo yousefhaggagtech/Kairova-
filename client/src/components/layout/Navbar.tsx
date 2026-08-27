@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 
+import AuthNav from "./AuthNav";
 import CartLink from "./CartLink";
 import LocaleSwitcher from "./LocaleSwitcher";
 import Logo from "./Logo";
@@ -41,6 +42,7 @@ export default async function Navbar() {
 
         <div className="flex flex-1 items-center justify-end gap-3">
           <LocaleSwitcher />
+          <AuthNav />
           <CartLink />
         </div>
       </div>

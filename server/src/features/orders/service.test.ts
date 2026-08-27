@@ -16,6 +16,7 @@ import {
   canTransition,
 } from "../_shared/orderStateMachine.js";
 import {
+  addPaymentProof,
   cancelOrder,
   confirmDeposit,
   confirmFullPayment,
@@ -91,7 +92,7 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
 
   await Settings.create({
     depositPercentage: 50,
-    walletNumber: "01000000000",
+    instapayNumber: "01000000000",
     vodafoneCashNumber: "01000000001",
     whatsappNumber: "01000000002",
   });
@@ -106,6 +107,8 @@ const reservationInput = (
   customerId: idOf(seed.customer),
   items: [{ productId: idOf(seed.product), quantity: 2 }],
   shippingAddress,
+  paymentMethod: "vodafone_cash",
+  customerPhone: shippingAddress.phone,
   ...overrides,
 });
 
@@ -165,6 +168,9 @@ const createStoredOrder = async (
     depositPercentage: 50,
     depositAmount: 500,
     remainingAmount: 500,
+    paymentMethod: "vodafone_cash",
+    customerPhone: shippingAddress.phone,
+    paymentProofs: [],
     shippingAddress,
     refundStatus: "not_required",
   });
@@ -248,6 +254,70 @@ describe("order service", () => {
       const order = await createPendingOrder(seed);
 
       expect(order.refundStatus).toBe("not_required");
+    });
+
+    it("stores selected payment method and checkout phone", async () => {
+      const order = await createReservation(
+        reservationInput(seed, {
+          paymentMethod: "instapay",
+          customerPhone: "+201555555555",
+        }),
+      );
+
+      expect(order.paymentMethod).toBe("instapay");
+      expect(order.customerPhone).toBe("+201555555555");
+    });
+  });
+
+  describe("addPaymentProof", () => {
+    it("appends payment proofs without overwriting previous uploads", async () => {
+      const order = await createPendingOrder(seed);
+
+      const firstResult = await addPaymentProof(
+        idOf(order),
+        idOf(seed.customer),
+        {
+          url: "https://res.cloudinary.com/demo/image/upload/proof-1.jpg",
+          label: "Deposit",
+        },
+      );
+      const secondResult = await addPaymentProof(
+        idOf(order),
+        idOf(seed.customer),
+        {
+          url: "https://res.cloudinary.com/demo/image/upload/proof-2.jpg",
+          label: "Remaining balance",
+        },
+      );
+
+      expect(firstResult.paymentProofs).toHaveLength(1);
+      expect(secondResult.paymentProofs).toHaveLength(2);
+      expect(secondResult.paymentProofs).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ label: "Deposit" }),
+          expect.objectContaining({ label: "Remaining balance" }),
+        ]),
+      );
+    });
+
+    it("rejects proof uploads from another customer", async () => {
+      const otherCustomer = await User.create({
+        name: "Other Customer",
+        email: "other-proof@example.com",
+        password: "password123",
+        phone: "+201001111111",
+        role: "customer",
+      });
+      const order = await createPendingOrder(seed);
+
+      await expect(
+        addPaymentProof(idOf(order), idOf(otherCustomer), {
+          url: "https://res.cloudinary.com/demo/image/upload/proof.jpg",
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 403,
+        message: "Not authorized",
+      });
     });
   });
 

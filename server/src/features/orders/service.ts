@@ -3,6 +3,7 @@ import { Types, type QueryFilter } from "mongoose";
 import Order, {
   type IOrder,
   type IOrderItem,
+  type PaymentMethod,
   type IShippingAddress,
 } from "../../models/Order.js";
 import Product, { type IProduct } from "../../models/Product.js";
@@ -22,6 +23,13 @@ interface CreateReservationInput {
   customerId: string;
   items: Array<{ productId: string; quantity: number }>;
   shippingAddress: IShippingAddress;
+  paymentMethod: PaymentMethod;
+  customerPhone: string;
+}
+
+interface PaymentProofInput {
+  url: string;
+  label?: string;
 }
 
 interface OrderListFilters {
@@ -188,6 +196,9 @@ export const createReservation = async (
     Order.create({
       orderNumber,
       customer: customerId,
+      paymentMethod: input.paymentMethod,
+      customerPhone: input.customerPhone,
+      paymentProofs: [],
       items: orderItems,
       subtotal,
       depositPercentage,
@@ -198,6 +209,27 @@ export const createReservation = async (
       refundStatus: "not_required",
     }),
   );
+
+  return populateOrder(order);
+};
+
+export const addPaymentProof = async (
+  orderId: string,
+  customerId: string,
+  proof: PaymentProofInput,
+): Promise<IOrder> => {
+  const order = await getOrderDocumentById(orderId);
+
+  if (order.customer.toString() !== customerId) {
+    throw new AppError("Not authorized", 403);
+  }
+
+  order.paymentProofs.push({
+    url: proof.url,
+    label: proof.label,
+    uploadedAt: new Date(),
+  });
+  await order.save();
 
   return populateOrder(order);
 };

@@ -18,7 +18,9 @@ import productRoutes, {
 } from "./features/products/routes.js";
 import settingsPublicRoutes from "./features/settings/publicRoutes.js";
 import settingsRoutes from "./features/settings/routes.js";
-import uploadRoutes from "./features/uploads/routes.js";
+import adminUploadRoutes, {
+  paymentProofRouter as paymentProofUploadRoutes,
+} from "./features/uploads/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
 
@@ -48,7 +50,8 @@ app.use("/api/orders", customerOrdersRouter);
 app.use("/api/admin/orders", adminOrdersRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/settings", settingsRoutes);
-app.use("/api/admin/uploads", uploadRoutes);
+app.use("/api/admin/uploads", adminUploadRoutes);
+app.use("/api/uploads", paymentProofUploadRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);

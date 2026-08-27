@@ -7,6 +7,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { useAuthStore } from "@/application/store/authStore";
+import PasswordInput from "@/components/form/PasswordInput";
 import { Link } from "@/src/i18n/navigation";
 
 type ErrorResponse = {
@@ -81,19 +82,15 @@ export default function LoginPage() {
             className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
           />
         </div>
-        <div>
-          <label className="mb-2 block" htmlFor="password">
-            {t("password")}
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
-          />
-        </div>
+        <PasswordInput
+          id="password"
+          label={t("password")}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+          revealLabel={t("showPassword")}
+          hideLabel={t("hidePassword")}
+        />
 
         {error && <p className="text-body text-red-600">{error}</p>}
 
