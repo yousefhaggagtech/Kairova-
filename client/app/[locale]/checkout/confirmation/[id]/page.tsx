@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
+import { usePublicSettings } from "@/application/hooks/useSettings";
 import { useMyOrder } from "@/application/hooks/useOrders";
 
 type SupportedLocale = "ar" | "en";
@@ -16,10 +17,12 @@ export default function ConfirmationPage() {
   const orderId = getId(params.id);
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("checkout");
+  const tAdmin = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
   const { data: order, isError, isLoading } = useMyOrder(orderId);
+  const { data: settings, isLoading: isSettingsLoading } = usePublicSettings();
 
-  if (isLoading) {
+  if (isLoading || isSettingsLoading) {
     return (
       <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
         {tCatalog("loading")}
@@ -35,7 +38,8 @@ export default function ConfirmationPage() {
     );
   }
 
-  const storeWhatsApp = "201234567890";
+  const storeWhatsApp = settings?.whatsappNumber || "";
+  const walletNumber = settings?.walletNumber || settings?.vodafoneCashNumber;
   const message = encodeURIComponent(
     `Hi, I'm sending deposit for Order ${order.orderNumber}. Total: ${order.subtotal.toLocaleString()} EGP`,
   );
@@ -69,19 +73,25 @@ export default function ConfirmationPage() {
         </p>
         <p className="mb-2 text-body">{t("transferTo")}:</p>
         <p className="mb-4 font-mono text-body-lg">
-          01000000000 (Vodafone Cash - PLACEHOLDER)
+          {walletNumber || tAdmin("configureSettings")}
         </p>
         <p className="text-caption text-fg-muted">{t("afterTransfer")}</p>
       </div>
 
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block bg-fg-secondary px-8 py-4 text-bg-secondary hover:opacity-90 dark:bg-fg-primary dark:text-bg-primary"
-      >
-        {t("contactWhatsApp")}
-      </a>
+      {storeWhatsApp ? (
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-fg-secondary px-8 py-4 text-bg-secondary hover:opacity-90 dark:bg-fg-primary dark:text-bg-primary"
+        >
+          {t("contactWhatsApp")}
+        </a>
+      ) : (
+        <p className="inline-block border border-border-light px-8 py-4 text-body text-fg-muted dark:border-border-subtle">
+          {tAdmin("configureSettings")}
+        </p>
+      )}
     </div>
   );
 }

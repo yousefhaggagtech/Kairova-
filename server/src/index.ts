@@ -16,6 +16,8 @@ import {
 import productRoutes, {
   adminRouter as adminProductsRouter,
 } from "./features/products/routes.js";
+import settingsPublicRoutes from "./features/settings/publicRoutes.js";
+import settingsRoutes from "./features/settings/routes.js";
 import uploadRoutes from "./features/uploads/routes.js";
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 import notFoundHandler from "./middleware/notFoundHandler.js";
@@ -41,9 +43,11 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/settings", settingsPublicRoutes);
 app.use("/api/orders", customerOrdersRouter);
 app.use("/api/admin/orders", adminOrdersRouter);
 app.use("/api/admin/products", adminProductsRouter);
+app.use("/api/admin/settings", settingsRoutes);
 app.use("/api/admin/uploads", uploadRoutes);
 
 app.use(notFoundHandler);

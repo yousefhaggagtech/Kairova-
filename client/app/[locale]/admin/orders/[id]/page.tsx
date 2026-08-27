@@ -14,6 +14,7 @@ import {
   useMarkPacked,
   useShipOrder,
 } from "@/application/hooks/useAdminOrders";
+import { usePublicSettings } from "@/application/hooks/useSettings";
 import type {
   Order,
   OrderItem,
@@ -82,7 +83,9 @@ export default function AdminOrderDetailPage() {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
+  const tCheckout = useTranslations("checkout");
   const { data: order, isError, isLoading } = useAdminOrder(orderId);
+  const { data: settings } = usePublicSettings();
   const confirmDeposit = useConfirmDeposit();
   const markPacked = useMarkPacked();
   const confirmPayment = useConfirmPayment();
@@ -156,6 +159,11 @@ export default function AdminOrderDetailPage() {
   const shippingRequiresManualCheck =
     order.status === "FULLY_PAID" &&
     order.shippingStatus === "manual_required";
+  const storeWhatsApp = settings?.whatsappNumber || "";
+  const whatsappMessage = encodeURIComponent(
+    `Hi, I'm contacting you about Order ${order.orderNumber}.`,
+  );
+  const whatsappUrl = `https://wa.me/${storeWhatsApp}?text=${whatsappMessage}`;
 
   return (
     <section>
@@ -373,6 +381,23 @@ export default function AdminOrderDetailPage() {
                 <dt className="text-caption text-fg-muted">{t("phone")}</dt>
                 <dd>{getCustomerPhone(order)}</dd>
               </div>
+              {storeWhatsApp && (
+                <div>
+                  <dt className="text-caption text-fg-muted">
+                    {t("whatsappNumber")}
+                  </dt>
+                  <dd>
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {tCheckout("contactWhatsApp")}
+                    </a>
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt className="text-caption text-fg-muted">{t("created")}</dt>
                 <dd>{new Date(order.createdAt).toLocaleString(locale)}</dd>

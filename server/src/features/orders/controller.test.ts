@@ -86,12 +86,19 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
     gender: "men",
     parentCategory: null,
   });
+  const subcategory = await Category.create({
+    name: { ar: "Classic Watches AR", en: "Classic Watches" },
+    slug: "classic-watches",
+    gender: "men",
+    parentCategory: category._id.toString(),
+  } as unknown as ICategory);
   const product = await Product.create({
     name: { ar: "Classic Watch AR", en: "Classic Watch" },
     description: { ar: "Arabic description", en: "English description" },
     slug: "classic-watch",
     gender: "men",
     category: category._id,
+    subcategory: subcategory._id,
     price: 1000,
     sku: "KRV-CTRL-001",
     stockQuantity: 20,
