@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useCartStore } from "@/application/store/cartStore";
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
@@ -54,11 +54,11 @@ export default function CartPage() {
           >
             <div className="relative h-24 w-24 flex-shrink-0 bg-surface-light dark:bg-surface-dark">
               {item.imageUrl ? (
-                <Image
+                <OptimizedProductImage
                   src={item.imageUrl}
                   alt={item.name[locale] || item.name.en}
                   fill
-                  unoptimized
+                  variant="thumbnail"
                   sizes="96px"
                   className="object-cover"
                 />

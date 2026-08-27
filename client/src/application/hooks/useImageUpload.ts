@@ -12,18 +12,51 @@ interface UploadSignature {
   apiKey: string;
   uploadPreset: string;
   folder: string;
+  transformation?: string;
+  format?: string;
+  maxImageDimension?: number;
 }
 
 interface UploadResult {
   url: string;
   publicId: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
 }
 
 interface CloudinaryUploadResponse {
   secure_url?: string;
   public_id?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
   error?: {
     message?: string;
+  };
+}
+
+const signedUploadParamKeys = [
+  "folder",
+  "upload_preset",
+  "timestamp",
+  "transformation",
+  "format",
+] as const;
+
+type SignedUploadParamKey = (typeof signedUploadParamKeys)[number];
+
+function getSignedUploadParams(
+  signatureData: UploadSignature,
+): Record<SignedUploadParamKey, string | number | undefined> {
+  return {
+    folder: signatureData.folder,
+    upload_preset: signatureData.uploadPreset,
+    timestamp: signatureData.timestamp,
+    transformation: signatureData.transformation,
+    format: signatureData.format,
   };
 }
 
@@ -53,26 +86,24 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
         throw new Error("Upload signature response was empty");
       }
 
-      const {
-        signature,
-        timestamp,
-        cloudName,
-        apiKey,
-        uploadPreset,
-        folder,
-      } = signatureData;
-
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("api_key", apiKey);
-      formData.append("timestamp", String(timestamp));
-      formData.append("signature", signature);
-      formData.append("upload_preset", uploadPreset);
-      formData.append("folder", folder);
+      formData.append("api_key", signatureData.apiKey);
+      formData.append("signature", signatureData.signature);
+
+      const signedUploadParams = getSignedUploadParams(signatureData);
+
+      signedUploadParamKeys.forEach((key) => {
+        const value = signedUploadParams[key];
+
+        if (value !== undefined && value !== "") {
+          formData.append(key, String(value));
+        }
+      });
 
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/${encodeURIComponent(
-          cloudName,
+          signatureData.cloudName,
         )}/image/upload`,
         { method: "POST", body: formData },
       );
@@ -89,9 +120,22 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
         throw new Error("Cloudinary upload response missing image data");
       }
 
+      const longestUploadedEdge = Math.max(data.width ?? 0, data.height ?? 0);
+
+      if (
+        signatureData.maxImageDimension &&
+        longestUploadedEdge > signatureData.maxImageDimension
+      ) {
+        throw new Error("Uploaded image exceeded the configured dimensions");
+      }
+
       return {
         url: data.secure_url,
         publicId: data.public_id,
+        width: data.width,
+        height: data.height,
+        format: data.format,
+        bytes: data.bytes,
       };
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";

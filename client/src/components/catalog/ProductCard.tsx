@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import type { Product, ProductImage } from "@/domain/entities/api";
 import { Link } from "@/src/i18n/navigation";
 
@@ -23,11 +23,11 @@ export default function ProductCard({ product }: { product: Product }) {
     <Link href={`/product/${product.slug}`} className="block group">
       <div className="relative mb-3 aspect-square overflow-hidden bg-surface-light dark:bg-surface-dark">
         {primaryImage ? (
-          <Image
+          <OptimizedProductImage
             src={primaryImage.url}
             alt={primaryImage.alt[locale] || productName}
             fill
-            unoptimized
+            variant="card"
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -47,4 +47,3 @@ export default function ProductCard({ product }: { product: Product }) {
     </Link>
   );
 }
-

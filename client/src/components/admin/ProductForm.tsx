@@ -1,7 +1,6 @@
 "use client";
 
 import type { AxiosError } from "axios";
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import type { ChangeEvent, FormEvent } from "react";
 import { useMemo, useState } from "react";
@@ -15,6 +14,7 @@ import {
 } from "@/application/hooks/useAdminProducts";
 import { useCategories } from "@/application/hooks/useCategories";
 import { useImageUpload } from "@/application/hooks/useImageUpload";
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import type {
   Category,
   LocalizedString,
@@ -511,11 +511,11 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                   className="flex flex-col gap-3 border border-border-light p-3 dark:border-border-subtle sm:flex-row sm:items-center"
                 >
                   <div className="relative h-20 w-20 shrink-0 bg-surface-light dark:bg-surface-dark">
-                    <Image
+                    <OptimizedProductImage
                       src={image.url}
                       alt={image.alt[locale] || image.alt.en || name.en}
                       fill
-                      unoptimized
+                      variant="thumbnail"
                       sizes="80px"
                       className="object-cover"
                     />
@@ -579,11 +579,11 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                   className="flex flex-col gap-3 border border-border-light p-3 dark:border-border-subtle sm:flex-row sm:items-center"
                 >
                   <div className="relative h-20 w-20 shrink-0 bg-surface-light dark:bg-surface-dark">
-                    <Image
+                    <OptimizedProductImage
                       src={image.url}
                       alt={image.fileName}
                       fill
-                      unoptimized
+                      variant="thumbnail"
                       sizes="80px"
                       className="object-cover"
                     />

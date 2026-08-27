@@ -1,7 +1,6 @@
 "use client";
 
 import type { AxiosError } from "axios";
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
@@ -9,6 +8,7 @@ import {
   useAdminProducts,
   useDeleteProduct,
 } from "@/application/hooks/useAdminProducts";
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import type {
   Category,
   Product,
@@ -169,7 +169,7 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-4">
                       <div className="relative h-16 w-16 bg-surface-light dark:bg-surface-dark">
                         {primaryImage ? (
-                          <Image
+                          <OptimizedProductImage
                             src={primaryImage.url}
                             alt={
                               primaryImage.alt[locale] ||
@@ -177,7 +177,7 @@ export default function AdminProductsPage() {
                               product.name.en
                             }
                             fill
-                            unoptimized
+                            variant="thumbnail"
                             sizes="64px"
                             className="object-cover"
                           />

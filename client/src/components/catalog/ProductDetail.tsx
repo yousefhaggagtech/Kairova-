@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { useCartStore } from "@/application/store/cartStore";
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import type { Product, ProductImage } from "@/domain/entities/api";
 import { Link } from "@/src/i18n/navigation";
 
@@ -48,12 +48,12 @@ export default function ProductDetail({ product }: { product: Product }) {
       <div className="grid gap-12 md:grid-cols-2">
         <div className="relative aspect-square bg-surface-light dark:bg-surface-dark">
           {primaryImage ? (
-            <Image
+            <OptimizedProductImage
               src={primaryImage.url}
               alt={primaryImage.alt[locale] || productName}
               fill
               priority
-              unoptimized
+              variant="detail"
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />

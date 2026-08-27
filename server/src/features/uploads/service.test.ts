@@ -1,7 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 
 import { env } from "../../config/env.js";
-import { deleteImage, generateUploadSignature } from "./service.js";
+import {
+  PRODUCT_IMAGE_BASE_FORMAT,
+  PRODUCT_IMAGE_MAX_EDGE,
+  PRODUCT_IMAGE_UPLOAD_TRANSFORMATION,
+  deleteImage,
+  generateUploadSignature,
+} from "./service.js";
 
 type MutableCloudinaryEnv = {
   cloudinaryCloudName: string;
@@ -37,6 +43,7 @@ describe("uploads service", () => {
 
   describe("generateUploadSignature", () => {
     it("returns the required signature fields", () => {
+      const signSpy = jest.spyOn(cloudinary.utils, "api_sign_request");
       const result = generateUploadSignature();
 
       expect(result).toMatchObject({
@@ -44,11 +51,42 @@ describe("uploads service", () => {
         apiKey: env.cloudinaryApiKey,
         uploadPreset: env.cloudinaryUploadPreset,
         folder: "kairova/products",
+        transformation: PRODUCT_IMAGE_UPLOAD_TRANSFORMATION,
+        format: PRODUCT_IMAGE_BASE_FORMAT,
+        maxImageDimension: PRODUCT_IMAGE_MAX_EDGE,
       });
       expect(result.signature).toEqual(expect.any(String));
       expect(result.signature.length).toBeGreaterThan(0);
       expect(result.timestamp).toEqual(expect.any(Number));
       expect(result.timestamp).toBeGreaterThan(0);
+      expect(signSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          folder: "kairova/products",
+          upload_preset: env.cloudinaryUploadPreset,
+          transformation: PRODUCT_IMAGE_UPLOAD_TRANSFORMATION,
+          format: PRODUCT_IMAGE_BASE_FORMAT,
+        }),
+        env.cloudinaryApiSecret,
+      );
+    });
+
+    it("does not apply product image optimization to non-product folders", () => {
+      const signSpy = jest.spyOn(cloudinary.utils, "api_sign_request");
+      const result = generateUploadSignature("kairova/payment-proofs");
+
+      expect(result).toMatchObject({
+        folder: "kairova/payment-proofs",
+      });
+      expect(result.transformation).toBeUndefined();
+      expect(result.format).toBeUndefined();
+      expect(result.maxImageDimension).toBeUndefined();
+      expect(signSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          transformation: expect.any(String),
+          format: expect.any(String),
+        }),
+        env.cloudinaryApiSecret,
+      );
     });
   });
 
