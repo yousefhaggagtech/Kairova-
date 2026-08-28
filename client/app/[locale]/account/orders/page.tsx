@@ -1,11 +1,9 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { useMyOrders } from "@/application/hooks/useOrders";
-import { useAuthStore } from "@/application/store/authStore";
 import type { Order, OrderStatus } from "@/domain/entities/api";
 import { Link } from "@/src/i18n/navigation";
 
@@ -28,72 +26,10 @@ const statusClassByStatus: Record<OrderStatus, string> = {
 
 export default function CustomerOrdersPage() {
   const locale = useLocale() as SupportedLocale;
-  const router = useRouter();
   const t = useTranslations("account");
   const tAdmin = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
-  const [authChecked, setAuthChecked] = useState(false);
-  const { data: orders = [], isError, isLoading } = useMyOrders(authChecked);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function verifyCustomer() {
-      if (!hasHydrated) {
-        return;
-      }
-
-      if (isAuthenticated && user) {
-        if (user.role === "admin") {
-          router.replace(`/${locale}/admin/orders`);
-          return;
-        }
-
-        setAuthChecked(true);
-        return;
-      }
-
-      try {
-        const currentUser = await loadCurrentUser();
-
-        if (cancelled) {
-          return;
-        }
-
-        if (currentUser.role === "admin") {
-          router.replace(`/${locale}/admin/orders`);
-          return;
-        }
-
-        setAuthChecked(true);
-      } catch {
-        if (!cancelled) {
-          router.replace(
-            `/${locale}/auth/login?redirect=${encodeURIComponent(
-              `/${locale}/account/orders`,
-            )}`,
-          );
-        }
-      }
-    }
-
-    void verifyCustomer();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    hasHydrated,
-    isAuthenticated,
-    loadCurrentUser,
-    locale,
-    router,
-    user,
-  ]);
+  const { data: orders = [], isError, isLoading } = useMyOrders();
 
   const sortedOrders = useMemo(() => {
     return [...orders].sort(
@@ -102,16 +38,12 @@ export default function CustomerOrdersPage() {
     );
   }, [orders]);
 
-  if (!authChecked || isLoading) {
-    return (
-      <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
-        {tCatalog("loading")}
-      </div>
-    );
+  if (isLoading) {
+    return <p className="py-8 text-body text-fg-muted">{tCatalog("loading")}</p>;
   }
 
   return (
-    <section className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 md:px-10">
+    <section>
       <h1 className="mb-8 text-h1 leading-heading">{t("myOrders")}</h1>
 
       {isError && (

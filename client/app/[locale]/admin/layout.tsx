@@ -1,9 +1,12 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { useAdminGuard } from "@/application/hooks/useAdminGuard";
+import { useAuthStore } from "@/application/store/authStore";
 import { Link } from "@/src/i18n/navigation";
 
 type Props = {
@@ -11,8 +14,25 @@ type Props = {
 };
 
 export default function AdminLayout({ children }: Props) {
+  const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations("admin");
   const { user, hasHydrated, isChecking } = useAdminGuard();
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const logout = useAuthStore((state) => state.logout);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+      router.push(`/${locale}`);
+      router.refresh();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   if (!hasHydrated || isChecking) {
     return (
@@ -36,17 +56,28 @@ export default function AdminLayout({ children }: Props) {
             </p>
             <h1 className="text-h2 leading-heading">{t("title")}</h1>
           </div>
-          <nav className="flex items-center gap-4 text-body">
-            <Link href="/admin/orders" className="underline">
-              {t("orders")}
-            </Link>
-            <Link href="/admin/products" className="underline">
-              {t("products")}
-            </Link>
-            <Link href="/admin/settings" className="underline">
-              {t("settings")}
-            </Link>
-          </nav>
+          <div className="flex flex-wrap items-center gap-4">
+            <nav className="flex items-center gap-4 text-body">
+              <Link href="/admin/orders" className="underline">
+                {t("orders")}
+              </Link>
+              <Link href="/admin/products" className="underline">
+                {t("products")}
+              </Link>
+              <Link href="/admin/settings" className="underline">
+                {t("settings")}
+              </Link>
+            </nav>
+
+            <button
+              type="button"
+              disabled={isLoading || isLoggingOut}
+              onClick={() => void handleLogout()}
+              className="border border-border-light px-4 py-2 text-body transition-colors hover:border-fg-secondary disabled:cursor-not-allowed disabled:opacity-50 dark:border-border-subtle dark:hover:border-fg-primary"
+            >
+              {t("logOut")}
+            </button>
+          </div>
         </div>
       </header>
 

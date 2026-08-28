@@ -64,3 +64,25 @@ html[lang="en"] h3 {
   font-family: var(--font-display-en);
   font-weight: 600;
 }
+
+.kairova-nav-logo {
+  filter: var(--kairova-logo-filter, brightness(0));
+  transition: filter 200ms ease;
+}
+
+.kairova-nav-logo-link:hover .kairova-nav-logo,
+.kairova-nav-logo-link:focus-visible .kairova-nav-logo {
+  filter: brightness(0) invert(50.6%);
+}
+
+.kairova-cart-drawer {
+  transform: translateX(100%);
+}
+
+html[dir="rtl"] .kairova-cart-drawer {
+  transform: translateX(-100%);
+}
+
+.kairova-cart-drawer[data-open="true"] {
+  transform: translateX(0);
+}
