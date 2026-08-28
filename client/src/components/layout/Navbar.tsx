@@ -315,6 +315,7 @@ export default function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [scrollState, setScrollState] = useState({
     hidden: false,
+    atTop: isHomeRoute,
     pastHero: !isHomeRoute,
   });
 
@@ -343,29 +344,49 @@ export default function Navbar() {
   }, [hasAuthHydrated, isAuthenticated, loadCurrentUser, user?.id]);
 
   useEffect(() => {
-    setActiveMenu(null);
-    setIsSearchOpen(false);
-    setIsCartOpen(false);
+    const resetTimeout = window.setTimeout(() => {
+      setActiveMenu(null);
+      setIsSearchOpen(false);
+      setIsCartOpen(false);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(resetTimeout);
+    };
   }, [pathname]);
 
   useEffect(() => {
+    function getHeaderChromeHeight() {
+      const headerChrome = headerRef.current?.firstElementChild;
+
+      if (headerChrome instanceof HTMLElement) {
+        return headerChrome.getBoundingClientRect().height;
+      }
+
+      return headerRef.current?.getBoundingClientRect().height ?? 80;
+    }
+
     function getHeroThreshold() {
       if (!isHomeRoute) {
         return 0;
       }
 
       const hero = document.querySelector<HTMLElement>("[data-section='hero']");
-      return Math.max((hero?.offsetHeight ?? window.innerHeight) - 80, 0);
+      const heroHeight = hero?.getBoundingClientRect().height ?? window.innerHeight;
+      const headerHeight = getHeaderChromeHeight();
+
+      return Math.max(heroHeight - headerHeight, 0);
     }
 
     function updateScrollState() {
       const currentY = Math.max(window.scrollY, 0);
       const threshold = getHeroThreshold();
+      const atTop = isHomeRoute ? currentY <= 8 : false;
       const pastHero = isHomeRoute ? currentY > threshold : true;
       const delta = currentY - lastScrollYRef.current;
       let hidden = hiddenRef.current;
 
-      if (!pastHero || currentY <= 8) {
+      if (!pastHero || atTop) {
         hidden = false;
       } else if (Math.abs(delta) > 4) {
         hidden = delta > 0;
@@ -373,17 +394,35 @@ export default function Navbar() {
 
       hiddenRef.current = hidden;
       lastScrollYRef.current = currentY;
-      setScrollState({ hidden, pastHero });
+      setScrollState({ hidden, atTop, pastHero });
     }
 
     lastScrollYRef.current = Math.max(window.scrollY, 0);
     hiddenRef.current = false;
     updateScrollState();
 
+    const resizeObserver =
+      isHomeRoute && "ResizeObserver" in window
+        ? new ResizeObserver(() => updateScrollState())
+        : null;
+    const hero = isHomeRoute
+      ? document.querySelector<HTMLElement>("[data-section='hero']")
+      : null;
+    const headerChrome = headerRef.current?.firstElementChild;
+
+    if (hero) {
+      resizeObserver?.observe(hero);
+    }
+
+    if (headerChrome instanceof HTMLElement) {
+      resizeObserver?.observe(headerChrome);
+    }
+
     window.addEventListener("scroll", updateScrollState, { passive: true });
     window.addEventListener("resize", updateScrollState);
 
     return () => {
+      resizeObserver?.disconnect();
       window.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("resize", updateScrollState);
     };
@@ -437,7 +476,7 @@ export default function Navbar() {
   const nextLocale: Locale = locale === "ar" ? "en" : "ar";
   const nextLocaleLabel = nextLocale === "ar" ? t("arabic") : t("english");
   const isPanelOpen = activeMenu !== null || isSearchOpen || isCartOpen;
-  const isSolid = isPanelOpen || scrollState.pastHero;
+  const isSolid = isPanelOpen || !isHomeRoute || !scrollState.atTop;
   const isHidden = !isPanelOpen && scrollState.hidden;
   const logoStyle = {
     "--kairova-logo-filter": isSolid

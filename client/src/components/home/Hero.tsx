@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import Logo from "@/src/components/layout/Logo";
 
 type HeroProps = {
@@ -23,19 +21,6 @@ export default function Hero({ title, tagline }: HeroProps) {
         <p className="max-w-xl text-body-lg leading-body text-fg-muted">
           {tagline}
         </p>
-      </div>
-
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 flex justify-center opacity-[0.15]"
-        aria-hidden="true"
-      >
-        <Image
-          src="/pyramid-skyline.svg"
-          alt=""
-          width={1200}
-          height={260}
-          className="h-auto w-full max-w-[1200px]"
-        />
       </div>
     </section>
   );

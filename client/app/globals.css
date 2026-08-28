@@ -75,6 +75,67 @@ html[lang="en"] h3 {
   filter: brightness(0) invert(50.6%);
 }
 
+.kairova-hero-media-layer {
+  opacity: 1;
+}
+
+.kairova-hero-media-layer[data-phase="incoming"] {
+  z-index: 1;
+  animation: kairova-hero-media-fade-in 900ms ease-in-out forwards;
+}
+
+.kairova-hero-media-layer[data-phase="outgoing"] {
+  z-index: 0;
+  animation: kairova-hero-media-fade-out 900ms ease-in-out forwards;
+}
+
+.kairova-hero-copy {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 900ms ease,
+    transform 900ms ease;
+  will-change: opacity, transform;
+}
+
+.kairova-hero-copy.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes kairova-hero-media-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kairova-hero-media-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kairova-hero-media-layer {
+    animation: none;
+  }
+
+  .kairova-hero-copy {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}
+
 .kairova-cart-drawer {
   transform: translateX(100%);
 }
