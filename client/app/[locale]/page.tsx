@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import CatalogHome from "@/components/catalog/CatalogHome";
+import BrandPhilosophySection from "@/components/home/BrandPhilosophySection";
 import DualGateway from "@/components/home/DualGateway";
 import HeroMotion from "@/components/home/HeroMotion";
 
@@ -26,7 +26,7 @@ export default async function HomePage() {
     <>
       <HeroMotion title={t("title")} tagline={t("tagline")} />
       <DualGateway />
-      <CatalogHome />
+      <BrandPhilosophySection />
     </>
   );
 }

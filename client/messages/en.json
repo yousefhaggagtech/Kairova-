@@ -37,6 +37,13 @@
   "home": {
     "featuredMen": "Coming Soon: Men's Collection",
     "featuredWomen": "Coming Soon: Women's Collection",
+    "brandPhilosophy": {
+      "eyebrow": "Brand Philosophy",
+      "heading": "Ancient Egyptian grandeur, refined for contemporary luxury.",
+      "body": "Kairova distills the geometry of the pyramids and the presence of Egyptian symbols into accessories of quiet command: pure lines, luminous restraint, and a modern ritual of luxury.",
+      "closing": "An ancient legacy, worn with ease.",
+      "imageAlt": "Kairova luxury details inspired by Egyptian heritage"
+    },
     "dualGateway": {
       "label": "Choose a Kairova collection",
       "menTitle": "Men's Collection",

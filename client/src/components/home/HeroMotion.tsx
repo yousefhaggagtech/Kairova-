@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type HeroMotionProps = {
@@ -11,7 +10,6 @@ type HeroMotionProps = {
 type HeroSlide = {
   id: string;
   src: string;
-  type: "image" | "video";
 };
 
 type TransitionState = {
@@ -24,22 +22,14 @@ type MediaPhase = "active" | "incoming" | "outgoing";
 const HERO_MEDIA: HeroSlide[] = [
   {
     id: "first-film",
-    src: "https://ik.imagekit.io/1pscfy7oah/kiarova/first-hero-section-video.mp4",
-    type: "video",
+    src: "https://ik.imagekit.io/1pscfy7oah/kiarova/first-hero-section-video.mp4?tr=q-100,w-1920,f-mp4",
   },
   {
     id: "second-film",
-    src: "https://ik.imagekit.io/1pscfy7oah/kiarova/second-hero-section-video.mp4",
-    type: "video",
-  },
-  {
-    id: "legacy-still",
-    src: "https://ik.imagekit.io/1pscfy7oah/kiarova/hero-section-pic.png",
-    type: "image",
+    src: "https://ik.imagekit.io/1pscfy7oah/kiarova/second-hero-section-video.mp4?tr=q-100,w-1920,f-mp4",
   },
 ];
 
-const IMAGE_DURATION_MS = 6000;
 const MEDIA_FADE_DURATION_MS = 900;
 
 function getNextSlideIndex(index: number) {
@@ -74,10 +64,6 @@ function HeroMediaLayer({ onVideoEnded, phase, slide }: HeroMediaLayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (slide.type !== "video") {
-      return;
-    }
-
     const video = videoRef.current;
 
     if (!video) {
@@ -94,34 +80,22 @@ function HeroMediaLayer({ onVideoEnded, phase, slide }: HeroMediaLayerProps) {
         // Muted autoplay should pass; ignore browser interruptions during swaps.
       });
     }
-  }, [slide.id, slide.type]);
+  }, [slide.id]);
 
   return (
     <div className="kairova-hero-media-layer absolute inset-0" data-phase={phase}>
-      {slide.type === "video" ? (
-        <video
-          ref={videoRef}
-          aria-hidden="true"
-          autoPlay
-          className="h-full w-full object-cover object-center"
-          disablePictureInPicture
-          muted
-          onEnded={onVideoEnded}
-          playsInline
-          preload="auto"
-          src={slide.src}
-        />
-      ) : (
-        <Image
-          fill
-          priority
-          alt=""
-          aria-hidden="true"
-          className="object-cover object-center"
-          sizes="100vw"
-          src={slide.src}
-        />
-      )}
+      <video
+        ref={videoRef}
+        aria-hidden="true"
+        autoPlay
+        className="h-full w-full object-cover object-center"
+        disablePictureInPicture
+        muted
+        onEnded={onVideoEnded}
+        playsInline
+        preload="auto"
+        src={slide.src}
+      />
     </div>
   );
 }
@@ -183,25 +157,18 @@ export default function HeroMotion({ title, tagline }: HeroMotionProps) {
 
   useEffect(() => {
     const nextSlide = HERO_MEDIA[getNextSlideIndex(currentIndex)];
+    const video = document.createElement("video");
 
-    if (nextSlide.type === "video") {
-      const video = document.createElement("video");
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = "auto";
-      video.src = nextSlide.src;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.src = nextSlide.src;
+    video.load();
+
+    return () => {
+      video.removeAttribute("src");
       video.load();
-
-      return () => {
-        video.removeAttribute("src");
-        video.load();
-      };
-    }
-
-    const image = new window.Image();
-    image.src = nextSlide.src;
-
-    return undefined;
+    };
   }, [currentIndex]);
 
   useEffect(() => {
@@ -232,22 +199,6 @@ export default function HeroMotion({ title, tagline }: HeroMotionProps) {
       observer.disconnect();
     };
   }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    const slide = HERO_MEDIA[currentIndex];
-
-    if (slide.type !== "image" || transitionState) {
-      return;
-    }
-
-    const imageTimeout = window.setTimeout(() => {
-      advanceToNextSlide();
-    }, IMAGE_DURATION_MS);
-
-    return () => {
-      window.clearTimeout(imageTimeout);
-    };
-  }, [advanceToNextSlide, currentIndex, transitionState]);
 
   const activeSlide = HERO_MEDIA[currentIndex];
   const isCopyVisible = prefersReducedMotion || isCopyIntersecting;
