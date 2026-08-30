@@ -1,12 +1,12 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
+import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import { useAuthStore } from "@/application/store/authStore";
-import { Link, usePathname } from "@/src/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/src/i18n/navigation";
 
 type Props = {
   children: ReactNode;
@@ -19,82 +19,21 @@ const navItems = [
 ] as const;
 
 export default function AccountLayout({ children }: Props) {
-  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const t = useTranslations("account");
   const tCatalog = useTranslations("catalog");
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const { user, hasHydrated, isChecking } = useAuthGuard("customer");
   const isLoading = useAuthStore((state) => state.isLoading);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
   const logout = useAuthStore((state) => state.logout);
-  const [isChecking, setIsChecking] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function verifyCustomer() {
-      if (!hasHydrated) {
-        return;
-      }
-
-      if (isAuthenticated && user) {
-        if (user.role === "admin") {
-          router.replace(`/${locale}/admin`);
-          return;
-        }
-
-        setIsChecking(false);
-        return;
-      }
-
-      try {
-        const currentUser = await loadCurrentUser();
-
-        if (cancelled) {
-          return;
-        }
-
-        if (currentUser.role === "admin") {
-          router.replace(`/${locale}/admin`);
-          return;
-        }
-
-        setIsChecking(false);
-      } catch {
-        if (!cancelled) {
-          router.replace(
-            `/${locale}/auth/login?redirect=${encodeURIComponent(
-              `/${locale}/account`,
-            )}`,
-          );
-        }
-      }
-    }
-
-    void verifyCustomer();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    hasHydrated,
-    isAuthenticated,
-    loadCurrentUser,
-    locale,
-    router,
-    user,
-  ]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
 
     try {
       await logout();
-      router.push(`/${locale}`);
+      router.push("/");
       router.refresh();
     } finally {
       setIsLoggingOut(false);
@@ -135,7 +74,7 @@ export default function AccountLayout({ children }: Props) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`transition-colors hover:text-[#818181] ${
+                    className={`transition-colors hover:text-hover-muted ${
                       isActive ? "underline" : "text-fg-muted"
                     }`}
                   >

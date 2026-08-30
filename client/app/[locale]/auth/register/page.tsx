@@ -1,14 +1,13 @@
 "use client";
 
 import type { AxiosError } from "axios";
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { useAuthStore } from "@/application/store/authStore";
 import PasswordInput from "@/components/form/PasswordInput";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 
 type ErrorResponse = {
   message?: string;
@@ -20,7 +19,6 @@ function getErrorMessage(error: unknown, fallback: string) {
 }
 
 export default function RegisterPage() {
-  const locale = useLocale();
   const t = useTranslations("auth");
   const router = useRouter();
 
@@ -44,7 +42,7 @@ export default function RegisterPage() {
 
     try {
       await registerUser(name, email, password, phone);
-      router.push(`/${locale}`);
+      router.push("/");
     } catch (registerError) {
       setError(getErrorMessage(registerError, t("registerFailed")));
     }

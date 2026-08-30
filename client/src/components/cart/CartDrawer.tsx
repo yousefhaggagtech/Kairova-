@@ -105,7 +105,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           <button
             type="button"
             aria-label={tCheckout("closeCart")}
-            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none"
+            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
             onClick={onClose}
           >
             <CloseIcon />
@@ -120,7 +120,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <p className="mb-5 text-body-lg">{tCheckout("emptyCart")}</p>
               <button
                 type="button"
-                className="text-body text-fg-muted underline transition-colors hover:text-[#818181]"
+                className="text-body text-fg-muted underline transition-colors hover:text-hover-muted"
                 onClick={onClose}
               >
                 {tCheckout("continueShopping")}
@@ -158,14 +158,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <div className="flex items-start justify-between gap-3">
                       <Link
                         href={`/product/${item.slug}`}
-                        className="text-body transition-colors hover:text-[#818181]"
+                        className="text-body transition-colors hover:text-hover-muted"
                         onClick={onClose}
                       >
                         {item.name[locale] || item.name.en}
                       </Link>
                       <button
                         type="button"
-                        className="text-caption text-fg-muted underline transition-colors hover:text-[#818181]"
+                        className="text-caption text-fg-muted underline transition-colors hover:text-hover-muted"
                         onClick={() => removeItem(item.productId)}
                       >
                         {tCheckout("remove")}

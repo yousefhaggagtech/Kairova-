@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/src/i18n/navigation";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -7,5 +7,5 @@ type Props = {
 export default async function AdminPage({ params }: Props) {
   const { locale } = await params;
 
-  redirect(`/${locale}/admin/orders`);
+  redirect({ href: "/admin/orders", locale, forcePrefix: true });
 }

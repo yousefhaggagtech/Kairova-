@@ -3,8 +3,10 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { authMeQueryKey } from "@/application/hooks/authQueryKeys";
 import type { User } from "@/domain/entities/api";
 import { authApi } from "@/infrastructure/api/authApi";
+import { queryClient } from "@/infrastructure/http/queryClient";
 
 interface AuthState {
   user: User | null;
@@ -20,7 +22,8 @@ interface AuthState {
     phone: string,
   ) => Promise<User>;
   logout: () => Promise<void>;
-  loadCurrentUser: () => Promise<User>;
+  setAuthenticatedUser: (user: User) => void;
+  clearAuthenticatedUser: () => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 }
 
@@ -37,6 +40,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const { user } = await authApi.login({ email, password });
           set({ user, isAuthenticated: true });
+          queryClient.setQueryData(authMeQueryKey, user);
           return user;
         } finally {
           set({ isLoading: false });
@@ -53,6 +57,7 @@ export const useAuthStore = create<AuthState>()(
             phone,
           });
           set({ user, isAuthenticated: true });
+          queryClient.setQueryData(authMeQueryKey, user);
           return user;
         } finally {
           set({ isLoading: false });
@@ -62,21 +67,12 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         await authApi.logout();
         set({ user: null, isAuthenticated: false });
+        queryClient.removeQueries({ queryKey: authMeQueryKey });
       },
 
-      loadCurrentUser: async () => {
-        set({ isLoading: true });
-        try {
-          const user = await authApi.getMe();
-          set({ user, isAuthenticated: true });
-          return user;
-        } catch (error) {
-          set({ user: null, isAuthenticated: false });
-          throw error;
-        } finally {
-          set({ isLoading: false });
-        }
-      },
+      setAuthenticatedUser: (user) => set({ user, isAuthenticated: true }),
+      clearAuthenticatedUser: () =>
+        set({ user: null, isAuthenticated: false }),
 
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
     }),

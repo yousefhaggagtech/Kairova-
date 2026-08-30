@@ -1,5 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 
+import { defaultLocale, locales } from "@/src/i18n/config";
+
 type RetriableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
@@ -39,6 +41,20 @@ const processQueue = (error?: unknown) => {
   failedQueue = [];
 };
 
+function getLocaleFromPathname(pathname: string) {
+  const firstSegment = pathname.split("/").filter(Boolean)[0];
+
+  return locales.includes(firstSegment as (typeof locales)[number])
+    ? firstSegment
+    : defaultLocale;
+}
+
+function getLocaleAwareLoginUrl() {
+  const locale = getLocaleFromPathname(window.location.pathname);
+
+  return new URL(`/${locale}/auth/login`, window.location.origin);
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -70,7 +86,7 @@ apiClient.interceptors.response.use(
         processQueue(refreshError);
 
         if (typeof window !== "undefined") {
-          window.location.assign(new URL("/auth/login", window.location.origin));
+          window.location.assign(getLocaleAwareLoginUrl());
         }
 
         return Promise.reject(refreshError);

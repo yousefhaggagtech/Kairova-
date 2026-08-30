@@ -2,19 +2,27 @@
 
 import type { AxiosError } from "axios";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 
+import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import { useCreateOrder } from "@/application/hooks/useOrders";
 import { usePublicSettings } from "@/application/hooks/useSettings";
-import { useAuthStore } from "@/application/store/authStore";
 import { useCartStore } from "@/application/store/cartStore";
 import type { PaymentMethod, ShippingAddress } from "@/domain/entities/api";
+import { useRouter } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
 type ErrorResponse = {
   message?: string;
+};
+
+const emptyShippingAddress: ShippingAddress = {
+  label: "",
+  street: "",
+  city: "",
+  governorate: "",
+  phone: "",
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -27,11 +35,7 @@ export default function CheckoutPage() {
   const t = useTranslations("checkout");
   const tCatalog = useTranslations("catalog");
   const router = useRouter();
-
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const authHydrated = useAuthStore((state) => state.hasHydrated);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
+  const { user, isChecking: isAuthChecking } = useAuthGuard("customer");
 
   const items = useCartStore((state) => state.items);
   const cartHydrated = useCartStore((state) => state.hasHydrated);
@@ -41,67 +45,23 @@ export default function CheckoutPage() {
 
   const createOrder = useCreateOrder();
   const { data: settings, isLoading: isSettingsLoading } = usePublicSettings();
-  const [authChecked, setAuthChecked] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState("");
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>("vodafone_cash");
-  const [address, setAddress] = useState<ShippingAddress>({
-    label: "Home",
-    street: "",
-    city: "",
-    governorate: "Cairo",
-    phone: "",
-  });
+  const [address, setAddress] = useState<ShippingAddress>(emptyShippingAddress);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function verifyAuth() {
-      if (!authHydrated) {
-        return;
-      }
-
-      if (isAuthenticated && user) {
-        setAuthChecked(true);
-        return;
-      }
-
-      try {
-        await loadCurrentUser();
-        if (!cancelled) {
-          setAuthChecked(true);
-        }
-      } catch {
-        if (!cancelled) {
-          router.replace(
-            `/${locale}/auth/login?redirect=${encodeURIComponent(
-              `/${locale}/checkout`,
-            )}`,
-          );
-        }
-      }
+    if (
+      !isAuthChecking &&
+      user?.role === "customer" &&
+      cartHydrated &&
+      items.length === 0 &&
+      !isRedirecting
+    ) {
+      router.replace("/cart");
     }
-
-    void verifyAuth();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    authHydrated,
-    isAuthenticated,
-    loadCurrentUser,
-    locale,
-    router,
-    user,
-  ]);
-
-  useEffect(() => {
-    if (authChecked && cartHydrated && items.length === 0 && !isRedirecting) {
-      router.replace(`/${locale}/cart`);
-    }
-  }, [authChecked, cartHydrated, isRedirecting, items.length, locale, router]);
+  }, [cartHydrated, isAuthChecking, isRedirecting, items.length, router, user]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -121,19 +81,28 @@ export default function CheckoutPage() {
 
       setShippingAddress(address);
       clearCart();
-      router.push(`/${locale}/account/orders/${order._id}`);
+      router.push(`/account/orders/${order._id}`);
     } catch (checkoutError) {
       setIsRedirecting(false);
       setError(getErrorMessage(checkoutError, t("checkoutFailed")));
     }
   };
 
-  if (!authChecked || !cartHydrated || isSettingsLoading || items.length === 0) {
+  if (
+    isAuthChecking ||
+    !cartHydrated ||
+    isSettingsLoading ||
+    items.length === 0
+  ) {
     return (
       <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
         {tCatalog("loading")}
       </div>
     );
+  }
+
+  if (user?.role !== "customer") {
+    return null;
   }
 
   const depositPercentage = settings?.depositPercentage ?? 50;

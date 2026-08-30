@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 
+import { useAuthMe } from "@/application/hooks/useAuthMe";
 import { useAuthStore } from "@/application/store/authStore";
 import { useCartStore } from "@/application/store/cartStore";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -189,10 +190,10 @@ const NAV_TREES: Record<MenuKey, NavTree> = {
 };
 
 const navTextClass =
-  "cursor-pointer whitespace-nowrap text-[0.625rem] font-medium uppercase transition-colors duration-200 hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none sm:text-xs md:text-caption";
+  "cursor-pointer whitespace-nowrap text-[0.625rem] font-medium uppercase transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none sm:text-xs md:text-caption";
 
 const iconButtonClass =
-  "relative inline-flex h-9 w-9 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none sm:h-10 sm:w-10";
+  "relative inline-flex h-9 w-9 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none sm:h-10 sm:w-10";
 
 function SearchIcon() {
   return (
@@ -307,7 +308,6 @@ export default function Navbar() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasAuthHydrated = useAuthStore((state) => state.hasHydrated);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
   const hasCartHydrated = useCartStore((state) => state.hasHydrated);
   const itemCount = useCartStore((state) => state.getItemCount());
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
@@ -319,29 +319,9 @@ export default function Navbar() {
     pastHero: !isHomeRoute,
   });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!hasAuthHydrated || !isAuthenticated || !user?.id) {
-      return;
-    }
-
-    async function refreshCurrentUser() {
-      try {
-        await loadCurrentUser();
-      } catch {
-        if (!cancelled) {
-          // The auth store clears stale sessions when /me fails.
-        }
-      }
-    }
-
-    void refreshCurrentUser();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [hasAuthHydrated, isAuthenticated, loadCurrentUser, user?.id]);
+  useAuthMe({
+    enabled: hasAuthHydrated && isAuthenticated && Boolean(user?.id),
+  });
 
   useEffect(() => {
     const resetTimeout = window.setTimeout(() => {
@@ -466,7 +446,7 @@ export default function Navbar() {
       ? user.role === "admin"
         ? "/admin"
         : "/account"
-      : "/login";
+      : "/auth/login";
   const accountLabel =
     hasAuthHydrated && isAuthenticated && user
       ? user.role === "admin"
@@ -626,7 +606,7 @@ export default function Navbar() {
                 >
                   <Link
                     href={activeMenuTree.allHref}
-                    className="inline-flex cursor-pointer text-caption font-medium uppercase text-fg-muted transition-colors duration-200 hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none"
+                    className="inline-flex cursor-pointer text-caption font-medium uppercase text-fg-muted transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
                     onClick={() => setActiveMenu(null)}
                   >
                     {t(activeMenuTree.allLabelKey)}
@@ -640,7 +620,7 @@ export default function Navbar() {
                       >
                         <Link
                           href={branch.href}
-                          className="block cursor-pointer text-body-lg font-medium text-fg-secondary transition-colors duration-200 hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none"
+                          className="block cursor-pointer text-body-lg font-medium text-fg-secondary transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
                           onClick={() => setActiveMenu(null)}
                         >
                           {t(branch.labelKey)}
@@ -652,7 +632,7 @@ export default function Navbar() {
                               <li key={product.href}>
                                 <Link
                                   href={product.href}
-                                  className="group grid cursor-pointer grid-cols-[72px_1fr] items-center gap-3 transition-colors duration-200 hover:text-[#818181] focus-visible:text-[#818181] focus-visible:outline-none"
+                                  className="group grid cursor-pointer grid-cols-[72px_1fr] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
                                   onClick={() => setActiveMenu(null)}
                                 >
                                   <span className="relative block aspect-[4/5] overflow-hidden bg-surface-light">

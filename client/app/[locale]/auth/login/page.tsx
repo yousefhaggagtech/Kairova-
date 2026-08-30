@@ -2,13 +2,12 @@
 
 import type { AxiosError } from "axios";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { useAuthStore } from "@/application/store/authStore";
 import PasswordInput from "@/components/form/PasswordInput";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 
 type ErrorResponse = {
   message?: string;
@@ -21,7 +20,17 @@ function getErrorMessage(error: unknown, fallback: string) {
 
 function getRedirectPath(redirect: string | null, locale: string) {
   if (!redirect || !redirect.startsWith("/") || redirect.startsWith("//")) {
-    return `/${locale}`;
+    return "/";
+  }
+
+  const localePrefix = `/${locale}`;
+
+  if (redirect === localePrefix) {
+    return "/";
+  }
+
+  if (redirect.startsWith(`${localePrefix}/`)) {
+    return redirect.slice(localePrefix.length);
   }
 
   return redirect;
@@ -54,7 +63,7 @@ export default function LoginPage() {
       const user = await login(email, password);
 
       if (user.role === "admin") {
-        router.push(`/${locale}/admin/orders`);
+        router.push("/admin/orders");
         return;
       }
 

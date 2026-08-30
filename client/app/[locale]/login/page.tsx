@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect } from "@/src/i18n/navigation";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -7,5 +7,5 @@ type Props = {
 export default async function LoginAliasPage({ params }: Props) {
   const { locale } = await params;
 
-  redirect(`/${locale}/auth/login`);
+  redirect({ href: "/auth/login", locale, forcePrefix: true });
 }

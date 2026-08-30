@@ -3,19 +3,24 @@
 import type { AxiosError } from "axios";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import type { ChangeEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
+import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import {
   useAddPaymentProof,
   useMyOrder,
 } from "@/application/hooks/useOrders";
 import { usePublicSettings } from "@/application/hooks/useSettings";
 import { useImageUpload } from "@/application/hooks/useImageUpload";
-import { useAuthStore } from "@/application/store/authStore";
-import type { OrderStatus, PaymentMethod } from "@/domain/entities/api";
+import type { PaymentMethod } from "@/domain/entities/api";
 import type { PublicSettings } from "@/infrastructure/api/settingsApi";
+import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
+import {
+  getPaymentProofLabelKey,
+  paymentProofLabelKeys,
+  type PaymentProofLabelKey,
+} from "@/lib/paymentProofLabels";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
@@ -26,21 +31,6 @@ type ErrorResponse = {
 type CustomerOrderDetailProps = {
   orderId: string;
   showBackLink?: boolean;
-};
-
-const statusClassByStatus: Record<OrderStatus, string> = {
-  PENDING_DEPOSIT:
-    "border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-100",
-  RESERVED:
-    "border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-100",
-  PACKED:
-    "border-violet-300 bg-violet-50 text-violet-800 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-100",
-  FULLY_PAID:
-    "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-100",
-  CONFIRMED_SHIPPED:
-    "border-teal-300 bg-teal-50 text-teal-800 dark:border-teal-700 dark:bg-teal-950/40 dark:text-teal-100",
-  CANCELLED:
-    "border-red-300 bg-red-50 text-red-800 dark:border-red-700 dark:bg-red-950/40 dark:text-red-100",
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -71,79 +61,30 @@ export default function CustomerOrderDetail({
   showBackLink = true,
 }: CustomerOrderDetailProps) {
   const locale = useLocale() as SupportedLocale;
-  const router = useRouter();
   const t = useTranslations("account");
   const tAdmin = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
   const tCheckout = useTranslations("checkout");
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const hasHydrated = useAuthStore((state) => state.hasHydrated);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [proofLabel, setProofLabel] = useState("Deposit");
+  const tOrders = useTranslations("orders");
+  const { user, isChecking: isAuthChecking } = useAuthGuard("customer");
+  const [proofLabel, setProofLabel] =
+    useState<PaymentProofLabelKey>("deposit");
   const [actionError, setActionError] = useState("");
-  const { data: order, isError, isLoading } = useMyOrder(orderId, authChecked);
+  const { data: order, isError, isLoading } = useMyOrder(
+    orderId,
+    !isAuthChecking && user?.role === "customer",
+  );
   const { data: settings, isLoading: isSettingsLoading } = usePublicSettings();
   const proofUpload = useImageUpload("/api/uploads/payment-proofs/sign");
   const addPaymentProof = useAddPaymentProof();
 
-  useEffect(() => {
-    let cancelled = false;
+  const getProofDisplayLabel = (label?: string) => {
+    const labelKey = getPaymentProofLabelKey(label);
 
-    async function verifyCustomer() {
-      if (!hasHydrated) {
-        return;
-      }
-
-      if (isAuthenticated && user) {
-        if (user.role === "admin") {
-          router.replace(`/${locale}/admin/orders/${orderId}`);
-          return;
-        }
-
-        setAuthChecked(true);
-        return;
-      }
-
-      try {
-        const currentUser = await loadCurrentUser();
-
-        if (cancelled) {
-          return;
-        }
-
-        if (currentUser.role === "admin") {
-          router.replace(`/${locale}/admin/orders/${orderId}`);
-          return;
-        }
-
-        setAuthChecked(true);
-      } catch {
-        if (!cancelled) {
-          router.replace(
-            `/${locale}/auth/login?redirect=${encodeURIComponent(
-              `/${locale}/account/orders/${orderId}`,
-            )}`,
-          );
-        }
-      }
-    }
-
-    void verifyCustomer();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    hasHydrated,
-    isAuthenticated,
-    loadCurrentUser,
-    locale,
-    orderId,
-    router,
-    user,
-  ]);
+    return labelKey
+      ? tOrders(`paymentProofLabels.${labelKey}`)
+      : label || t("paymentProof");
+  };
 
   const handleProofChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -174,12 +115,16 @@ export default function CustomerOrderDetail({
     }
   };
 
-  if (!authChecked || isLoading || isSettingsLoading) {
+  if (isAuthChecking || isLoading || isSettingsLoading) {
     return (
       <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
         {tCatalog("loading")}
       </div>
     );
+  }
+
+  if (user?.role !== "customer") {
+    return null;
   }
 
   if (isError || !order) {
@@ -195,7 +140,7 @@ export default function CustomerOrderDetail({
   const storeWhatsApp = settings?.whatsappNumber || "";
   const whatsappPhone = getWhatsAppPhone(storeWhatsApp);
   const whatsappMessage = encodeURIComponent(
-    `Hi, I'm asking about Order ${order.orderNumber}.`,
+    tOrders("customerWhatsAppMessage", { orderNumber: order.orderNumber }),
   );
   const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
   const paymentProofs = order.paymentProofs ?? [];
@@ -218,7 +163,7 @@ export default function CustomerOrderDetail({
         </div>
         <span
           className={`inline-block border px-3 py-2 text-body ${
-            statusClassByStatus[order.status]
+            getOrderStatusClasses(order.status)
           }`}
         >
           {tAdmin(`status.${order.status}`)}
@@ -303,13 +248,16 @@ export default function CustomerOrderDetail({
             <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_1.5fr]">
               <select
                 value={proofLabel}
-                onChange={(event) => setProofLabel(event.target.value)}
+                onChange={(event) =>
+                  setProofLabel(event.target.value as PaymentProofLabelKey)
+                }
                 className="w-full border border-border-light bg-bg-secondary px-3 py-3 dark:border-border-subtle dark:bg-bg-primary"
               >
-                <option value="Deposit">{t("depositProof")}</option>
-                <option value="Remaining balance">
-                  {t("remainingBalanceProof")}
-                </option>
+                {paymentProofLabelKeys.map((labelKey) => (
+                  <option key={labelKey} value={labelKey}>
+                    {tOrders(`paymentProofLabels.${labelKey}`)}
+                  </option>
+                ))}
               </select>
               <input
                 type="file"
@@ -341,14 +289,16 @@ export default function CustomerOrderDetail({
                     <div className="relative mb-2 h-32 w-full overflow-hidden bg-surface-light dark:bg-surface-dark">
                       <Image
                         src={proof.url}
-                        alt={proof.label || t("paymentProof")}
+                        alt={getProofDisplayLabel(proof.label)}
                         fill
                         unoptimized
                         sizes="(min-width: 640px) 300px, 100vw"
                         className="object-cover"
                       />
                     </div>
-                    <p className="text-body">{proof.label || t("paymentProof")}</p>
+                    <p className="text-body">
+                      {getProofDisplayLabel(proof.label)}
+                    </p>
                     <p className="text-caption text-fg-muted">
                       {new Date(proof.uploadedAt).toLocaleString(locale)}
                     </p>

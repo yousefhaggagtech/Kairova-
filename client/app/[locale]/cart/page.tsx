@@ -1,11 +1,10 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 import { useCartStore } from "@/application/store/cartStore";
 import OptimizedProductImage from "@/components/media/OptimizedProductImage";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
 
@@ -125,7 +124,7 @@ export default function CartPage() {
         </div>
         <button
           type="button"
-          onClick={() => router.push(`/${locale}/checkout`)}
+          onClick={() => router.push("/checkout")}
           className="w-full bg-fg-secondary py-4 text-bg-secondary hover:opacity-90 dark:bg-fg-primary dark:text-bg-primary"
         >
           {tCheckout("proceedToCheckout")}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 
 import type { ApiResponse } from "@/domain/entities/api";
@@ -61,6 +62,7 @@ function getSignedUploadParams(
 }
 
 export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
+  const t = useTranslations("uploads");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,11 +72,11 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
 
     try {
       if (!file.type.startsWith("image/")) {
-        throw new Error("File must be an image");
+        throw new Error(t("fileMustBeImage"));
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        throw new Error("File must be under 5MB");
+        throw new Error(t("fileMustBeUnder5MB"));
       }
 
       const sigResponse = await apiClient.get<ApiResponse<UploadSignature>>(
@@ -83,7 +85,7 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
       const signatureData = sigResponse.data.data;
 
       if (!signatureData) {
-        throw new Error("Upload signature response was empty");
+        throw new Error(t("emptySignature"));
       }
 
       const formData = new FormData();
@@ -113,11 +115,11 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
           .catch(() => ({}))) as CloudinaryUploadResponse;
 
       if (!cloudinaryResponse.ok) {
-        throw new Error(data.error?.message || "Cloudinary upload failed");
+        throw new Error(data.error?.message || t("cloudinaryUploadFailed"));
       }
 
       if (!data.secure_url || !data.public_id) {
-        throw new Error("Cloudinary upload response missing image data");
+        throw new Error(t("missingImageData"));
       }
 
       const longestUploadedEdge = Math.max(data.width ?? 0, data.height ?? 0);
@@ -126,7 +128,7 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
         signatureData.maxImageDimension &&
         longestUploadedEdge > signatureData.maxImageDimension
       ) {
-        throw new Error("Uploaded image exceeded the configured dimensions");
+        throw new Error(t("exceededConfiguredDimensions"));
       }
 
       return {
@@ -138,13 +140,13 @@ export function useImageUpload(signUrl = "/api/admin/uploads/sign") {
         bytes: data.bytes,
       };
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed";
+      const message = err instanceof Error ? err.message : t("uploadFailed");
       setError(message);
       return null;
     } finally {
       setUploading(false);
     }
-  }, [signUrl]);
+  }, [signUrl, t]);
 
   return { upload, uploading, error };
 }

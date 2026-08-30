@@ -114,6 +114,23 @@
     "afterTransfer": "After transferring, upload a screenshot here or contact us via WhatsApp.",
     "contactWhatsApp": "Contact via WhatsApp"
   },
+  "orders": {
+    "paymentProofLabels": {
+      "deposit": "Deposit",
+      "remainingBalance": "Remaining balance"
+    },
+    "customerWhatsAppMessage": "Hi, I'm asking about Order {orderNumber}.",
+    "adminWhatsAppMessage": "Hi, I'm contacting you about Order {orderNumber}."
+  },
+  "uploads": {
+    "fileMustBeImage": "File must be an image",
+    "fileMustBeUnder5MB": "File must be under 5MB",
+    "emptySignature": "Upload signature response was empty",
+    "cloudinaryUploadFailed": "Cloudinary upload failed",
+    "missingImageData": "Cloudinary upload response missing image data",
+    "exceededConfiguredDimensions": "Uploaded image exceeded the configured dimensions",
+    "uploadFailed": "Upload failed"
+  },
   "auth": {
     "login": "Login",
     "register": "Register",

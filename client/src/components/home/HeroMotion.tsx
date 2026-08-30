@@ -249,7 +249,7 @@ export default function HeroMotion({ title, tagline }: HeroMotionProps) {
             isCopyVisible ? "is-visible" : ""
           }`}
         >
-          <h1 className="max-w-4xl text-h2 leading-display text-fg-primary [font-family:var(--font-display-en)] sm:text-h1 lg:text-display">
+          <h1 className="max-w-4xl text-h2 leading-display text-fg-primary sm:text-h1 lg:text-display">
             {title}
           </h1>
           <p className="max-w-xl text-body-lg leading-body text-border-light">

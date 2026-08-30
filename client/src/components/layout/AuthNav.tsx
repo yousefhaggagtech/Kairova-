@@ -1,11 +1,11 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
 
+import { useAuthMe } from "@/application/hooks/useAuthMe";
 import { useAuthStore } from "@/application/store/authStore";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 
 type IconName = "login" | "account" | "admin" | "logout";
 
@@ -87,48 +87,25 @@ const authControlClass =
   "inline-flex h-10 w-10 items-center justify-center border border-border-light text-fg-secondary transition-colors hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50 dark:border-border-subtle";
 
 export default function AuthNav() {
-  const locale = useLocale();
   const router = useRouter();
   const t = useTranslations("nav");
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const isLoading = useAuthStore((state) => state.isLoading);
-  const loadCurrentUser = useAuthStore((state) => state.loadCurrentUser);
   const logout = useAuthStore((state) => state.logout);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const userId = user?.id;
 
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!hasHydrated || !isAuthenticated || !userId) {
-      return;
-    }
-
-    async function refreshCurrentUser() {
-      try {
-        await loadCurrentUser();
-      } catch {
-        if (!cancelled) {
-          // The store clears itself when /me fails; the logged-out link will render.
-        }
-      }
-    }
-
-    void refreshCurrentUser();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [hasHydrated, isAuthenticated, loadCurrentUser, userId]);
+  useAuthMe({
+    enabled: hasHydrated && isAuthenticated && Boolean(user?.id),
+  });
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
 
     try {
       await logout();
-      router.push(`/${locale}`);
+      router.push("/");
       router.refresh();
     } finally {
       setIsLoggingOut(false);

@@ -1,23 +1,21 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { useState } from "react";
 
-import { useAdminGuard } from "@/application/hooks/useAdminGuard";
+import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import { useAuthStore } from "@/application/store/authStore";
-import { Link } from "@/src/i18n/navigation";
+import { Link, useRouter } from "@/src/i18n/navigation";
 
 type Props = {
   children: ReactNode;
 };
 
 export default function AdminLayout({ children }: Props) {
-  const locale = useLocale();
   const router = useRouter();
   const t = useTranslations("admin");
-  const { user, hasHydrated, isChecking } = useAdminGuard();
+  const { user, hasHydrated, isChecking } = useAuthGuard("admin");
   const isLoading = useAuthStore((state) => state.isLoading);
   const logout = useAuthStore((state) => state.logout);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -27,7 +25,7 @@ export default function AdminLayout({ children }: Props) {
 
     try {
       await logout();
-      router.push(`/${locale}`);
+      router.push("/");
       router.refresh();
     } finally {
       setIsLoggingOut(false);

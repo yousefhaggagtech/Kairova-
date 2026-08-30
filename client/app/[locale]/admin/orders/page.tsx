@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { useAdminOrders } from "@/application/hooks/useAdminOrders";
 import type { Order, OrderStatus, User } from "@/domain/entities/api";
+import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
@@ -32,23 +33,6 @@ function getCustomerPhone(order: Order) {
 
 function getCustomerEmail(order: Order) {
   return getCustomer(order)?.email ?? "";
-}
-
-function getStatusClass(status: OrderStatus) {
-  switch (status) {
-    case "PENDING_DEPOSIT":
-      return "border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-100";
-    case "RESERVED":
-      return "border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-700 dark:bg-sky-950/40 dark:text-sky-100";
-    case "PACKED":
-      return "border-violet-300 bg-violet-50 text-violet-800 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-100";
-    case "FULLY_PAID":
-      return "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-100";
-    case "CONFIRMED_SHIPPED":
-      return "border-teal-300 bg-teal-50 text-teal-800 dark:border-teal-700 dark:bg-teal-950/40 dark:text-teal-100";
-    case "CANCELLED":
-      return "border-red-300 bg-red-50 text-red-800 dark:border-red-700 dark:bg-red-950/40 dark:text-red-100";
-  }
 }
 
 function matchesSearch(order: Order, query: string) {
@@ -193,7 +177,7 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="px-4 py-4">
                     <span
-                      className={`inline-block border px-2 py-1 text-caption ${getStatusClass(
+                      className={`inline-block border px-2 py-1 text-caption ${getOrderStatusClasses(
                         order.status,
                       )}`}
                     >
