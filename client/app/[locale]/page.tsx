@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import CatalogHome from "@/components/catalog/CatalogHome";
+import DualGateway from "@/components/home/DualGateway";
 import HeroMotion from "@/components/home/HeroMotion";
 
 type Props = {
@@ -24,6 +25,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroMotion title={t("title")} tagline={t("tagline")} />
+      <DualGateway />
       <CatalogHome />
     </>
   );

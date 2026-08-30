@@ -103,6 +103,52 @@ html[lang="en"] h3 {
   transform: translateY(0);
 }
 
+.kairova-dual-gateway-media {
+  transform: scale(1);
+}
+
+.kairova-dual-gateway-cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+  .kairova-dual-gateway-panel,
+  .kairova-dual-gateway-media,
+  .kairova-dual-gateway-cta {
+    will-change: opacity, transform;
+  }
+
+  .kairova-dual-gateway:hover .kairova-dual-gateway-panel {
+    opacity: 0.68;
+    transform: scale(0.985);
+  }
+
+  .kairova-dual-gateway .kairova-dual-gateway-panel:hover,
+  .kairova-dual-gateway .kairova-dual-gateway-panel:focus-visible {
+    flex: 1.06 1 0%;
+    opacity: 1;
+    transform: scale(1.02);
+    z-index: 10;
+  }
+
+  .kairova-dual-gateway-panel:hover .kairova-dual-gateway-media,
+  .kairova-dual-gateway-panel:focus-visible .kairova-dual-gateway-media {
+    transform: scale(1.04);
+  }
+
+  .kairova-dual-gateway-cta {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  .kairova-dual-gateway-panel:hover .kairova-dual-gateway-cta,
+  .kairova-dual-gateway-panel:focus-visible .kairova-dual-gateway-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes kairova-hero-media-fade-in {
   from {
     opacity: 0;
@@ -133,6 +179,25 @@ html[lang="en"] h3 {
     transform: none;
     transition: none;
     will-change: auto;
+  }
+
+  .kairova-dual-gateway-panel,
+  .kairova-dual-gateway-media,
+  .kairova-dual-gateway-cta {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .kairova-dual-gateway:hover .kairova-dual-gateway-panel,
+  .kairova-dual-gateway .kairova-dual-gateway-panel:hover,
+  .kairova-dual-gateway .kairova-dual-gateway-panel:focus-visible {
+    flex: 1 1 0%;
+    opacity: 1;
+  }
+
+  .kairova-dual-gateway-cta {
+    opacity: 1;
   }
 }
 
