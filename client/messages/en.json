@@ -181,6 +181,18 @@
     "productNotFound": "Product not found",
     "menCollection": "Men's Collection",
     "womenCollection": "Women's Collection",
+    "collectionHeader": {
+      "men": {
+        "title": "The Gentleman's Selection",
+        "subtitle": "Precision, leather, and fragrance composed for a presence that speaks in restraint.",
+        "imageAlt": "A refined man in a tailored suit wearing a luxury watch in a Cairo-inspired interior"
+      },
+      "women": {
+        "title": "The Women's Selection",
+        "subtitle": "Luminous accessories and signature scent notes chosen for elegance that moves with quiet confidence.",
+        "imageAlt": "An elegant woman holding perfume and wearing fine accessories on a Cairo-inspired terrace"
+      }
+    },
     "noImage": "No image"
   },
   "checkout": {
