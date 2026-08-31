@@ -413,6 +413,31 @@
     "body": "Kairova is shaping a refined accessories house rooted in Egyptian craft, restraint, and everyday ceremony."
   },
   "footer": {
+    "brandStatement": "Egyptian Heritage. Modern Luxury.",
+    "collections": {
+      "title": "Collections",
+      "men": "Men's Collection",
+      "women": "Women's Collection",
+      "accessories": "All Accessories"
+    },
+    "support": {
+      "title": "Support",
+      "shipping": "Shipping Policy",
+      "refunds": "Refund Policy",
+      "faq": "FAQ"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About Kairova",
+      "contact": "Contact Us",
+      "terms": "Terms of Service"
+    },
+    "connect": {
+      "title": "Connect",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "email": "Email"
+    },
     "rights": "All rights reserved"
   }
 }
