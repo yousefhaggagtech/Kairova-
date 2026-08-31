@@ -134,6 +134,25 @@
         }
       }
     },
+    "reservationJourney": {
+      "eyebrow": "Acquisition Journey",
+      "title": "How to Acquire Your Piece",
+      "subtitle": "A measured ritual designed to give you clarity, confidence, and a seamless luxury experience.",
+      "steps": {
+        "reserve": {
+          "label": "Reserve",
+          "text": "Secure your selection with a 50% deposit."
+        },
+        "verify": {
+          "label": "Verify",
+          "text": "Personalized confirmation and coordination via our concierge."
+        },
+        "own": {
+          "label": "Own",
+          "text": "Final payment and swift delivery via J&T Express."
+        }
+      }
+    },
     "dualGateway": {
       "label": "Choose a Kairova collection",
       "menTitle": "Men's Collection",
