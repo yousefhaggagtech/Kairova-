@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 
 import BrandPhilosophySection from "@/components/home/BrandPhilosophySection";
 import CuratedIconsSection from "@/components/home/CuratedIconsSection";
+import DetailStorytellingSection from "@/components/home/DetailStorytellingSection";
+import DetailStorytellingCta from "@/components/home/DetailStorytellingCta";
 import DualGateway from "@/components/home/DualGateway";
 import HeroMotion from "@/components/home/HeroMotion";
 
@@ -29,6 +31,8 @@ export default async function HomePage() {
       <DualGateway />
       <BrandPhilosophySection />
       <CuratedIconsSection />
+      <DetailStorytellingSection />
+      <DetailStorytellingCta />
     </>
   );
 }

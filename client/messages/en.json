@@ -71,6 +71,15 @@
         }
       }
     },
+    "detailStorytelling": {
+      "heading": "The Art of Subtlety",
+      "videoAlt": "A hand moving through river water while wearing Kairova bracelets"
+    },
+    "detailCta": {
+      "heading": "Grace Redefined.",
+      "body": "A symphony of elegance and heritage, crafted for the woman who leads with subtlety and shines with confidence.",
+      "cta": "Explore the Collection"
+    },
     "dualGateway": {
       "label": "Choose a Kairova collection",
       "menTitle": "Men's Collection",
