@@ -80,6 +80,60 @@
       "body": "A symphony of elegance and heritage, crafted for the woman who leads with subtlety and shines with confidence.",
       "cta": "Explore the Collection"
     },
+    "clientTestimonials": {
+      "eyebrow": "Client Experience",
+      "title": "The Kairova Experience",
+      "subtitle": "Words of appreciation from our inner circle of connoisseurs.",
+      "paginationGroupLabel": "Client experience gallery",
+      "paginationLabel": "Show client experience {number}",
+      "items": {
+        "review1": {
+          "title": "Exceptional Quality",
+          "body": "A refined note on craftsmanship, presentation, and the quiet confidence of receiving a piece that feels considered.",
+          "imageAlt": "Client chat screenshot praising Kairova quality"
+        },
+        "review2": {
+          "title": "A Timeless Piece",
+          "body": "The kind of appreciation reserved for a piece that feels elegant from the first look and memorable after it arrives.",
+          "imageAlt": "Client chat screenshot describing a timeless Kairova piece"
+        },
+        "review3": {
+          "title": "Quiet Luxury",
+          "body": "A response shaped by restraint: polished details, elevated packaging, and a presence that never needs to be loud.",
+          "imageAlt": "Client chat screenshot appreciating Kairova quiet luxury"
+        },
+        "review4": {
+          "title": "Made To Impress",
+          "body": "A client moment centered on the delight of gifting, where the unboxing feels as intentional as the piece itself.",
+          "imageAlt": "Client chat screenshot praising a Kairova gift experience"
+        },
+        "review5": {
+          "title": "Effortless Service",
+          "body": "Appreciation for a smooth experience from first conversation to final delivery, handled with care and clarity.",
+          "imageAlt": "Client chat screenshot praising Kairova service"
+        },
+        "review6": {
+          "title": "Refined Presence",
+          "body": "A note on pieces that carry elegance with ease, designed to feel polished in daily rituals and special moments alike.",
+          "imageAlt": "Client chat screenshot describing refined Kairova presence"
+        },
+        "review7": {
+          "title": "Lasting Detail",
+          "body": "Praise for the small finishing choices that make a product feel personal, tactile, and worthy of returning to.",
+          "imageAlt": "Client chat screenshot praising Kairova product details"
+        },
+        "review8": {
+          "title": "Trusted Taste",
+          "body": "A recommendation born from confidence: the kind of client trust earned by consistency, polish, and thoughtful curation.",
+          "imageAlt": "Client chat screenshot recommending Kairova"
+        },
+        "review9": {
+          "title": "A Signature Moment",
+          "body": "A final word of appreciation for the way Kairova turns a purchase into a composed and memorable experience.",
+          "imageAlt": "Client chat screenshot appreciating the Kairova experience"
+        }
+      }
+    },
     "dualGateway": {
       "label": "Choose a Kairova collection",
       "menTitle": "Men's Collection",

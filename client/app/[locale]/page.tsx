@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import BrandPhilosophySection from "@/components/home/BrandPhilosophySection";
+import ClientTestimonialsSection from "@/components/home/ClientTestimonialsSection";
 import CuratedIconsSection from "@/components/home/CuratedIconsSection";
 import DetailStorytellingSection from "@/components/home/DetailStorytellingSection";
 import DetailStorytellingCta from "@/components/home/DetailStorytellingCta";
@@ -33,6 +34,7 @@ export default async function HomePage() {
       <CuratedIconsSection />
       <DetailStorytellingSection />
       <DetailStorytellingCta />
+      <ClientTestimonialsSection />
     </>
   );
 }
