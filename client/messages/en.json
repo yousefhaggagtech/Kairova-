@@ -44,6 +44,33 @@
       "closing": "An ancient legacy, worn with ease.",
       "imageAlt": "Kairova luxury details inspired by Egyptian heritage"
     },
+    "curatedIcons": {
+      "eyebrow": "Curated Icons",
+      "heading": "The Essence of Presence",
+      "subtitle": "A curated dialogue between timeless precision and olfactory art. Pieces designed to define your presence before a word is spoken.",
+      "items": {
+        "phantom": {
+          "name": "Phantom Chronograph",
+          "price": "EGP 26,400",
+          "feature": "Black Ceramic"
+        },
+        "aura": {
+          "name": "Aura Vanilla Amber",
+          "price": "EGP 9,300",
+          "feature": "Vanilla Amber"
+        },
+        "monarch": {
+          "name": "Monarch Oud Wood",
+          "price": "EGP 8,950",
+          "feature": "Oud Wood"
+        },
+        "starlight": {
+          "name": "Starlight Diamond",
+          "price": "EGP 33,600",
+          "feature": "Diamond Gold"
+        }
+      }
+    },
     "dualGateway": {
       "label": "Choose a Kairova collection",
       "menTitle": "Men's Collection",
