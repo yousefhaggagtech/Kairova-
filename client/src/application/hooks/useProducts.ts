@@ -8,10 +8,18 @@ type ProductFilters = {
   subcategoryId?: string;
 };
 
-export function useProducts(filters?: ProductFilters) {
+type UseProductsOptions = {
+  enabled?: boolean;
+};
+
+export function useProducts(
+  filters?: ProductFilters,
+  options: UseProductsOptions = {},
+) {
   return useQuery({
     queryKey: ["products", filters],
     queryFn: () => productsApi.list(filters),
+    enabled: options.enabled ?? true,
   });
 }
 

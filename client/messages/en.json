@@ -21,7 +21,7 @@
     "belts": "Belts",
     "wallets": "Wallets",
     "accessories": "Accessories",
-    "perfume": "Perfume",
+    "perfume": "Perfumes",
     "search": "Search",
     "searchProducts": "Search products",
     "searchPlaceholder": "Search Kairova",
@@ -169,8 +169,24 @@
     "accessories": "Accessories",
     "perfume": "Perfume",
     "shopNow": "Shop Now",
+    "all": "All",
     "viewAll": "View All",
     "noProducts": "No products in this category",
+    "noPiecesFound": "No pieces found",
+    "categoryFilterLabel": "Filter {collection} by category",
+    "menMarketingIntro": {
+      "eyebrow": "For the man who arrives before he speaks",
+      "title": "Sharp pieces. Dangerous calm.",
+      "body": "Watches with command, leather with bite, fragrance with after-hours gravity. This is not a loud flex. It is pressure, polished."
+    },
+    "womenMarketingIntro": {
+      "eyebrow": "For the woman who turns restraint into voltage",
+      "title": "Soft power. Dangerous shine.",
+      "body": "Watches that catch the room, perfume that stays after the door closes, and details with just enough edge to feel unforgettable."
+    },
+    "productCarouselLabel": "{category} products",
+    "carouselPrevious": "Scroll {category} products left",
+    "carouselNext": "Scroll {category} products right",
     "addedToCart": "Added to cart",
     "inStock": "In stock",
     "outOfStock": "Out of stock",
