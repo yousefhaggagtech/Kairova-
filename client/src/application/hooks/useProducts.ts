@@ -12,6 +12,11 @@ type UseProductsOptions = {
   enabled?: boolean;
 };
 
+type UseProductOptions = {
+  enabled?: boolean;
+  initialData?: Awaited<ReturnType<typeof productsApi.getBySlug>>;
+};
+
 export function useProducts(
   filters?: ProductFilters,
   options: UseProductsOptions = {},
@@ -23,10 +28,11 @@ export function useProducts(
   });
 }
 
-export function useProduct(slug: string) {
+export function useProduct(slug: string, options: UseProductOptions = {}) {
   return useQuery({
     queryKey: ["product", slug],
     queryFn: () => productsApi.getBySlug(slug),
-    enabled: !!slug,
+    enabled: (options.enabled ?? true) && !!slug,
+    initialData: options.initialData,
   });
 }

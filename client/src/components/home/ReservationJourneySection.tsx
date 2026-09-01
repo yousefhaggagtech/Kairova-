@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 import type { Locale } from "@/src/i18n/config";
 
@@ -28,24 +29,46 @@ const editorialEase: [number, number, number, number] = [0.19, 1, 0.22, 1];
 export default function ReservationJourneySection() {
   const t = useTranslations("home.reservationJourney");
   const locale = useLocale() as Locale;
+  const pathname = usePathname();
   const isRtl = locale === "ar";
+  const isProductDetailPage = /\/product\/[^/]+\/?$/.test(pathname);
   const shouldReduceMotion = useReducedMotion();
+  const surfaceClassName = isProductDetailPage
+    ? "border-t border-border-subtle bg-bg-absolute text-fg-primary"
+    : "bg-bg-secondary text-fg-secondary";
+  const eyebrowClassName = isProductDetailPage
+    ? "text-fg-muted"
+    : "text-fg-secondary/55";
+  const headingClassName = isProductDetailPage
+    ? "text-fg-primary"
+    : "text-fg-secondary";
+  const bodyClassName = isProductDetailPage
+    ? "text-fg-muted"
+    : "text-fg-secondary/68";
+  const mutedClassName = isProductDetailPage
+    ? "text-fg-muted"
+    : "text-fg-secondary/45";
+  const dividerClassName = isProductDetailPage
+    ? "bg-border-subtle"
+    : "bg-fg-secondary/10";
+  const iconShellClassName = isProductDetailPage
+    ? "border-border-subtle bg-surface-dark shadow-[0_10px_30px_rgba(255,255,255,0.03)] group-hover:border-fg-primary/28 group-hover:bg-bg-absolute"
+    : "border-fg-secondary/12 bg-bg-secondary shadow-[0_10px_30px_rgba(10,10,10,0.06)] group-hover:border-fg-secondary/22 group-hover:bg-surface-light";
+  const iconClassName = isProductDetailPage
+    ? "text-fg-primary"
+    : "text-fg-secondary";
 
   return (
     <motion.section
       aria-labelledby="reservation-journey-heading"
-      className="bg-bg-secondary px-4 py-24 text-fg-secondary sm:px-6 sm:py-32 md:px-10 lg:py-40"
+      className={`${surfaceClassName} px-4 py-24 sm:px-6 sm:py-32 md:px-10 lg:py-40`}
       data-section="reservation-journey"
       dir={isRtl ? "rtl" : "ltr"}
-      initial="hidden"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={containerVariants}
-      whileInView="show"
     >
       <div className="mx-auto w-full max-w-[var(--max-content)]">
         <div className="mx-auto max-w-3xl text-center">
           <p
-            className={`text-caption font-medium text-fg-secondary/55 ${
+            className={`text-caption font-medium ${eyebrowClassName} ${
               isRtl ? "" : "uppercase tracking-[0.32em]"
             }`}
           >
@@ -53,17 +76,19 @@ export default function ReservationJourneySection() {
           </p>
           <h2
             id="reservation-journey-heading"
-            className="mt-5 text-h2 leading-heading text-fg-secondary sm:text-h1"
+            className={`mt-5 text-h2 leading-heading sm:text-h1 ${headingClassName}`}
           >
             {t("title")}
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-body-lg leading-body text-fg-secondary/68">
+          <p className={`mx-auto mt-5 max-w-2xl text-body-lg leading-body ${bodyClassName}`}>
             {t("subtitle")}
           </p>
         </div>
 
         <div className="relative mt-16 lg:mt-20">
-          <div className="absolute left-1/2 top-10 hidden h-px w-[72%] -translate-x-1/2 bg-fg-secondary/10 lg:block" />
+          <div
+            className={`absolute left-1/2 top-10 hidden h-px w-[72%] -translate-x-1/2 lg:block ${dividerClassName}`}
+          />
 
           <motion.div
             className="grid gap-8 md:gap-10 lg:grid-cols-3"
@@ -92,31 +117,33 @@ export default function ReservationJourneySection() {
                       isRtl ? "lg:items-end" : "lg:items-start"
                     }`}
                   >
-                    <div className="absolute bottom-0 left-7 top-0 w-px bg-fg-secondary/10 lg:hidden" />
+                    <div
+                      className={`absolute bottom-0 left-7 top-0 w-px lg:hidden ${dividerClassName}`}
+                    />
 
                     <motion.div
                       animate={shouldReduceMotion ? undefined : { scale: 1.04 }}
-                      className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-fg-secondary/12 bg-bg-secondary shadow-[0_10px_30px_rgba(10,10,10,0.06)] transition-colors duration-300 group-hover:border-fg-secondary/22 group-hover:bg-surface-light"
+                      className={`relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${iconShellClassName}`}
                       whileHover={shouldReduceMotion ? undefined : { scale: 1.08 }}
                     >
-                      <Icon className="h-7 w-7 stroke-[1.5] text-fg-secondary" />
+                      <Icon className={`h-7 w-7 stroke-[1.5] ${iconClassName}`} />
                     </motion.div>
 
                     <div className={`relative z-10 flex-1 pt-2 ${isRtl ? "lg:pt-6" : "lg:pt-6"}`}>
-                      <p className="text-caption font-medium text-fg-secondary/45">
+                      <p className={`text-caption font-medium ${mutedClassName}`}>
                         {step.number}
                       </p>
-                      <h3 className="mt-3 text-h3 leading-heading text-fg-secondary">
+                      <h3 className={`mt-3 text-h3 leading-heading ${headingClassName}`}>
                         {t(`steps.${step.id}.label`)}
                       </h3>
-                      <p className="mt-4 max-w-md text-body-lg leading-body text-fg-secondary/68 lg:max-w-none">
+                      <p className={`mt-4 max-w-md text-body-lg leading-body lg:max-w-none ${bodyClassName}`}>
                         {t(`steps.${step.id}.text`)}
                       </p>
                     </div>
                   </div>
 
                   {!isLast && (
-                    <div className="hidden h-px w-full bg-fg-secondary/10 lg:block" />
+                    <div className={`hidden h-px w-full lg:block ${dividerClassName}`} />
                   )}
                 </motion.article>
               );

@@ -2,6 +2,7 @@
 
 @theme {
   /* Colors - luxury grayscale from logo */
+  --color-bg-absolute: #000000;
   --color-bg-primary: #0A0A0A;
   --color-bg-secondary: #FFFFFF;
   --color-surface-dark: #141414;

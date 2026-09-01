@@ -8,7 +8,6 @@ import DetailStorytellingSection from "@/components/home/DetailStorytellingSecti
 import DetailStorytellingCta from "@/components/home/DetailStorytellingCta";
 import DualGateway from "@/components/home/DualGateway";
 import HeroMotion from "@/components/home/HeroMotion";
-import ReservationJourneySection from "@/components/home/ReservationJourneySection";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -36,7 +35,6 @@ export default async function HomePage() {
       <DetailStorytellingSection />
       <DetailStorytellingCta />
       <ClientTestimonialsSection />
-      <ReservationJourneySection />
     </>
   );
 }

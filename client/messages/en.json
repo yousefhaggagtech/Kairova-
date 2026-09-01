@@ -209,7 +209,38 @@
         "imageAlt": "An elegant woman holding perfume and wearing fine accessories on a Cairo-inspired terrace"
       }
     },
-    "noImage": "No image"
+    "noImage": "No image",
+    "productDetail": {
+      "galleryLabel": "Product image gallery for {product}",
+      "imageLabel": "{product} view {number}",
+      "paymentBreakdown": "Payment breakdown",
+      "totalPrice": "Total Price",
+      "depositDue": "Deposit Due ({percentage})",
+      "remainingBalance": "Remaining Balance",
+      "reserveThisPiece": "Reserve This Piece",
+      "storyEyebrow": "The Story",
+      "storyTitle": "Crafted Presence",
+      "specsEyebrow": "Details",
+      "specsTitle": "Technical Specifications",
+      "suggestionsEyebrow": "Same Category",
+      "suggestionsTitle": "Pieces in the Same Edit",
+      "suggestionsEmpty": "No companion pieces are available from this category right now.",
+      "suggestionCardLabel": "View {product}",
+      "specs": {
+        "sku": "SKU",
+        "collection": "Collection",
+        "category": "Category",
+        "subcategory": "Subcategory",
+        "availability": "Availability",
+        "stockCount": "{count} available"
+      },
+      "notSpecified": "Not specified",
+      "notFoundEyebrow": "404",
+      "notFoundTitle": "Piece Not Found",
+      "notFoundBody": "The piece you are looking for may have been reserved or removed from the collection.",
+      "returnHome": "Return to Kairova",
+      "metadataFallbackDescription": "Explore a refined Kairova piece with reserve-first service in Egypt."
+    }
   },
   "checkout": {
     "quantity": "Quantity",
