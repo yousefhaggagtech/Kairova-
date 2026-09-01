@@ -60,3 +60,21 @@ interceptor, since hooks aren't available there).
 - TanStack Query: anything server-backed. If you're tempted to store
   server data in Zustand "for convenience," that's a sign it should
   be a query instead.
+
+## Verification
+
+- Run `npm run test:e2e` in addition to `npm run build` for tasks
+  touching browser-only APIs (`window`, scroll, `localStorage`),
+  global layout (Navbar, providers), or first-paint rendered UI. A
+  route reporting a new console/page error is a real bug unless the
+  message is already covered by the smoke test allowlist.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
