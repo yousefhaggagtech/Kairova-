@@ -345,7 +345,8 @@ function ProductCarouselSection({
         <div className="relative px-10 md:px-16">
           <button
             aria-label={t("carouselPrevious", { category: title })}
-            className="absolute top-[43%] z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black [inset-inline-start:0]"
+            className="absolute top-[43%] left-0 z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black"
+            dir="ltr"
             onClick={() => scrollCarousel("previous")}
             type="button"
           >
@@ -353,7 +354,8 @@ function ProductCarouselSection({
           </button>
           <button
             aria-label={t("carouselNext", { category: title })}
-            className="absolute top-[43%] z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black [inset-inline-end:0]"
+            className="absolute top-[43%] right-0 z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black"
+            dir="ltr"
             onClick={() => scrollCarousel("next")}
             type="button"
           >

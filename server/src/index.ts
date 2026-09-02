@@ -16,6 +16,7 @@ import {
 import productRoutes, {
   adminRouter as adminProductsRouter,
 } from "./features/products/routes.js";
+import { seedFeaturedProducts } from "./scripts/seedFeaturedProducts.js";
 import settingsPublicRoutes from "./features/settings/publicRoutes.js";
 import settingsRoutes from "./features/settings/routes.js";
 import adminUploadRoutes, {
@@ -58,7 +59,13 @@ app.use(globalErrorHandler);
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   connectDB()
-    .then(() => {
+    .then(async () => {
+      const result = await seedFeaturedProducts();
+
+      console.log(
+        `Featured products ready. Created ${result.productsCreated} products. Updated ${result.productsUpdated} products.`,
+      );
+
       app.listen(port, () => {
         console.log(`Server listening on port ${port}`);
       });

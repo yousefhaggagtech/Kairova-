@@ -80,6 +80,8 @@ const catalog = {
       subcategories: [
         { ar: "\u0623\u0633\u0627\u0648\u0631", en: "Bracelets" },
         { ar: "\u0646\u0638\u0627\u0631\u0627\u062a \u0634\u0645\u0633\u064a\u0629", en: "Sunglasses" },
+        { ar: "\u0642\u0644\u0627\u0626\u062f", en: "Necklaces" },
+        { ar: "\u0623\u0642\u0631\u0627\u0637", en: "Earrings" },
         { ar: "\u0623\u0648\u0634\u062d\u0629", en: "Scarves" },
       ],
     },

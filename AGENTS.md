@@ -31,6 +31,11 @@ this business model is why — it's intentional, not a missing feature.
 - Fonts: Fraunces for English display headings, IBM Plex Sans Arabic
   for Arabic display headings — configured centrally, never override
   per-component.
+- Featured product links in `client/src/components/layout/Navbar.tsx`
+  depend on real Mongo product records. When adding or changing those
+  links, update `server/src/scripts/seedFeaturedProducts.ts`; the
+  server seeds them at startup, and `npm run seed:products` is the
+  manual backfill command from `server/`.
 
 ## Working agreements
 

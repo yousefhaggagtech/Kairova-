@@ -11,6 +11,7 @@
     "test": "jest",
     "seed:admin": "tsx src/scripts/seedAdmin.ts",
     "seed:categories": "tsx src/scripts/seedCategories.ts",
+    "seed:products": "tsx src/scripts/seedFeaturedProducts.ts",
     "reset:admin-password": "tsx src/scripts/resetAdminPassword.ts"
   },
   "keywords": [],
