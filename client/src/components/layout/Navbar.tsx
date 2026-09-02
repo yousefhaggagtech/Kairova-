@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
@@ -195,7 +195,7 @@ const navTextClass =
 const iconButtonClass =
   "relative inline-flex h-9 w-9 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none sm:h-10 sm:w-10";
 
-function SearchIcon() {
+function SearchIcon({ title }: { title: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +206,7 @@ function SearchIcon() {
       focusable="false"
       role="img"
     >
-      <title>Search</title>
+      <title>{title}</title>
       <path
         fill="currentColor"
         fillRule="evenodd"
@@ -313,6 +313,7 @@ export default function Navbar() {
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [scrollState, setScrollState] = useState({
     hidden: false,
     atTop: isHomeRoute,
@@ -475,6 +476,21 @@ export default function Navbar() {
     setIsSearchOpen((currentValue) => !currentValue);
   }
 
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const query = searchQuery.trim().replace(/\s+/g, " ");
+
+    if (!query) {
+      searchInputRef.current?.focus();
+      return;
+    }
+
+    setActiveMenu(null);
+    setIsSearchOpen(false);
+    router.push(`/search?q=${encodeURIComponent(query)}`);
+  }
+
   function openCart() {
     setActiveMenu(null);
     setIsSearchOpen(false);
@@ -557,7 +573,7 @@ export default function Navbar() {
               aria-controls="navbar-search-panel"
               onClick={toggleSearch}
             >
-              <SearchIcon />
+              <SearchIcon title={t("search")} />
             </button>
             <Link
               href={accountHref}
@@ -668,16 +684,33 @@ export default function Navbar() {
           }`}
         >
           <div className="mx-auto w-full max-w-[var(--max-content)] ps-4 pe-4 py-6 sm:ps-6 sm:pe-6 md:ps-10 md:pe-10">
-            <label htmlFor="navbar-search-input" className="sr-only">
-              {t("searchProducts")}
-            </label>
-            <input
-              ref={searchInputRef}
-              id="navbar-search-input"
-              type="search"
-              placeholder={t("searchPlaceholder")}
-              className="w-full border-0 border-b border-border-light bg-transparent py-3 text-body text-fg-secondary outline-none transition-colors placeholder:text-fg-muted focus:border-fg-secondary"
-            />
+            <form
+              className="flex items-end gap-4"
+              onSubmit={handleSearchSubmit}
+            >
+              <div className="min-w-0 flex-1">
+                <label htmlFor="navbar-search-input" className="sr-only">
+                  {t("searchProducts")}
+                </label>
+                <input
+                  ref={searchInputRef}
+                  id="navbar-search-input"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder={t("searchPlaceholder")}
+                  className="w-full border-0 border-b border-border-light bg-transparent py-3 text-body text-fg-secondary outline-none transition-colors placeholder:text-fg-muted focus:border-fg-secondary"
+                />
+              </div>
+              <button
+                type="submit"
+                className="inline-flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center border border-border-light text-fg-secondary transition-colors duration-200 hover:border-fg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
+                aria-label={t("search")}
+                title={t("search")}
+              >
+                <SearchIcon title={t("search")} />
+              </button>
+            </form>
           </div>
         </div>
       </header>

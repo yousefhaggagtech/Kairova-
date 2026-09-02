@@ -28,6 +28,7 @@ interface ProductListFilters {
   gender?: ProductGender;
   categoryId?: string;
   subcategoryId?: string | null;
+  search?: string;
 }
 
 type ProductUpdates = Partial<{
@@ -82,6 +83,40 @@ const getSubcategoryId = (
   }
 
   return updates.subcategory;
+};
+
+const searchableProductFields = [
+  "name.en",
+  "name.ar",
+  "description.en",
+  "description.ar",
+  "sku",
+  "slug",
+];
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const getSearchTerms = (search: string | undefined): string[] =>
+  (search || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 8);
+
+const buildSearchFilter = (search: string | undefined) => {
+  const terms = getSearchTerms(search);
+
+  if (terms.length === 0) {
+    return [];
+  }
+
+  return terms.map((term) => ({
+    $or: searchableProductFields.map((field) => ({
+      [field]: { $regex: escapeRegExp(term), $options: "i" },
+    })),
+  }));
 };
 
 const validateCategory = async (
@@ -219,6 +254,7 @@ export const listProducts = async (
   filters: ProductListFilters = {},
 ): Promise<IProduct[]> => {
   const query: Record<string, unknown> = {};
+  const searchFilters = buildSearchFilter(filters.search);
 
   if (filters.gender) {
     query.gender = filters.gender;
@@ -232,6 +268,10 @@ export const listProducts = async (
     query.subcategory = filters.subcategoryId
       ? toObjectId(filters.subcategoryId, "Invalid subcategory id")
       : null;
+  }
+
+  if (searchFilters.length > 0) {
+    query.$and = searchFilters;
   }
 
   return Product.find(query).active().populate(productPopulate);

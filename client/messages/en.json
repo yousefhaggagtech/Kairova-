@@ -242,6 +242,22 @@
       "metadataFallbackDescription": "Explore a refined Kairova piece with reserve-first service in Egypt."
     }
   },
+  "search": {
+    "metadata": {
+      "title": "Search | Kairova",
+      "titleWithQuery": "Search results for {query} | Kairova",
+      "description": "Search Kairova products by name, description, or SKU."
+    },
+    "eyebrow": "Product Search",
+    "title": "Search Kairova",
+    "titleWithQuery": "Results for {query}",
+    "inputLabel": "Search query",
+    "submit": "Search",
+    "loading": "Loading results...",
+    "resultCount": "{count} results",
+    "emptyState": "Your search results will appear here.",
+    "loadFailed": "Failed to load search results"
+  },
   "checkout": {
     "quantity": "Quantity",
     "decreaseQuantity": "Decrease quantity",

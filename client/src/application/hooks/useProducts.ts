@@ -6,6 +6,7 @@ type ProductFilters = {
   gender?: string;
   categoryId?: string;
   subcategoryId?: string;
+  search?: string;
 };
 
 type UseProductsOptions = {

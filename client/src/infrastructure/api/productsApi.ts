@@ -6,6 +6,7 @@ type ProductFilters = {
   gender?: string;
   categoryId?: string;
   subcategoryId?: string;
+  search?: string;
 };
 
 export const productsApi = {
@@ -16,6 +17,7 @@ export const productsApi = {
     if (filters?.subcategoryId) {
       params.set("subcategoryId", filters.subcategoryId);
     }
+    if (filters?.search) params.set("search", filters.search);
 
     const queryString = params.toString();
     const response = await apiClient.get<ApiResponse<{ products: Product[] }>>(

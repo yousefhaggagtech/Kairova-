@@ -13,6 +13,9 @@ import {
   updateProduct,
 } from "./service.js";
 
+const getStringQueryParam = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
+
 export const createProductController = catchError(
   async (req: Request, res: Response) => {
     const product = await createProduct(req.body);
@@ -27,9 +30,10 @@ export const createProductController = catchError(
 export const listProductsController = catchError(
   async (req: Request, res: Response) => {
     const products = await listProducts({
-      gender: req.query.gender as never,
-      categoryId: req.query.categoryId as string | undefined,
-      subcategoryId: req.query.subcategoryId as string | undefined,
+      gender: getStringQueryParam(req.query.gender) as never,
+      categoryId: getStringQueryParam(req.query.categoryId),
+      subcategoryId: getStringQueryParam(req.query.subcategoryId),
+      search: getStringQueryParam(req.query.search),
     });
 
     res.status(200).json({

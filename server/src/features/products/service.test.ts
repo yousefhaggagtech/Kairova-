@@ -203,6 +203,43 @@ describe("product service", () => {
     expect(products[0]?.name.en).toBe("Bracelet");
   });
 
+  it("listProducts filters by search terms across product fields", async () => {
+    const categories = await seedCategories();
+    const classic = await createSeedProduct(categories, {
+      name: { ar: "Royal Automatic Watch AR", en: "Royal Automatic Watch" },
+      description: {
+        ar: "Silver dial description AR",
+        en: "Silver dial with bracelet detail",
+      },
+    });
+    const bracelet = await createProduct(
+      productInput({
+        name: { ar: "Titan Bracelet AR", en: "Titan Bracelet" },
+        description: {
+          ar: "Braided accent description AR",
+          en: "Braided leather accent",
+        },
+        categoryId: categories.menAccessories._id.toString(),
+        subcategoryId: categories.menBracelets._id.toString(),
+      }),
+    );
+
+    const nameResults = await listProducts({ search: "royal watch" });
+    const descriptionResults = await listProducts({ search: "leather accent" });
+    const skuResults = await listProducts({ search: classic.sku.toLowerCase() });
+    const escapedResults = await listProducts({ search: ".*" });
+
+    expect(nameResults).toHaveLength(1);
+    expect(nameResults[0]?._id.toString()).toBe(classic._id.toString());
+    expect(descriptionResults).toHaveLength(1);
+    expect(descriptionResults[0]?._id.toString()).toBe(
+      bracelet._id.toString(),
+    );
+    expect(skuResults).toHaveLength(1);
+    expect(skuResults[0]?._id.toString()).toBe(classic._id.toString());
+    expect(escapedResults).toHaveLength(0);
+  });
+
   it("getProductById populates images and category", async () => {
     const categories = await seedCategories();
     const product = await createSeedProduct(categories);
