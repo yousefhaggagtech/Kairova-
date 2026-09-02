@@ -214,3 +214,7 @@ html[dir="rtl"] .kairova-cart-drawer {
 .kairova-cart-drawer[data-open="true"] {
   transform: translateX(0);
 }
+
+html[dir="rtl"] .kairova-cart-drawer[data-open="true"] {
+  transform: translateX(0);
+}

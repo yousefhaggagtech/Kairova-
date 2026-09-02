@@ -255,6 +255,33 @@
     "total": "Total",
     "proceedToCheckout": "Proceed to Checkout",
     "closeCart": "Close cart",
+    "cartPage": {
+      "metadata": {
+        "title": "Cart | Kairova",
+        "description": "Review your Kairova selection before continuing to the reserve-first checkout."
+      },
+      "eyebrow": "Private Selection",
+      "intro": "Review the pieces you are preparing to reserve, adjust quantities, and continue into Kairova's manual confirmation flow.",
+      "cartItemCount": "Selected pieces: {count}",
+      "lineItem": "Selected piece",
+      "unitPrice": "Unit price",
+      "itemTotal": "Line total",
+      "stockLimit": "Only {count} available",
+      "emptyEyebrow": "Selection Awaits",
+      "emptyBody": "Begin with a watch, a scent, or a detail that gives your next arrival its quiet signature.",
+      "emptyImageAlt": "Kairova pendant jewelry photographed in a monochrome luxury composition",
+      "shopWomen": "Explore Women",
+      "shopMen": "Explore Men",
+      "summaryEyebrow": "Reservation Summary",
+      "summaryTitle": "Prepared for checkout",
+      "depositNote": "Your piece is reserved first. Deposit transfer and confirmation happen personally before fulfillment.",
+      "serviceTitle": "What happens next",
+      "steps": {
+        "reserve": "Place the reservation and secure your selection.",
+        "confirm": "Transfer the deposit outside the site and wait for admin confirmation.",
+        "receive": "Complete the balance, then your order moves to J&T Express delivery."
+      }
+    },
     "shippingAddress": "Shipping Address",
     "addressLabel": "Address Label (Home, Work)",
     "street": "Street",

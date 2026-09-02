@@ -283,6 +283,33 @@ for (const route of localizedRoutes(staticRoutes)) {
   });
 }
 
+test("cart drawer opens from the Arabic navbar", async ({ page }) => {
+  await page.goto("/", { waitUntil: "networkidle" });
+
+  await page.locator("button[aria-controls='cart-drawer']").click();
+
+  const drawer = page.locator("#cart-drawer");
+  const viewport = page.viewportSize();
+
+  expect(viewport).not.toBeNull();
+  await expect(drawer).toHaveAttribute("data-open", "true");
+  await expect(drawer).toBeVisible();
+  await expect
+    .poll(async () => {
+      const box = await drawer.boundingBox();
+
+      return box ? Math.round(box.x) : -9999;
+    })
+    .toBeGreaterThanOrEqual(-1);
+  await expect
+    .poll(async () => {
+      const box = await drawer.boundingBox();
+
+      return box && viewport ? Math.round(box.x + box.width) : 9999;
+    })
+    .toBeLessThanOrEqual((viewport?.width ?? 0) + 1);
+});
+
 for (const { locale, prefix } of locales) {
   test(`smoke: ${locale} product detail`, async ({ page }) => {
     const path = productLookup.slug
