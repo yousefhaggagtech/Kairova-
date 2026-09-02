@@ -71,10 +71,11 @@ export const adminOrdersApi = {
     return getOrderFromResponse(response.data);
   },
 
-  cancel: async (id: string, reason: string): Promise<Order> => {
+  cancel: async (id: string, reason?: string): Promise<Order> => {
+    const payload = reason?.trim() ? { reason: reason.trim() } : {};
     const response = await apiClient.post<ApiResponse<{ order: Order }>>(
       `/api/admin/orders/${id}/cancel`,
-      { reason },
+      payload,
     );
     return getOrderFromResponse(response.data);
   },

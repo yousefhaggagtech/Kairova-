@@ -80,8 +80,7 @@ export function useCancelOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      adminOrdersApi.cancel(id, reason),
+    mutationFn: (id: string) => adminOrdersApi.cancel(id),
     onSuccess: (order) => updateOrderCache(queryClient, order),
   });
 }

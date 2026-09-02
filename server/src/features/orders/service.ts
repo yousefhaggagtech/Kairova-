@@ -312,7 +312,7 @@ export const shipOrder = async (
 export const cancelOrder = async (
   orderId: string,
   adminId: string,
-  reason: string,
+  reason?: string,
 ): Promise<IOrder> => {
   void adminId;
 
@@ -327,7 +327,7 @@ export const cancelOrder = async (
   }
 
   order.status = "CANCELLED";
-  order.cancellationReason = reason;
+  order.cancellationReason = reason?.trim() || null;
   order.refundStatus = requiresRefund(previousStatus) ? "pending" : "not_required";
   await order.save();
 

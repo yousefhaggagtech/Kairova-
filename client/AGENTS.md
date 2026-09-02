@@ -45,6 +45,9 @@ Any hex color or Tailwind literal repeated in 2+ files becomes a
 token in `app/globals.css`'s `@theme` block or a shared
 constant/util (e.g. `src/lib/orderStatusStyles.ts` for order-status
 colors) — never copy-paste the literal again.
+- Native `<select>` controls use the global `.kairova-select` class
+  plus size/layout utilities so option menus stay light and readable
+  across themes.
 
 ## Navigation
 

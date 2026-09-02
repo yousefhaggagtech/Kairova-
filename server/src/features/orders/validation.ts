@@ -30,10 +30,13 @@ export const addPaymentProofSchema = z.object({
 });
 
 export const cancelOrderSchema = z.object({
-  reason: z
-    .string()
-    .min(1, "Cancellation reason is required")
-    .max(500),
+  reason: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim().length === 0
+        ? undefined
+        : value,
+    z.string().trim().max(500).optional(),
+  ),
 });
 
 export const shipOrderSchema = z.object({

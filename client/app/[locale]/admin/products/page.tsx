@@ -2,7 +2,7 @@
 
 import type { AxiosError } from "axios";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   useAdminProducts,
@@ -20,6 +20,10 @@ type SupportedLocale = "ar" | "en";
 type GenderFilter = "men" | "women" | "";
 type ErrorResponse = {
   message?: string;
+};
+type GenderFilterOption = {
+  label: string;
+  value: GenderFilter;
 };
 
 function isProductImage(image: Product["images"][number]): image is ProductImage {
@@ -49,12 +53,110 @@ function getPrimaryImage(product: Product) {
   return images.find((image) => image.isPrimary) || images[0];
 }
 
+function GenderFilterDropdown({
+  onChange,
+  options,
+  value,
+}: {
+  onChange: (value: GenderFilter) => void;
+  options: GenderFilterOption[];
+  value: GenderFilter;
+}) {
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption =
+    options.find((option) => option.value === value) || options[0];
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className="relative">
+      <button
+        type="button"
+        id="gender-filter"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-labelledby="gender-filter-label gender-filter"
+        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        className="flex min-h-11 w-full items-center justify-between gap-3 border border-border-light bg-surface-light px-3 py-2 text-start text-body text-fg-secondary transition-colors hover:bg-bg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
+      >
+        <span>{selectedOption.label}</span>
+        <span aria-hidden="true" className="text-caption text-fg-muted">
+          v
+        </span>
+      </button>
+
+      {isOpen ? (
+        <ul
+          role="listbox"
+          aria-labelledby="gender-filter-label"
+          className="absolute z-40 mt-2 max-h-60 w-full overflow-y-auto border border-border-light bg-surface-light py-1 text-fg-secondary shadow-[0_18px_44px_rgba(10,10,10,0.14)]"
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
+
+            return (
+              <li key={option.value || "all"} role="presentation">
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`block min-h-10 w-full px-3 py-2 text-start text-body transition-colors hover:bg-bg-secondary focus-visible:bg-bg-secondary focus-visible:outline-none ${
+                    isSelected ? "font-medium text-fg-secondary" : "text-fg-muted"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 export default function AdminProductsPage() {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("");
   const [actionError, setActionError] = useState("");
+  const genderFilterOptions = useMemo<GenderFilterOption[]>(
+    () => [
+      { label: t("allGenders"), value: "" },
+      { label: t("men"), value: "men" },
+      { label: t("women"), value: "women" },
+    ],
+    [t],
+  );
   const filters = useMemo(
     () => (genderFilter ? { gender: genderFilter } : undefined),
     [genderFilter],
@@ -95,19 +197,18 @@ export default function AdminProductsPage() {
       </div>
 
       <div className="mb-6 max-w-xs">
-        <label className="mb-2 block text-caption" htmlFor="gender-filter">
+        <label
+          id="gender-filter-label"
+          className="mb-2 block text-caption"
+          htmlFor="gender-filter"
+        >
           {t("gender")}
         </label>
-        <select
-          id="gender-filter"
+        <GenderFilterDropdown
           value={genderFilter}
-          onChange={(event) => setGenderFilter(event.target.value as GenderFilter)}
-          className="w-full border border-border-light bg-bg-secondary px-3 py-2 dark:border-border-subtle dark:bg-bg-primary"
-        >
-          <option value="">{t("allGenders")}</option>
-          <option value="men">{t("men")}</option>
-          <option value="women">{t("women")}</option>
-        </select>
+          options={genderFilterOptions}
+          onChange={setGenderFilter}
+        />
       </div>
 
       {actionError && (

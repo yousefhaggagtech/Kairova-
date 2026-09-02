@@ -31,8 +31,17 @@ export default function ReservationJourneySection() {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const isRtl = locale === "ar";
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const routeSegment =
+    pathSegments[0] === locale ? pathSegments[1] : pathSegments[0];
+  const isAdminRoute = routeSegment === "admin";
   const isProductDetailPage = /\/product\/[^/]+\/?$/.test(pathname);
   const shouldReduceMotion = useReducedMotion();
+
+  if (isAdminRoute) {
+    return null;
+  }
+
   const surfaceClassName = isProductDetailPage
     ? "border-t border-border-subtle bg-bg-absolute text-fg-primary"
     : "bg-bg-secondary text-fg-secondary";

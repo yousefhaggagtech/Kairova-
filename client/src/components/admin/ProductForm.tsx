@@ -423,7 +423,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                 setSubcategoryId("");
               }}
               required
-              className="w-full border border-border-light bg-bg-secondary px-3 py-2 dark:border-border-subtle dark:bg-bg-primary"
+              className="kairova-select w-full border px-3 py-2"
             >
               <option value="">{t("selectCategory")}</option>
               {parentCategories.map((category) => (
@@ -447,7 +447,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               onChange={(event) => setSubcategoryId(event.target.value)}
               required
               disabled={!categoryId}
-              className="w-full border border-border-light bg-bg-secondary px-3 py-2 disabled:opacity-50 dark:border-border-subtle dark:bg-bg-primary"
+              className="kairova-select w-full border px-3 py-2 disabled:opacity-50"
             >
               <option value="">
                 {categoryId && subcategories.length === 0

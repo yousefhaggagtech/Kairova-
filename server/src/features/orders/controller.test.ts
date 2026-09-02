@@ -371,6 +371,21 @@ describe("order controllers", () => {
       });
     });
 
+    it("POST /api/admin/orders/:id/cancel allows no reason", async () => {
+      const order = await createPendingOrder(seed);
+
+      const response = await request(app)
+        .post(`/api/admin/orders/${idOf(order)}/cancel`)
+        .set("Cookie", authCookie(seed.admin))
+        .send({})
+        .expect(200);
+
+      expect(response.body.data.order).toMatchObject({
+        status: "CANCELLED",
+        cancellationReason: null,
+      });
+    });
+
     it("POST /api/admin/orders/:id/confirm-deposit throws on invalid state", async () => {
       const order = await createReservedOrder(seed);
 

@@ -588,7 +588,7 @@ export default function Navbar() {
 
         <div
           id="navbar-menu-panel"
-          className={`overflow-hidden border-border-light transition-[max-height,opacity] duration-300 ease-out ${
+          className={`overflow-hidden border-border-light bg-surface-light text-fg-secondary shadow-[0_18px_52px_rgba(10,10,10,0.10)] transition-[max-height,opacity] duration-300 ease-out ${
             activeMenu
               ? "max-h-[calc(100svh-5rem)] border-t opacity-100"
               : "max-h-0 opacity-0"
@@ -663,7 +663,7 @@ export default function Navbar() {
 
         <div
           id="navbar-search-panel"
-          className={`overflow-hidden border-border-light transition-[max-height,opacity] duration-300 ease-out ${
+          className={`overflow-hidden border-border-light bg-surface-light text-fg-secondary shadow-[0_18px_52px_rgba(10,10,10,0.10)] transition-[max-height,opacity] duration-300 ease-out ${
             isSearchOpen ? "max-h-40 border-t opacity-100" : "max-h-0 opacity-0"
           }`}
         >

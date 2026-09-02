@@ -45,6 +45,24 @@
 html { background: var(--color-bg-secondary); color: var(--color-fg-secondary); }
 html.dark { background: var(--color-bg-primary); color: var(--color-fg-primary); }
 
+.kairova-select {
+  background-color: var(--color-surface-light);
+  border-color: var(--color-border-light);
+  color: var(--color-fg-secondary);
+  color-scheme: light;
+}
+
+.kairova-select option {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-fg-secondary);
+}
+
+html.dark .kairova-select {
+  background-color: var(--color-surface-light);
+  border-color: var(--color-border-light);
+  color: var(--color-fg-secondary);
+}
+
 html[lang="ar"] {
   font-family: var(--font-body-ar);
 }

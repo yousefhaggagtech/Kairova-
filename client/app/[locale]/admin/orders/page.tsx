@@ -101,7 +101,7 @@ export default function AdminOrdersPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value as OrderStatus | "")
               }
-              className="w-full border border-border-light bg-bg-secondary px-3 py-2 dark:border-border-subtle dark:bg-bg-primary"
+              className="kairova-select w-full border px-3 py-2"
             >
               <option value="">{t("allStatuses")}</option>
               {ORDER_STATUSES.map((status) => (

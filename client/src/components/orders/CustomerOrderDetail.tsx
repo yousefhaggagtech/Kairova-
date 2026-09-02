@@ -251,7 +251,7 @@ export default function CustomerOrderDetail({
                 onChange={(event) =>
                   setProofLabel(event.target.value as PaymentProofLabelKey)
                 }
-                className="w-full border border-border-light bg-bg-secondary px-3 py-3 dark:border-border-subtle dark:bg-bg-primary"
+                className="kairova-select w-full border px-3 py-3"
               >
                 {paymentProofLabelKeys.map((labelKey) => (
                   <option key={labelKey} value={labelKey}>

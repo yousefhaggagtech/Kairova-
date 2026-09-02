@@ -15,9 +15,11 @@ import {
   useMarkPacked,
   useShipOrder,
 } from "@/application/hooks/useAdminOrders";
+import OptimizedProductImage from "@/components/media/OptimizedProductImage";
 import type {
   Order,
   OrderItem,
+  ProductImage,
   OrderStatus,
   User,
 } from "@/domain/entities/api";
@@ -29,6 +31,22 @@ type SupportedLocale = "ar" | "en";
 type ErrorResponse = {
   message?: string;
 };
+
+type DetailItem = {
+  label: string;
+  value: string;
+};
+
+const panelClassName = "border border-border-light bg-bg-secondary p-5 sm:p-6";
+const panelTitleClassName = "text-h3 leading-heading text-fg-secondary";
+const detailLabelClassName = "block text-caption uppercase text-fg-muted";
+const detailValueClassName = "break-words text-body font-medium text-fg-secondary";
+const fieldClassName =
+  "w-full border border-border-light bg-bg-secondary px-3 py-2 text-body text-fg-secondary transition-colors placeholder:text-fg-muted focus:border-fg-secondary focus:outline-none disabled:cursor-not-allowed disabled:opacity-60";
+const primaryButtonClassName =
+  "w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-body font-medium text-bg-secondary transition-colors hover:bg-bg-absolute focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
+const secondaryButtonClassName =
+  "w-full border border-border-light bg-bg-secondary px-4 py-3 text-body font-medium text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
 
 function getId(idParam: string | string[] | undefined) {
   return Array.isArray(idParam) ? idParam[0] : idParam || "";
@@ -70,6 +88,16 @@ function getProofKey(url: string, uploadedAt: string, index: number) {
   return `${url}-${uploadedAt}-${index}`;
 }
 
+function getItemPrimaryImage(item: OrderItem): ProductImage | null {
+  if (typeof item.product === "string") {
+    return null;
+  }
+
+  const images = Array.isArray(item.product.images) ? item.product.images : [];
+
+  return images.find((image) => image.isPrimary) || images[0] || null;
+}
+
 export default function AdminOrderDetailPage() {
   const params = useParams();
   const orderId = getId(params.id);
@@ -85,7 +113,6 @@ export default function AdminOrderDetailPage() {
   const shipOrder = useShipOrder();
   const cancelOrder = useCancelOrder();
   const [waybillNumber, setWaybillNumber] = useState("");
-  const [cancelReason, setCancelReason] = useState("");
   const [actionError, setActionError] = useState("");
 
   const actionPending =
@@ -131,12 +158,7 @@ export default function AdminOrderDetailPage() {
       return;
     }
 
-    void runAction(() =>
-      cancelOrder.mutateAsync({
-        id: order._id,
-        reason: cancelReason.trim(),
-      }),
-    );
+    void runAction(() => cancelOrder.mutateAsync(order._id));
   };
 
   const getProofDisplayLabel = (label?: string) => {
@@ -148,11 +170,19 @@ export default function AdminOrderDetailPage() {
   };
 
   if (isLoading) {
-    return <p className="py-8 text-body text-fg-muted">{t("loading")}</p>;
+    return (
+      <section className={panelClassName}>
+        <p className="text-body text-fg-muted">{t("loading")}</p>
+      </section>
+    );
   }
 
   if (isError || !order) {
-    return <p className="py-8 text-body text-fg-muted">{t("orderNotFound")}</p>;
+    return (
+      <section className={panelClassName}>
+        <p className="text-body text-fg-muted">{t("orderNotFound")}</p>
+      </section>
+    );
   }
 
   const customer = getCustomer(order);
@@ -167,323 +197,453 @@ export default function AdminOrderDetailPage() {
   );
   const whatsappUrl = `https://wa.me/${customerWhatsAppPhone}?text=${whatsappMessage}`;
   const paymentProofs = order.paymentProofs ?? [];
+  const formatMoney = (amount: number) =>
+    `${amount.toLocaleString(locale)} ${tCatalog("egp")}`;
+  const paymentMethodLabel =
+    order.paymentMethod === "instapay"
+      ? tCheckout("instapay")
+      : order.paymentMethod === "vodafone_cash"
+        ? tCheckout("vodafoneCash")
+        : t("notSet");
+  const totalQuantity = order.items.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+  const headerMetrics: DetailItem[] = [
+    { label: t("customer"), value: getCustomerName(order) },
+    { label: t("total"), value: formatMoney(order.subtotal) },
+    {
+      label: t("paymentProofs"),
+      value: paymentProofs.length.toLocaleString(locale),
+    },
+    { label: t("quantity"), value: totalQuantity.toLocaleString(locale) },
+  ];
+  const orderSummaryItems: DetailItem[] = [
+    { label: t("paymentChannel"), value: paymentMethodLabel },
+    { label: t("subtotal"), value: formatMoney(order.subtotal) },
+    {
+      label: `${t("deposit")} (${order.depositPercentage}%)`,
+      value: formatMoney(order.depositAmount),
+    },
+    { label: t("remaining"), value: formatMoney(order.remainingAmount) },
+  ];
+  const customerItems: DetailItem[] = [
+    { label: t("customer"), value: getCustomerName(order) },
+    { label: t("email"), value: customer?.email || t("notSet") },
+    { label: t("phone"), value: customerPhone },
+  ];
+  const deliveryItems: DetailItem[] = [
+    {
+      label: t("address"),
+      value: `${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.governorate}`,
+    },
+    { label: t("phone"), value: shippingAddress.phone },
+    { label: t("waybill"), value: order.waybillNumber || t("notSet") },
+  ];
+  const timelineItems: DetailItem[] = [
+    {
+      label: t("created"),
+      value: new Date(order.createdAt).toLocaleString(locale),
+    },
+    {
+      label: t("updated"),
+      value: new Date(order.updatedAt).toLocaleString(locale),
+    },
+    ...(order.cancellationReason
+      ? [{ label: t("cancelReason"), value: order.cancellationReason }]
+      : []),
+  ];
 
   return (
-    <section>
-      <Link href="/admin/orders" className="mb-6 inline-block underline">
+    <section className="space-y-8">
+      <Link
+        href="/admin/orders"
+        className="inline-flex min-h-10 items-center border border-border-light bg-bg-secondary px-4 text-body text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
+      >
         {t("backToOrders")}
       </Link>
 
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="mb-2 font-mono text-body text-fg-muted">
-            {order.orderNumber}
-          </p>
-          <h2 className="text-h2 leading-heading">{t("order")}</h2>
-        </div>
-        <span
-          className={`inline-block border px-3 py-2 text-body ${getOrderStatusClasses(
-            order.status,
-          )}`}
-        >
-          {t(`status.${order.status}`)}
-        </span>
-      </div>
-
-      <section className="mb-8 border border-border-light bg-surface-light p-5 dark:border-border-subtle dark:bg-surface-dark">
-        <h3 className="mb-4 text-h3 leading-heading">{t("actions")}</h3>
-
-        <div className="grid gap-3 md:grid-cols-2">
-          {order.status === "PENDING_DEPOSIT" && (
-            <button
-              type="button"
-              disabled={actionPending}
-              onClick={() =>
-                void runAction(() => confirmDeposit.mutateAsync(order._id))
-              }
-              className="w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
-              data-testid="admin-forward-action"
+      <section className="relative overflow-hidden border-y border-border-light bg-bg-secondary py-8 sm:py-10">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--color-bg-secondary)_0%,var(--color-surface-light)_48%,var(--color-bg-secondary)_100%)]" />
+        <div className="pointer-events-none absolute end-0 top-0 hidden h-full w-2/5 border-s border-border-light bg-[repeating-linear-gradient(135deg,rgba(10,10,10,0.04)_0,rgba(10,10,10,0.04)_1px,transparent_1px,transparent_18px)] lg:block" />
+        <div className="relative px-5 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-caption uppercase text-fg-muted">
+                {t("orderWorkspace")}
+              </p>
+              <p className="mt-4 font-mono text-body text-fg-muted">
+                {order.orderNumber}
+              </p>
+              <h2 className="mt-2 text-h1 leading-heading text-fg-secondary">
+                {t("order")}
+              </h2>
+              <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
+                {t("orderDetailLead")}
+              </p>
+            </div>
+            <span
+              className={`inline-flex min-h-10 shrink-0 items-center border px-3 text-body ${getOrderStatusClasses(
+                order.status,
+              )}`}
             >
-              {actionPending ? t("processing") : t("confirmDeposit")}
-            </button>
-          )}
+              {t(`status.${order.status}`)}
+            </span>
+          </div>
 
-          {order.status === "RESERVED" && (
-            <button
-              type="button"
-              disabled={actionPending}
-              onClick={() =>
-                void runAction(() => markPacked.mutateAsync(order._id))
-              }
-              className="w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
-              data-testid="admin-forward-action"
-            >
-              {actionPending ? t("processing") : t("markPacked")}
-            </button>
-          )}
-
-          {order.status === "PACKED" && (
-            <button
-              type="button"
-              disabled={actionPending}
-              onClick={() =>
-                void runAction(() => confirmPayment.mutateAsync(order._id))
-              }
-              className="w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
-              data-testid="admin-forward-action"
-            >
-              {actionPending ? t("processing") : t("confirmPayment")}
-            </button>
-          )}
-
-          {order.status === "FULLY_PAID" && (
-            <form
-              onSubmit={handleShip}
-              className="space-y-3 md:col-span-2"
-              data-testid="admin-ship-form"
-            >
-              <label className="block text-caption" htmlFor="waybill">
-                {t("waybillNumber")}
-              </label>
-              <input
-                id="waybill"
-                type="text"
-                value={waybillNumber}
-                onChange={(event) => setWaybillNumber(event.target.value)}
-                required
-                disabled={shippingRequiresManualCheck}
-                className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
-              />
-              {shippingRequiresManualCheck && (
-                <p className="text-caption text-fg-muted">
-                  {t("manualShippingRequired")}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={
-                  actionPending ||
-                  shippingRequiresManualCheck ||
-                  waybillNumber.trim().length === 0
-                }
-                className="w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
-                data-testid="admin-forward-action"
+          <dl className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {headerMetrics.map((item) => (
+              <div
+                key={item.label}
+                className="border border-border-light bg-bg-secondary/85 p-4"
               >
-                {actionPending ? t("processing") : t("shipOrder")}
-              </button>
-            </form>
-          )}
-
-          {order.status === "CONFIRMED_SHIPPED" && (
-            <p className="text-body text-fg-muted">{t("noForwardAction")}</p>
-          )}
-
-          {order.status === "CANCELLED" && (
-            <p className="text-body text-fg-muted">{t("alreadyCancelled")}</p>
-          )}
-
-          {canCancel(order.status) && (
-            <form
-              onSubmit={handleCancel}
-              className="space-y-3 md:col-span-2"
-              data-testid="admin-cancel-form"
-            >
-              <label className="block text-caption" htmlFor="cancel-reason">
-                {t("cancelReason")}
-              </label>
-              <textarea
-                id="cancel-reason"
-                value={cancelReason}
-                onChange={(event) => setCancelReason(event.target.value)}
-                required
-                maxLength={500}
-                className="min-h-24 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
-              />
-              <button
-                type="submit"
-                disabled={actionPending || cancelReason.trim().length === 0}
-                className="w-full border border-red-700 px-4 py-3 text-red-700 disabled:opacity-50 dark:border-red-300 dark:text-red-300"
-                data-testid="admin-cancel-action"
-              >
-                {actionPending ? t("processing") : t("cancelOrder")}
-              </button>
-            </form>
-          )}
+                <dt className={detailLabelClassName}>{item.label}</dt>
+                <dd className="mt-2 break-words text-body-lg font-semibold text-fg-secondary">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-
-        {actionError && (
-          <p className="mt-4 text-body text-red-600">{actionError}</p>
-        )}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="space-y-6">
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h3 className="mb-4 text-h3 leading-heading">{t("items")}</h3>
-            <div className="space-y-4">
-              {order.items.map((item, index) => (
-                <div
-                  key={getProductKey(item, index)}
-                  className="flex flex-col gap-2 border-b border-border-light pb-4 last:border-b-0 last:pb-0 dark:border-border-subtle sm:flex-row sm:items-center sm:justify-between"
+          <section className={panelClassName}>
+            <div className="border-b border-border-light pb-5">
+              <p className={detailLabelClassName}>{t("actions")}</p>
+              <h3 className={`mt-2 ${panelTitleClassName}`}>
+                {t("fulfillmentControls")}
+              </h3>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {order.status === "PENDING_DEPOSIT" && (
+                <button
+                  type="button"
+                  disabled={actionPending}
+                  onClick={() =>
+                    void runAction(() => confirmDeposit.mutateAsync(order._id))
+                  }
+                  className={primaryButtonClassName}
+                  data-testid="admin-forward-action"
                 >
-                  <div>
-                    <p>{item.name[locale] || item.name.en}</p>
+                  {actionPending ? t("processing") : t("confirmDeposit")}
+                </button>
+              )}
+
+              {order.status === "RESERVED" && (
+                <button
+                  type="button"
+                  disabled={actionPending}
+                  onClick={() =>
+                    void runAction(() => markPacked.mutateAsync(order._id))
+                  }
+                  className={primaryButtonClassName}
+                  data-testid="admin-forward-action"
+                >
+                  {actionPending ? t("processing") : t("markPacked")}
+                </button>
+              )}
+
+              {order.status === "PACKED" && (
+                <button
+                  type="button"
+                  disabled={actionPending}
+                  onClick={() =>
+                    void runAction(() => confirmPayment.mutateAsync(order._id))
+                  }
+                  className={primaryButtonClassName}
+                  data-testid="admin-forward-action"
+                >
+                  {actionPending ? t("processing") : t("confirmPayment")}
+                </button>
+              )}
+
+              {order.status === "FULLY_PAID" && (
+                <form
+                  onSubmit={handleShip}
+                  className="space-y-3 md:col-span-2"
+                  data-testid="admin-ship-form"
+                >
+                  <label className={detailLabelClassName} htmlFor="waybill">
+                    {t("waybillNumber")}
+                  </label>
+                  <input
+                    id="waybill"
+                    type="text"
+                    value={waybillNumber}
+                    onChange={(event) => setWaybillNumber(event.target.value)}
+                    required
+                    disabled={shippingRequiresManualCheck}
+                    className={fieldClassName}
+                  />
+                  {shippingRequiresManualCheck && (
                     <p className="text-caption text-fg-muted">
-                      {item.quantity} x{" "}
-                      {item.unitPrice.toLocaleString(locale)} {tCatalog("egp")}
+                      {t("manualShippingRequired")}
                     </p>
-                  </div>
-                  <p className="font-medium">
-                    {(item.unitPrice * item.quantity).toLocaleString(locale)}{" "}
-                    {tCatalog("egp")}
-                  </p>
-                </div>
-              ))}
+                  )}
+                  <button
+                    type="submit"
+                    disabled={
+                      actionPending ||
+                      shippingRequiresManualCheck ||
+                      waybillNumber.trim().length === 0
+                    }
+                    className={primaryButtonClassName}
+                    data-testid="admin-forward-action"
+                  >
+                    {actionPending ? t("processing") : t("shipOrder")}
+                  </button>
+                </form>
+              )}
+
+              {order.status === "CONFIRMED_SHIPPED" && (
+                <p className="text-body text-fg-muted">{t("noForwardAction")}</p>
+              )}
+
+              {order.status === "CANCELLED" && (
+                <p className="text-body text-fg-muted">{t("alreadyCancelled")}</p>
+              )}
+
+              {canCancel(order.status) && (
+                <form
+                  onSubmit={handleCancel}
+                  className="md:col-span-2"
+                  data-testid="admin-cancel-form"
+                >
+                  <button
+                    type="submit"
+                    disabled={actionPending}
+                    className={secondaryButtonClassName}
+                    data-testid="admin-cancel-action"
+                  >
+                    {actionPending ? t("processing") : t("cancelOrder")}
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {actionError && (
+              <p className="mt-5 border border-fg-secondary bg-surface-light px-4 py-3 text-body text-fg-secondary">
+                {actionError}
+              </p>
+            )}
+          </section>
+
+          <section className={panelClassName}>
+            <div className="flex flex-col gap-2 border-b border-border-light pb-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className={detailLabelClassName}>{t("orderSummary")}</p>
+                <h3 className={`mt-2 ${panelTitleClassName}`}>{t("items")}</h3>
+              </div>
+              <p className="text-body text-fg-muted">
+                {totalQuantity.toLocaleString(locale)} {t("quantity")}
+              </p>
+            </div>
+
+            <div className="divide-y divide-border-light">
+              {order.items.map((item, index) => {
+                const itemImage = getItemPrimaryImage(item);
+                const itemName = item.name[locale] || item.name.en;
+
+                return (
+                  <article
+                    key={getProductKey(item, index)}
+                    className="grid gap-4 py-5 sm:grid-cols-[88px_minmax(0,1fr)_auto] sm:items-center"
+                  >
+                    <div className="relative h-24 w-[88px] overflow-hidden bg-surface-light">
+                      {itemImage ? (
+                        <OptimizedProductImage
+                          src={itemImage.url}
+                          alt={
+                            itemImage.alt[locale] ||
+                            itemImage.alt.en ||
+                            itemName
+                          }
+                          fill
+                          variant="thumbnail"
+                          sizes="88px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center px-2 text-center text-caption text-fg-muted">
+                          {tCatalog("noImage")}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0">
+                      <h4 className="break-words text-body-lg font-medium text-fg-secondary">
+                        {itemName}
+                      </h4>
+                      <dl className="mt-3 grid gap-3 text-body sm:grid-cols-2">
+                        <div>
+                          <dt className={detailLabelClassName}>
+                            {t("quantity")}
+                          </dt>
+                          <dd className={detailValueClassName}>
+                            {item.quantity.toLocaleString(locale)}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className={detailLabelClassName}>
+                            {t("price")}
+                          </dt>
+                          <dd className={detailValueClassName}>
+                            {formatMoney(item.unitPrice)}
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <div className="border-t border-border-light pt-4 sm:border-t-0 sm:pt-0 sm:text-end">
+                      <p className={detailLabelClassName}>{t("lineTotal")}</p>
+                      <p className="mt-2 text-body-lg font-semibold text-fg-secondary">
+                        {formatMoney(item.unitPrice * item.quantity)}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </section>
 
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h3 className="mb-4 text-h3 leading-heading">
-              {t("shippingAddress")}
-            </h3>
-            <dl className="grid gap-3 text-body sm:grid-cols-2">
-              <div>
-                <dt className="text-caption text-fg-muted">{t("address")}</dt>
-                <dd>
-                  {shippingAddress.street}, {shippingAddress.city},{" "}
-                  {shippingAddress.governorate}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("phone")}</dt>
-                <dd>{shippingAddress.phone}</dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("waybill")}</dt>
-                <dd>{order.waybillNumber || t("notSet")}</dd>
-              </div>
-            </dl>
-          </section>
-        </div>
+          <section className={panelClassName}>
+            <div className="border-b border-border-light pb-5">
+              <p className={detailLabelClassName}>{t("uploadedProofs")}</p>
+              <h3 className={`mt-2 ${panelTitleClassName}`}>
+                {t("paymentProofs")}
+              </h3>
+            </div>
 
-        <aside className="space-y-6">
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h3 className="mb-4 text-h3 leading-heading">
-              {t("customerDetails")}
-            </h3>
-            <dl className="space-y-3 text-body">
-              <div>
-                <dt className="text-caption text-fg-muted">{t("customer")}</dt>
-                <dd>{getCustomerName(order)}</dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("email")}</dt>
-                <dd>{customer?.email || t("notSet")}</dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("phone")}</dt>
-                <dd>{customerPhone}</dd>
-              </div>
-              {customerWhatsAppPhone && (
-                <div>
-                  <dt className="text-caption text-fg-muted">
-                    {t("customerWhatsApp")}
-                  </dt>
-                  <dd>
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline"
-                    >
-                      {t("contactCustomerWhatsApp")}
-                    </a>
-                  </dd>
-                </div>
-              )}
-              <div>
-                <dt className="text-caption text-fg-muted">{t("created")}</dt>
-                <dd>{new Date(order.createdAt).toLocaleString(locale)}</dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("updated")}</dt>
-                <dd>{new Date(order.updatedAt).toLocaleString(locale)}</dd>
-              </div>
-            </dl>
-          </section>
-
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h3 className="mb-4 text-h3 leading-heading">{t("payments")}</h3>
-            <dl className="space-y-3 text-body">
-              <div className="flex justify-between gap-4">
-                <dt>{t("paymentMethod")}</dt>
-                <dd>
-                  {order.paymentMethod === "instapay"
-                    ? tCheckout("instapay")
-                    : tCheckout("vodafoneCash")}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt>{t("subtotal")}</dt>
-                <dd>
-                  {order.subtotal.toLocaleString(locale)} {tCatalog("egp")}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt>
-                  {t("deposit")} ({order.depositPercentage}%)
-                </dt>
-                <dd>
-                  {order.depositAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4 font-medium">
-                <dt>{t("remaining")}</dt>
-                <dd>
-                  {order.remainingAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
-                </dd>
-              </div>
-            </dl>
-          </section>
-
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h3 className="mb-4 text-h3 leading-heading">
-              {t("paymentProofs")}
-            </h3>
             {paymentProofs.length > 0 ? (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
                 {paymentProofs.map((proof, index) => (
                   <a
                     key={getProofKey(proof.url, proof.uploadedAt, index)}
                     href={proof.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block border border-border-light p-2 transition-colors hover:bg-surface-light dark:border-border-subtle dark:hover:bg-surface-dark"
+                    className="group block border border-border-light bg-bg-secondary p-3 transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
                   >
-                    <div className="relative mb-2 h-28 w-full overflow-hidden bg-surface-light dark:bg-surface-dark">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-light">
                       <Image
                         src={proof.url}
                         alt={getProofDisplayLabel(proof.label)}
                         fill
                         unoptimized
-                        sizes="(min-width: 1024px) 300px, 50vw"
-                        className="object-cover"
+                        sizes="(min-width: 1280px) 360px, (min-width: 768px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
-                    <p className="text-body">
+                    <p className="mt-3 text-body font-medium text-fg-secondary">
                       {getProofDisplayLabel(proof.label)}
                     </p>
-                    <p className="text-caption text-fg-muted">
+                    <p className="mt-1 text-caption text-fg-muted">
                       {new Date(proof.uploadedAt).toLocaleString(locale)}
                     </p>
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="text-body text-fg-muted">{t("noPaymentProofs")}</p>
+              <p className="mt-5 border border-border-light bg-surface-light px-4 py-5 text-body text-fg-muted">
+                {t("noPaymentProofs")}
+              </p>
             )}
+          </section>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-28 xl:self-start">
+          <section className={panelClassName}>
+            <div className="border-b border-border-light pb-5">
+              <p className={detailLabelClassName}>{t("payments")}</p>
+              <h3 className={`mt-2 ${panelTitleClassName}`}>
+                {t("orderSummary")}
+              </h3>
+            </div>
+
+            <dl className="divide-y divide-border-light">
+              {orderSummaryItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-start justify-between gap-4 py-4"
+                >
+                  <dt className="text-body text-fg-muted">{item.label}</dt>
+                  <dd className="max-w-[55%] break-words text-end text-body font-semibold text-fg-secondary">
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className={panelClassName}>
+            <div className="border-b border-border-light pb-5">
+              <p className={detailLabelClassName}>{t("customerDetails")}</p>
+              <h3 className={`mt-2 ${panelTitleClassName}`}>
+                {t("customerSnapshot")}
+              </h3>
+            </div>
+
+            <dl className="mt-5 space-y-4">
+              {customerItems.map((item) => (
+                <div key={item.label}>
+                  <dt className={detailLabelClassName}>{item.label}</dt>
+                  <dd className={`mt-1 ${detailValueClassName}`}>
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            {customerWhatsAppPhone && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex min-h-11 w-full items-center justify-center border border-fg-secondary px-4 text-center text-body font-medium text-fg-secondary transition-colors hover:bg-fg-secondary hover:text-bg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
+              >
+                {t("contactCustomerWhatsApp")}
+              </a>
+            )}
+          </section>
+
+          <section className={panelClassName}>
+            <div className="border-b border-border-light pb-5">
+              <p className={detailLabelClassName}>{t("shippingAddress")}</p>
+              <h3 className={`mt-2 ${panelTitleClassName}`}>
+                {t("deliverySnapshot")}
+              </h3>
+            </div>
+
+            <dl className="mt-5 space-y-4">
+              {deliveryItems.map((item) => (
+                <div key={item.label}>
+                  <dt className={detailLabelClassName}>{item.label}</dt>
+                  <dd className={`mt-1 ${detailValueClassName}`}>
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className={panelClassName}>
+            <h3 className={panelTitleClassName}>{t("timeline")}</h3>
+            <dl className="mt-5 space-y-4">
+              {timelineItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="border-s border-border-light ps-4"
+                >
+                  <dt className={detailLabelClassName}>{item.label}</dt>
+                  <dd className={`mt-1 ${detailValueClassName}`}>
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </section>
         </aside>
       </div>
