@@ -468,8 +468,69 @@
     "summary": "Summary"
   },
   "about": {
-    "title": "Our Story",
-    "body": "Kairova is shaping a refined accessories house rooted in Egyptian craft, restraint, and everyday ceremony."
+    "metadata": {
+      "title": "About Kairova | Our Story",
+      "description": "Discover the Kairova philosophy: Egyptian heritage, modern accessories, and a refined reserve-first experience."
+    },
+    "eyebrow": "About Kairova",
+    "title": "Kairova, worn anew.",
+    "body": "A contemporary Egyptian accessories house shaping watches, leather, jewelry, and fragrance into quiet symbols of presence.",
+    "heroNote": "Every edit begins with contrast: ancient geometry, modern restraint, and pieces that feel composed before they ever speak.",
+    "heroProof": "The experience is intentionally personal: reserve clearly, confirm with care, and receive a piece prepared with ceremony.",
+    "imageAlt": "Kairova Solaris emerald pendant necklace photographed as a luxury jewelry still life",
+    "imageCaption": "Solaris Emerald Pendant, rendered in the Kairova monochrome world.",
+    "statementEyebrow": "The House",
+    "statementTitle": "Ancient Egyptian grandeur, refined for the present.",
+    "storyIntro": "Kairova is built around a simple belief: luxury should feel powerful without becoming loud. The house takes cues from Egyptian proportion, architectural shadow, and the calm confidence of an object chosen with intent.",
+    "storyBody": "Our collections are edited for daily rituals and decisive moments alike. A watch, belt, wallet, pendant, or perfume should hold its own in a room, then become intimate in the hand.",
+    "storyClosing": "Nothing is placed for noise. Every detail has to earn its place.",
+    "principlesEyebrow": "Our Codes",
+    "principlesTitle": "Quiet luxury with a Cairo pulse.",
+    "principlesSubtitle": "The brand language is strict, tactile, and deliberately restrained so the person wearing the piece remains the center of gravity.",
+    "principles": {
+      "heritage": {
+        "title": "Heritage",
+        "body": "Egyptian symbols and pyramid-like geometry guide the composition without turning the product into costume."
+      },
+      "restraint": {
+        "title": "Restraint",
+        "body": "Black, white, metal, leather, glass, and scent are treated as a disciplined palette rather than decoration."
+      },
+      "service": {
+        "title": "Service",
+        "body": "The reserve-first journey keeps acquisition clear, personal, and human from selection to delivery."
+      }
+    },
+    "craftEyebrow": "The Edit",
+    "craftTitle": "The quiet work is in the selection.",
+    "craftBody": "Kairova is not about overwhelming choice. It is about reducing the edit until each piece carries shape, tactility, and a confident reason to exist.",
+    "details": {
+      "materials": {
+        "label": "Materials",
+        "text": "Surfaces are chosen for how they catch light, age in use, and frame the body with polish."
+      },
+      "silhouette": {
+        "label": "Silhouette",
+        "text": "Lines stay clean and architectural, creating presence through proportion instead of excess."
+      },
+      "ritual": {
+        "label": "Ritual",
+        "text": "From reservation to handoff, the experience is designed to feel measured, direct, and worthy of the piece."
+      }
+    },
+    "ctaEyebrow": "Enter The Edit",
+    "ctaTitle": "Choose the presence you want to leave behind.",
+    "ctaBody": "Explore the men's and women's selections curated for elegance, restraint, and memorable detail.",
+    "collections": {
+      "women": {
+        "label": "Women's Collection",
+        "meta": "Luminous accessories and scent"
+      },
+      "men": {
+        "label": "Men's Collection",
+        "meta": "Watches, leather, and fragrance"
+      }
+    }
   },
   "footer": {
     "brandStatement": "Egyptian Heritage. Modern Luxury.",
