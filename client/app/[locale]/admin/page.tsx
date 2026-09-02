@@ -1,11 +1,5 @@
-import { redirect } from "@/src/i18n/navigation";
+import AdminDashboardClient from "./_components/AdminDashboardClient";
 
-type Props = {
-  params: Promise<{ locale: string }>;
-};
-
-export default async function AdminPage({ params }: Props) {
-  const { locale } = await params;
-
-  redirect({ href: "/admin/orders", locale, forcePrefix: true });
+export default function AdminPage() {
+  return <AdminDashboardClient />;
 }
