@@ -282,6 +282,48 @@
         "receive": "Complete the balance, then your order moves to J&T Express delivery."
       }
     },
+    "checkoutPage": {
+      "metadata": {
+        "title": "Checkout | Kairova",
+        "description": "Complete your Kairova reservation with delivery details and a manual deposit transfer."
+      },
+      "eyebrow": "Reservation Atelier",
+      "title": "Complete your reservation.",
+      "intro": "Confirm delivery details, choose the deposit channel, and submit your Kairova selection for personal review.",
+      "loadingTitle": "Preparing your checkout",
+      "loadingBody": "We are confirming your cart, account, and deposit settings.",
+      "selectedPieces": "Selected pieces: {count}",
+      "depositPreview": "{percentage}% deposit due after submission",
+      "addressEyebrow": "Step 01",
+      "addressTitle": "Delivery identity",
+      "addressBody": "Use the address and phone number our concierge can confirm before shipment.",
+      "addressSideNote": "Your reservation details stay editable until the order is reviewed by the Kairova team.",
+      "paymentEyebrow": "Step 02",
+      "paymentTitle": "Deposit channel",
+      "paymentBody": "Choose where you will transfer the deposit after placing the reservation. No online payment is taken on this page.",
+      "paymentMethods": {
+        "vodafone_cash": "Best for quick mobile wallet transfers inside Egypt.",
+        "instapay": "Best for bank-linked transfers with a clear receipt."
+      },
+      "paymentNumberTitle": "Transfer destination",
+      "paymentNumberBody": "Use this destination after submitting the reservation. You can upload proof from your order page.",
+      "summaryEyebrow": "Step 03",
+      "summaryTitle": "Reservation summary",
+      "itemsTitle": "Selected pieces",
+      "manualFlowNote": "Your order is reserved first, then reviewed manually once transfer proof is received.",
+      "depositDueNow": "Deposit due now",
+      "remainingLater": "Remaining on confirmation",
+      "fullTotal": "Full total",
+      "quantityLabel": "Qty {quantity}",
+      "processingTitle": "Securing your reservation...",
+      "submitNote": "After submission, your order page will show payment proof upload and WhatsApp follow-up options.",
+      "timelineTitle": "What happens next",
+      "steps": {
+        "reserve": "The reservation is created with your selected pieces.",
+        "transfer": "Transfer the deposit by Vodafone Cash or InstaPay.",
+        "ship": "Admin confirms payment, then prepares delivery via J&T Express."
+      }
+    },
     "shippingAddress": "Shipping Address",
     "addressLabel": "Address Label (Home, Work)",
     "street": "Street",
