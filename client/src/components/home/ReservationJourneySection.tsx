@@ -25,6 +25,7 @@ const steps = [
 ] as const;
 
 const editorialEase: [number, number, number, number] = [0.19, 1, 0.22, 1];
+const hiddenRouteSegments = new Set(["admin", "auth", "login"]);
 
 export default function ReservationJourneySection() {
   const t = useTranslations("home.reservationJourney");
@@ -34,11 +35,10 @@ export default function ReservationJourneySection() {
   const pathSegments = pathname.split("/").filter(Boolean);
   const routeSegment =
     pathSegments[0] === locale ? pathSegments[1] : pathSegments[0];
-  const isAdminRoute = routeSegment === "admin";
   const isProductDetailPage = /\/product\/[^/]+\/?$/.test(pathname);
   const shouldReduceMotion = useReducedMotion();
 
-  if (isAdminRoute) {
+  if (routeSegment && hiddenRouteSegments.has(routeSegment)) {
     return null;
   }
 

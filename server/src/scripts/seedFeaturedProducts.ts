@@ -562,10 +562,13 @@ async function ensureCategory(
   parentCategory: ICategory | null,
 ): Promise<ICategory> {
   const parentCategoryId = parentCategory ? getId(parentCategory) : null;
+  const parentCategoryObjectId = parentCategoryId
+    ? toObjectId(parentCategoryId)
+    : null;
   const categoryQuery = {
     gender,
     "name.en": seed.name.en,
-    parentCategory: parentCategoryId,
+    parentCategory: parentCategoryObjectId,
   };
   const existing =
     (await Category.findOne({ ...categoryQuery, deletedAt: null })) ||

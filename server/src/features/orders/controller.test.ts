@@ -1,11 +1,13 @@
 import cookieParser from "cookie-parser";
 import express from "express";
+import { Types } from "mongoose";
 import request from "supertest";
 
 import globalErrorHandler from "../../middleware/globalErrorHandler.js";
 import Category, { type ICategory } from "../../models/Category.js";
 import Order, { type IOrder, type IShippingAddress } from "../../models/Order.js";
 import Product, { type IProduct } from "../../models/Product.js";
+import ProductImage from "../../models/ProductImage.js";
 import Settings from "../../models/Settings.js";
 import User, { type IUser } from "../../models/User.js";
 import { signAccessToken } from "../auth/tokenService.js";
@@ -104,6 +106,17 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
     stockQuantity: 20,
     lowStockThreshold: 2,
   });
+  const productImage = await ProductImage.create({
+    product: product._id,
+    url: "https://example.com/classic-watch.jpg",
+    publicId: "classic-watch-primary",
+    alt: { ar: "Classic Watch image AR", en: "Classic Watch image" },
+    isPrimary: true,
+    order: 1,
+  });
+
+  product.images.push(productImage._id as Types.ObjectId);
+  await product.save();
 
   await Settings.create({
     depositPercentage: 50,
@@ -285,6 +298,21 @@ describe("order controllers", () => {
         .expect(200);
 
       expect(response.body.data.orders).toHaveLength(2);
+    });
+
+    it("GET /api/admin/orders/:id returns populated product images", async () => {
+      const order = await createPendingOrder(seed);
+
+      const response = await request(app)
+        .get(`/api/admin/orders/${idOf(order)}`)
+        .set("Cookie", authCookie(seed.admin))
+        .expect(200);
+
+      expect(response.body.data.order.items[0].product.images[0]).toMatchObject({
+        url: "https://example.com/classic-watch.jpg",
+        alt: { ar: "Classic Watch image AR", en: "Classic Watch image" },
+        isPrimary: true,
+      });
     });
 
     it("GET /api/admin/orders rejects invalid query filters", async () => {

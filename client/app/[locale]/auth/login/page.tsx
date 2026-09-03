@@ -6,8 +6,15 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 import { useAuthStore } from "@/application/store/authStore";
+import AuthPageShell, {
+  AuthFieldLabel,
+  authErrorClassName,
+  authInputClassName,
+  authPasswordInputClassName,
+  authSubmitButtonClassName,
+} from "@/components/auth/AuthPageShell";
 import PasswordInput from "@/components/form/PasswordInput";
-import { Link, useRouter } from "@/src/i18n/navigation";
+import { useRouter } from "@/src/i18n/navigation";
 
 type ErrorResponse = {
   message?: string;
@@ -74,26 +81,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-12">
-      <h1 className="mb-8 text-h1 leading-heading">{t("login")}</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <AuthPageShell
+      eyebrow={t("loginEyebrow")}
+      highlights={[
+        t("highlightReservations"),
+        t("highlightProof"),
+        t("highlightDelivery"),
+      ]}
+      imageAlt={t("imageAlt")}
+      intro={t("loginIntro")}
+      panelBody={t("experienceBody")}
+      panelTitle={t("experienceTitle")}
+      switchHref="/auth/register"
+      switchLabel={t("register")}
+      switchPrompt={t("noAccount")}
+      title={t("login")}
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="mb-2 block" htmlFor="email">
-            {t("email")}
+            <AuthFieldLabel>{t("email")}</AuthFieldLabel>
           </label>
           <input
             id="email"
+            autoComplete="email"
+            disabled={isLoading}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
-            className="w-full border border-border-light bg-transparent p-3 dark:border-border-subtle"
+            className={authInputClassName}
           />
         </div>
         <PasswordInput
           id="password"
-          label={t("password")}
+          autoComplete="current-password"
+          className={authPasswordInputClassName}
+          disabled={isLoading}
+          label={<AuthFieldLabel>{t("password")}</AuthFieldLabel>}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
@@ -101,23 +126,20 @@ export default function LoginPage() {
           hideLabel={t("hidePassword")}
         />
 
-        {error && <p className="text-body text-red-600">{error}</p>}
+        {error && (
+          <p className={authErrorClassName} role="alert">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-fg-secondary py-4 text-bg-secondary disabled:opacity-50 dark:bg-fg-primary dark:text-bg-primary"
+          className={authSubmitButtonClassName}
         >
           {isLoading ? t("loading") : t("loginButton")}
         </button>
       </form>
-
-      <p className="mt-6 text-center text-body">
-        {t("noAccount")}{" "}
-        <Link href="/auth/register" className="underline">
-          {t("register")}
-        </Link>
-      </p>
-    </div>
+    </AuthPageShell>
   );
 }

@@ -7,6 +7,7 @@ import Order, {
   type IShippingAddress,
 } from "../../models/Order.js";
 import Product, { type IProduct } from "../../models/Product.js";
+import ProductImage from "../../models/ProductImage.js";
 import Settings from "../../models/Settings.js";
 import User from "../../models/User.js";
 import AppError from "../../utils/AppError.js";
@@ -37,9 +38,23 @@ interface OrderListFilters {
   customerId?: string;
 }
 
+const orderProductImagePopulate = {
+  path: "images",
+  model: ProductImage,
+  match: { deletedAt: null },
+  select: "url publicId isPrimary order alt",
+  options: { sort: { order: 1, createdAt: 1 } },
+};
+
+const orderProductPopulate = {
+  path: "items.product",
+  select: "name slug images",
+  populate: orderProductImagePopulate,
+};
+
 const orderPopulate = [
   { path: "customer", select: "name email phone" },
-  { path: "items.product", select: "name slug images" },
+  orderProductPopulate,
 ];
 
 const toObjectId = (id: string, message: string): Types.ObjectId => {
@@ -345,7 +360,7 @@ export const getOrdersByCustomer = async (
 ): Promise<IOrder[]> => {
   return Order.find({ customer: toObjectId(customerId, "Invalid customer id") })
     .sort({ createdAt: -1 })
-    .populate({ path: "items.product", select: "name slug images" });
+    .populate(orderProductPopulate);
 };
 
 export const listAllOrders = async (

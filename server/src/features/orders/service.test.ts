@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Category, { type ICategory } from "../../models/Category.js";
 import Order, { type IOrder, type IShippingAddress } from "../../models/Order.js";
 import Product, { type IProduct } from "../../models/Product.js";
+import ProductImage from "../../models/ProductImage.js";
 import Settings from "../../models/Settings.js";
 import User, { type IUser } from "../../models/User.js";
 import AppError from "../../utils/AppError.js";
@@ -89,6 +90,17 @@ const seedOrderDependencies = async (): Promise<SeedData> => {
     stockQuantity: 10,
     lowStockThreshold: 2,
   });
+  const productImage = await ProductImage.create({
+    product: product._id,
+    url: "https://example.com/classic-watch.jpg",
+    publicId: "classic-watch-primary",
+    alt: { ar: "Classic Watch image AR", en: "Classic Watch image" },
+    isPrimary: true,
+    order: 1,
+  });
+
+  product.images.push(productImage._id as mongoose.Types.ObjectId);
+  await product.save();
 
   await Settings.create({
     depositPercentage: 50,
@@ -195,6 +207,23 @@ describe("order service", () => {
       expect(order.items[0]?.name.ar).toBe(seed.product.name.ar);
       expect(order.items[0]?.name.en).toBe(seed.product.name.en);
       expect(order.items[0]?.unitPrice).toBe(seed.product.price);
+    });
+
+    it("populates product images for order item thumbnails", async () => {
+      const order = await createPendingOrder(seed);
+      const product = order.items[0]?.product as unknown as {
+        images?: Array<{
+          url?: string;
+          alt?: { ar?: string; en?: string };
+          isPrimary?: boolean;
+        }>;
+      };
+
+      expect(product.images?.[0]).toMatchObject({
+        url: "https://example.com/classic-watch.jpg",
+        alt: { ar: "Classic Watch image AR", en: "Classic Watch image" },
+        isPrimary: true,
+      });
     });
 
     it("calculates correct depositAmount", async () => {

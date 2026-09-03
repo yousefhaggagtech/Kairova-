@@ -4,6 +4,7 @@ import {
   Document,
   type Model,
   type QueryWithHelpers,
+  type Types,
 } from "mongoose";
 
 import { localizedField } from "./_fragments.js";
@@ -15,7 +16,7 @@ export interface ICategory extends Document {
   name: LocalizedString;
   slug: string;
   gender: CategoryGender;
-  parentCategory: Schema.Types.ObjectId | null;
+  parentCategory: Types.ObjectId | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
