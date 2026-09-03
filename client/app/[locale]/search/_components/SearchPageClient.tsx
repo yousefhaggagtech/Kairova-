@@ -1,7 +1,6 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { useProducts } from "@/application/hooks/useProducts";
@@ -22,7 +21,6 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
   const t = useTranslations("search");
   const tNav = useTranslations("nav");
   const router = useRouter();
-  const [draftQuery, setDraftQuery] = useState(query);
   const normalizedQuery = normalizeSearchQuery(query);
   const isRtl = locale === "ar";
   const { data: products = [], isError, isLoading } = useProducts(
@@ -30,14 +28,11 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
     { enabled: Boolean(normalizedQuery) },
   );
 
-  useEffect(() => {
-    setDraftQuery(query);
-  }, [query]);
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextQuery = normalizeSearchQuery(draftQuery);
+    const formData = new FormData(event.currentTarget);
+    const nextQuery = normalizeSearchQuery(String(formData.get("q") ?? ""));
 
     if (!nextQuery) {
       return;
@@ -78,12 +73,12 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
             </label>
             <input
               className="w-full border-0 border-b border-border-light bg-transparent py-3 text-body text-fg-secondary outline-none transition-colors placeholder:text-fg-muted focus:border-fg-secondary"
+              defaultValue={query}
               id="search-page-input"
+              key={query}
               name="q"
-              onChange={(event) => setDraftQuery(event.target.value)}
               placeholder={tNav("searchPlaceholder")}
               type="search"
-              value={draftQuery}
             />
           </div>
           <button

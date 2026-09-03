@@ -1,0 +1,165 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - "server/**"
+      - "vercel.json"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - "server/**"
+      - "vercel.json"
+      - ".github/workflows/frontend.yml"
+
+concurrency:
+  group: frontend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  NEXT_PUBLIC_API_URL: http://localhost:4000
+  NODE_ENV: test
+  PORT: "4000"
+  CLIENT_URL: http://localhost:3000
+  MONGODB_URI: mongodb://127.0.0.1:27017/kairova-ci
+  JWT_ACCESS_SECRET: ci-access-secret-that-is-at-least-thirty-two-chars
+  JWT_REFRESH_SECRET: ci-refresh-secret-that-is-at-least-thirty-two-chars
+  COOKIE_SECURE: "false"
+  COOKIE_SAME_SITE: lax
+
+jobs:
+  quality:
+    name: Install, Lint, Build, Smoke Test
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Cache frontend node_modules
+        id: client-node-modules
+        uses: actions/cache@v4
+        with:
+          path: client/node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-client-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-client-
+
+      - name: Cache backend node_modules
+        id: server-node-modules
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-server-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-server-
+
+      - name: Install frontend dependencies
+        if: steps.client-node-modules.outputs.cache-hit != 'true'
+        working-directory: client
+        run: npm ci
+
+      - name: Install backend dependencies for smoke server
+        if: steps.server-node-modules.outputs.cache-hit != 'true'
+        working-directory: server
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright Chromium
+        working-directory: client
+        run: npx playwright install --with-deps chromium
+
+      - name: Lint frontend
+        working-directory: client
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: client
+        run: npm run build
+
+      - name: Run Playwright smoke tests
+        working-directory: client
+        run: npx playwright test e2e/smoke.spec.ts
+
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs:
+      - quality
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # The Vercel project Root Directory is client, so CLI commands run from the repo root.
+      - name: Pull Vercel preview environment
+        if: github.event_name == 'pull_request'
+        run: vercel pull --yes --environment=preview --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Pull Vercel production environment
+        if: github.event_name == 'push'
+        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build Vercel preview artifact
+        if: github.event_name == 'pull_request'
+        run: vercel build --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build Vercel production artifact
+        if: github.event_name == 'push'
+        run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy Vercel preview
+        if: github.event_name == 'pull_request'
+        run: vercel deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy Vercel production
+        if: github.event_name == 'push'
+        run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"

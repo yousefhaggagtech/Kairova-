@@ -1,0 +1,77 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "server/**"
+      - ".github/workflows/backend.yml"
+
+concurrency:
+  group: backend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  NODE_ENV: test
+  PORT: "4000"
+  CLIENT_URL: http://localhost:3000
+  MONGODB_URI: mongodb://127.0.0.1:27017/kairova-test
+  JWT_ACCESS_SECRET: ci-access-secret-that-is-at-least-thirty-two-chars
+  JWT_REFRESH_SECRET: ci-refresh-secret-that-is-at-least-thirty-two-chars
+  COOKIE_SECURE: "false"
+  COOKIE_SAME_SITE: lax
+
+jobs:
+  quality-and-deploy:
+    name: Install, Build, Test, Deploy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Cache backend node_modules
+        id: server-node-modules
+        uses: actions/cache@v4
+        with:
+          path: server/node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-server-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-server-
+
+      - name: Install backend dependencies
+        if: steps.server-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Type-check backend
+        run: npx tsc --noEmit
+
+      - name: Build backend
+        run: npm run build
+
+      - name: Test backend
+        run: npm test
+
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli@latest
+        working-directory: .
+
+      - name: Deploy to Railway
+        run: railway up . --path-as-root --ci --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT" --service "$RAILWAY_SERVICE_NAME"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT: ${{ secrets.RAILWAY_ENVIRONMENT }}
+          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME }}
