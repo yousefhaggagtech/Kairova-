@@ -26,7 +26,6 @@ env:
   NODE_VERSION: "22"
   NEXT_PUBLIC_API_URL: http://localhost:4000
   NODE_ENV: test
-  PORT: "4000"
   CLIENT_URL: http://localhost:3000
   MONGODB_URI: mongodb://127.0.0.1:27017/kairova-ci
   JWT_ACCESS_SECRET: ci-access-secret-that-is-at-least-thirty-two-chars
@@ -139,7 +138,6 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      # The Vercel project Root Directory is client, so CLI commands run from the repo root.
       - name: Pull Vercel preview environment
         if: github.event_name == 'pull_request'
         run: vercel pull --yes --environment=preview --token="${{ secrets.VERCEL_TOKEN }}"
@@ -153,13 +151,13 @@ jobs:
         run: vercel build --token="${{ secrets.VERCEL_TOKEN }}"
 
       - name: Build Vercel production artifact
-        if: github.event_name == 'push'
+        if: github.event_//name == 'push'
         run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
 
       - name: Deploy Vercel preview
-        if: github.event_name == 'pull_request'
+        if: github.event_//name == 'pull_request'
         run: vercel deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}"
 
       - name: Deploy Vercel production
-        if: github.event_name == 'push'
+        if: github.event_//name == 'push'
         run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
