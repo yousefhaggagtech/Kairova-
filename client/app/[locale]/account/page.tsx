@@ -60,7 +60,7 @@ export default function AccountPage() {
           <p className="text-caption uppercase text-fg-muted">
             {t("overviewEyebrow")}
           </p>
-          <h2 className="mt-3 text-h1 leading-heading">
+          <h2 className="mt-3 break-words text-3xl leading-heading sm:text-h1">
             {t("overviewTitle", { name: user.name })}
           </h2>
           <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">

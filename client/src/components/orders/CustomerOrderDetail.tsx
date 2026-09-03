@@ -160,7 +160,7 @@ export default function CustomerOrderDetail({
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12 md:px-6">
       {showBackLink && (
-        <Link href="/account/orders" className="mb-6 inline-block underline text-sm text-fg-muted hover:text-fg-secondary transition-colors">
+        <Link href="/account/orders" className="mb-6 inline-flex min-h-11 items-center underline text-sm text-fg-muted transition-colors hover:text-fg-secondary">
           {t("backToOrders")}
         </Link>
       )}
@@ -170,10 +170,10 @@ export default function CustomerOrderDetail({
           <p className="font-mono text-xs tracking-widest text-fg-muted uppercase">
             {order.orderNumber}
           </p>
-          <h1 className="text-h1 leading-tight">{t("orderDetails")}</h1>
+          <h1 className="text-3xl leading-tight sm:text-h1">{t("orderDetails")}</h1>
         </div>
         <span
-          className={`inline-flex items-center gap-2 border px-4 py-1.5 text-xs font-medium rounded-full ${getOrderStatusClasses(
+          className={`inline-flex min-h-11 items-center gap-2 border px-4 py-2 text-xs font-medium rounded-full ${getOrderStatusClasses(
             order.status,
           )}`}
         >
@@ -183,25 +183,26 @@ export default function CustomerOrderDetail({
       </div>
 
       {/* JOURNEY SECTION - UPDATED FOR CUT BORDERS */}
-      <section className="mb-12 border border-border-light bg-surface-light p-6 dark:border-border-light dark:bg-bg-secondary md:p-10">
-        <div className="mb-10 flex items-center justify-between">
+      <section className="mb-12 border border-border-light bg-surface-light p-4 dark:border-border-light dark:bg-bg-secondary sm:p-6 md:p-10">
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-h3 leading-heading">{t("journeyTitle")}</h2>
           <span className="text-caption font-medium text-fg-muted">
             {order.status === "CANCELLED" ? t(`status.${order.status}`) : t(`journey.${order.status}`)}
           </span>
         </div>
         
-        <div className="flex w-full items-center justify-between overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+          <div className="flex min-w-max items-start">
           {journeyStages.map(([stage, Icon], index) => {
             const completed = currentStageIndex >= index;
             const current = currentStageIndex === index;
             const isLast = index === journeyStages.length - 1;
 
             return (
-              <div key={stage} className="flex items-center">
+              <div key={stage} className="flex shrink-0 items-start">
                 {/* Icon and Label Group */}
-                <div className="flex flex-col items-center gap-3 text-center relative z-10">
-                  <span className={`flex h-11 w-11 items-center justify-center border transition-all duration-500 bg-surface-light dark:bg-bg-secondary ${
+                <div className="relative z-10 flex w-[5.75rem] shrink-0 flex-col items-center gap-3 text-center">
+                  <span className={`flex h-12 w-12 items-center justify-center border transition-all duration-500 bg-surface-light dark:bg-bg-secondary ${
                     current 
                       ? "border-[#C5A059] text-[#C5A059] shadow-[0_0_15px_rgba(197,160,89,0.3)]" 
                       : completed 
@@ -210,14 +211,14 @@ export default function CustomerOrderDetail({
                   }`}>
                     {completed && !current ? <Check className="h-5 w-5 stroke-[2.5]" /> : <Icon className="h-5 w-5 stroke-[1.5]" />}
                   </span>
-                  <span className={`absolute top-14 whitespace-nowrap text-[10px] uppercase tracking-wider leading-tight ${completed ? "text-fg-secondary dark:text-fg-primary font-medium" : "text-fg-muted"}`}>
+                  <span className={`min-h-8 max-w-[5.75rem] text-[10px] uppercase tracking-wider leading-tight ${completed ? "text-fg-secondary dark:text-fg-primary font-medium" : "text-fg-muted"}`}>
                     {t(`journey.${stage}`)}
                   </span>
                 </div>
 
                 {/* Segmented Line - Only if not last */}
                 {!isLast && (
-                  <div className="flex-1 h-[1.5px] bg-border-light dark:bg-border-subtle mx-[-4px] relative min-w-[60px]">
+                  <div className="relative mx-[-6px] mt-6 h-[1.5px] w-14 shrink-0 bg-border-light dark:bg-border-subtle sm:w-16">
                     <motion.div
                       className="absolute top-0 left-0 h-full bg-[#C5A059]"
                       initial={{ width: 0 }}
@@ -229,6 +230,7 @@ export default function CustomerOrderDetail({
               </div>
             );
           })}
+          </div>
         </div>
       </section>
 
@@ -253,9 +255,9 @@ export default function CustomerOrderDetail({
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col gap-1">
                     <dt className="text-caption text-fg-muted">{item.label}</dt>
-                    <dd className={`${item.isMono ? "font-mono font-medium" : "font-medium"}`}>{item.value}</dd>
-                  </div>
-                ))}
+                  <dd className={`break-words ${item.isMono ? "font-mono font-medium" : "font-medium"}`}>{item.value}</dd>
+                </div>
+              ))}
               </dl>
               
               <p className="mt-6 text-caption text-fg-muted italic">
@@ -315,7 +317,7 @@ export default function CustomerOrderDetail({
                     href={whatsappUrl} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="block w-full bg-[#C5A059] px-5 py-4 text-center text-white text-body font-medium hover:bg-[#B8860B] transition-colors shadow-sm"
+                    className="block min-h-12 w-full bg-[#C5A059] px-5 py-4 text-center text-white text-body font-medium hover:bg-[#B8860B] transition-colors shadow-sm"
                   >
                     {t("whatsappOption")}
                   </a>
@@ -335,15 +337,15 @@ export default function CustomerOrderDetail({
               {order.items.map((item, index) => (
                 <div
                   key={`${order._id}-${index}`}
-                  className="flex justify-between items-center gap-4 border-b border-border-light pb-4 last:border-b-0 last:pb-0 dark:border-border-light"
+                  className="grid grid-cols-1 gap-3 border-b border-border-light pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center dark:border-border-light"
                 >
-                  <div>
-                    <p className="font-medium">{item.name[locale] || item.name.en}</p>
+                  <div className="min-w-0">
+                    <p className="break-words font-medium">{item.name[locale] || item.name.en}</p>
                     <p className="text-caption text-fg-muted">
                       {item.quantity} x {item.unitPrice.toLocaleString(locale)} {tCatalog("egp")}
                     </p>
                   </div>
-                  <p className="font-mono font-medium">
+                  <p className="break-words font-mono font-medium sm:text-end">
                     {(item.unitPrice * item.quantity).toLocaleString(locale)} {tCatalog("egp")}
                   </p>
                 </div>
@@ -356,19 +358,19 @@ export default function CustomerOrderDetail({
           <section className="border border-border-light bg-surface-light p-6 dark:border-border-light dark:bg-bg-secondary">
             <h2 className="mb-6 text-h3 leading-heading">{t("financialSummary")}</h2>
             <dl className="space-y-4 text-body">
-              <div className="flex justify-between gap-4">
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">{tCheckout("subtotal")}</dt>
-                <dd>{order.subtotal.toLocaleString(locale)} {tCatalog("egp")}</dd>
+                <dd className="break-words sm:text-end">{order.subtotal.toLocaleString(locale)} {tCatalog("egp")}</dd>
               </div>
-              <div className="flex justify-between gap-4">
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">{tCheckout("depositRequired")} ({order.depositPercentage}%)</dt>
-                <dd className="font-medium text-[#C5A059]">
+                <dd className="break-words font-medium text-[#C5A059] sm:text-end">
                   {order.depositAmount.toLocaleString(locale)} {tCatalog("egp")}
                 </dd>
               </div>
-              <div className="flex justify-between gap-4 pt-4 border-t border-border-light font-bold">
+              <div className="grid grid-cols-1 gap-1 border-t border-border-light pt-4 font-bold sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt>{t("remaining")}</dt>
-                <dd>{order.remainingAmount.toLocaleString(locale)} {tCatalog("egp")}</dd>
+                <dd className="break-words sm:text-end">{order.remainingAmount.toLocaleString(locale)} {tCatalog("egp")}</dd>
               </div>
             </dl>
           </section>
@@ -378,7 +380,7 @@ export default function CustomerOrderDetail({
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full bg-[#C5A059] px-5 py-4 text-center text-white font-medium hover:bg-[#B8860B] transition-all shadow-md"
+              className="block min-h-12 w-full bg-[#C5A059] px-5 py-4 text-center text-white font-medium hover:bg-[#B8860B] transition-all shadow-md"
             >
               {tCheckout("contactWhatsApp")}
             </a>

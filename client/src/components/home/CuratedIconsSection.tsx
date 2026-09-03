@@ -57,7 +57,7 @@ export default function CuratedIconsSection() {
               isRtl ? "lg:text-end" : ""
             }`}
           >
-            <h2 className="max-w-[15ch] text-h2 leading-heading text-fg-secondary sm:text-h1">
+            <h2 className="max-w-[15ch] text-3xl leading-heading text-fg-secondary sm:text-h1">
               {t("heading")}
             </h2>
             <p className="max-w-xl text-body-lg leading-body text-fg-secondary/70">

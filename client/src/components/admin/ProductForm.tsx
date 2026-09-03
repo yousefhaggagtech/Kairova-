@@ -298,12 +298,12 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
   };
 
   return (
-    <section className="max-w-3xl">
-      <Link href="/admin/products" className="mb-6 inline-block underline">
+    <section className="w-full max-w-3xl">
+      <Link href="/admin/products" className="mb-6 inline-flex min-h-11 items-center underline">
         {t("backToProducts")}
       </Link>
 
-      <h2 className="mb-6 text-h2 leading-heading">{pageTitle}</h2>
+      <h2 className="mb-6 break-words text-3xl leading-heading sm:text-h2">{pageTitle}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2">
@@ -321,7 +321,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               required
               minLength={2}
               maxLength={100}
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
           </div>
 
@@ -340,7 +340,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               minLength={2}
               maxLength={100}
               dir="rtl"
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
           </div>
         </div>
@@ -361,7 +361,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
             required
             maxLength={2000}
             rows={4}
-            className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+            className="min-h-32 w-full border border-border-light bg-transparent px-3 py-3 dark:border-border-subtle"
           />
         </div>
 
@@ -382,14 +382,14 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
             maxLength={2000}
             rows={4}
             dir="rtl"
-            className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+            className="min-h-32 w-full border border-border-light bg-transparent px-3 py-3 dark:border-border-subtle"
           />
         </div>
 
         <fieldset>
           <legend className="mb-2 text-caption">{t("gender")}</legend>
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2">
+          <div className="flex flex-wrap gap-4">
+            <label className="flex min-h-11 items-center gap-2">
               <input
                 type="radio"
                 value="men"
@@ -398,7 +398,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               />
               {t("men")}
             </label>
-            <label className="flex items-center gap-2">
+            <label className="flex min-h-11 items-center gap-2">
               <input
                 type="radio"
                 value="women"
@@ -423,7 +423,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                 setSubcategoryId("");
               }}
               required
-              className="kairova-select w-full border px-3 py-2"
+              className="kairova-select min-h-12 w-full border px-3 py-2"
             >
               <option value="">{t("selectCategory")}</option>
               {parentCategories.map((category) => (
@@ -447,7 +447,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               onChange={(event) => setSubcategoryId(event.target.value)}
               required
               disabled={!categoryId}
-              className="kairova-select w-full border px-3 py-2 disabled:opacity-50"
+              className="kairova-select min-h-12 w-full border px-3 py-2 disabled:opacity-50"
             >
               <option value="">
                 {categoryId && subcategories.length === 0
@@ -476,7 +476,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               required
               min={0}
               step="0.01"
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
           </div>
 
@@ -492,7 +492,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               required
               min={0}
               step={1}
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
           </div>
         </div>
@@ -528,7 +528,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                         type="button"
                         onClick={() => void handleSetPrimary(image._id)}
                         disabled={imageActionPending}
-                        className="underline disabled:opacity-50"
+                        className="inline-flex min-h-11 items-center underline disabled:opacity-50"
                       >
                         {t("setPrimary")}
                       </button>
@@ -538,7 +538,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                     type="button"
                     onClick={() => void handleExistingImageRemove(image._id)}
                     disabled={imageActionPending}
-                    className="border border-red-700 px-3 py-2 text-red-700 disabled:opacity-50 dark:border-red-300 dark:text-red-300"
+                    className="inline-flex min-h-11 items-center border border-red-700 px-3 py-2 text-red-700 disabled:opacity-50 dark:border-red-300 dark:text-red-300"
                   >
                     {t("delete")}
                   </button>
@@ -558,7 +558,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
               multiple
               onChange={(event) => void handleFileSelect(event)}
               disabled={uploading || saving}
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
             {uploading && (
               <p className="mt-2 text-caption text-fg-muted">
@@ -591,12 +591,12 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                   <p className="flex-1 break-all text-caption">
                     {image.fileName}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() => moveNewImage(index, -1)}
                       disabled={index === 0}
-                      className="border border-border-light px-3 py-2 disabled:opacity-50 dark:border-border-subtle"
+                      className="inline-flex min-h-11 items-center border border-border-light px-3 py-2 disabled:opacity-50 dark:border-border-subtle"
                     >
                       {t("moveUp")}
                     </button>
@@ -604,14 +604,14 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
                       type="button"
                       onClick={() => moveNewImage(index, 1)}
                       disabled={index === newImages.length - 1}
-                      className="border border-border-light px-3 py-2 disabled:opacity-50 dark:border-border-subtle"
+                      className="inline-flex min-h-11 items-center border border-border-light px-3 py-2 disabled:opacity-50 dark:border-border-subtle"
                     >
                       {t("moveDown")}
                     </button>
                     <button
                       type="button"
                       onClick={() => removeNewImage(index)}
-                      className="border border-red-700 px-3 py-2 text-red-700 dark:border-red-300 dark:text-red-300"
+                      className="inline-flex min-h-11 items-center border border-red-700 px-3 py-2 text-red-700 dark:border-red-300 dark:text-red-300"
                     >
                       {t("delete")}
                     </button>
@@ -627,7 +627,7 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
         <button
           type="submit"
           disabled={saving || uploading}
-          className="w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
+          className="min-h-12 w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-bg-secondary disabled:opacity-50 dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
         >
           {saving ? t("processing") : submitLabel}
         </button>

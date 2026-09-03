@@ -205,7 +205,7 @@ export default function HeroMotion({ title, tagline }: HeroMotionProps) {
 
   return (
     <section
-      className="relative flex h-[112svh] min-h-[700px] max-h-[1040px] overflow-hidden bg-bg-primary ps-6 pe-6 text-fg-primary"
+      className="relative flex h-[92svh] min-h-[560px] max-h-[920px] overflow-hidden bg-bg-primary ps-4 pe-4 text-fg-primary sm:h-[96svh] sm:min-h-[640px] sm:ps-6 sm:pe-6 lg:h-[94svh]"
       data-section="hero"
     >
       <div
@@ -242,17 +242,17 @@ export default function HeroMotion({ title, tagline }: HeroMotionProps) {
         aria-hidden="true"
       />
 
-      <div className="relative z-20 mx-auto flex h-full w-full max-w-[var(--max-content)] flex-col items-center justify-center pt-[36svh] pb-[4svh] text-center">
+      <div className="relative z-20 mx-auto flex h-full w-full max-w-[var(--max-content)] flex-col items-center justify-end pb-[13svh] pt-24 text-center sm:pb-[12svh]">
         <div
           ref={copyRef}
           className={`kairova-hero-copy flex max-w-4xl flex-col items-center gap-5 ${
             isCopyVisible ? "is-visible" : ""
           }`}
         >
-          <h1 className="max-w-4xl text-h2 leading-display text-fg-primary sm:text-h1 lg:text-display">
+          <h1 className="max-w-4xl text-4xl leading-display text-fg-primary sm:text-h1 lg:text-display">
             {title}
           </h1>
-          <p className="max-w-xl text-body-lg leading-body text-border-light">
+          <p className="max-w-xl text-body leading-body text-border-light sm:text-body-lg">
             {tagline}
           </p>
         </div>

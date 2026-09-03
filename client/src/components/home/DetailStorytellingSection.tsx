@@ -68,7 +68,7 @@ export default function DetailStorytellingSection() {
             transition={{ delay: 0.32, duration: 1.8, ease: editorialEase }}
           >
             <motion.h2
-              className="max-w-[12ch] text-h2 leading-heading tracking-[0.08em] text-fg-primary sm:text-h1 [will-change:transform,opacity,filter]"
+              className="max-w-[12ch] text-3xl leading-heading tracking-[0.08em] text-fg-primary sm:text-h1 [will-change:transform,opacity,filter]"
               initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
               animate={isInView && isVideoReady ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 8, filter: "blur(4px)" }}
               transition={{ delay: 0.48, duration: 1.6, ease: editorialEase }}

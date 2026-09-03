@@ -37,7 +37,7 @@ export default function CustomerOrdersPage() {
           <p className="text-caption uppercase text-fg-muted">
             {t("ordersEyebrow")}
           </p>
-          <h1 className="mt-3 text-h1 leading-heading">{t("myOrders")}</h1>
+          <h1 className="mt-3 text-3xl leading-heading sm:text-h1">{t("myOrders")}</h1>
           <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
             {t("ordersLead")}
           </p>
@@ -75,7 +75,7 @@ export default function CustomerOrdersPage() {
                 </div>
                 <div className="flex flex-col gap-3 md:items-end">
                   <span
-                    className={`inline-flex min-h-10 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
+                    className={`inline-flex min-h-11 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
                       order.status,
                     )}`}
                   >

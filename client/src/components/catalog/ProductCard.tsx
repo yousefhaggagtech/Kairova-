@@ -195,7 +195,7 @@ export default function ProductCard({ product }: { product: Product }) {
                       alt={primaryImage.alt[locale] || productName}
                       fill
                       variant="card"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
                       className="object-cover"
                     />
                   </motion.div>
@@ -210,7 +210,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         alt={secondaryImage.alt[locale] || productName}
                         fill
                         variant="card"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 639px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, 25vw"
                         className="object-cover"
                       />
                     </motion.div>
@@ -240,7 +240,7 @@ export default function ProductCard({ product }: { product: Product }) {
               type="button"
               disabled={!inStock}
               onClick={handleAddToCart}
-              className="w-full cursor-pointer border border-fg-primary/75 bg-transparent px-4 py-3 text-center text-caption font-medium text-fg-primary backdrop-blur-[2px] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-primary disabled:cursor-not-allowed disabled:opacity-65"
+              className="min-h-11 w-full cursor-pointer border border-fg-primary/75 bg-transparent px-4 py-3 text-center text-caption font-medium text-fg-primary backdrop-blur-[2px] focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-primary disabled:cursor-not-allowed disabled:opacity-65"
               transition={{ duration: 0.42, ease: luxuryEase }}
               whileFocus={
                 inStock
@@ -278,7 +278,7 @@ export default function ProductCard({ product }: { product: Product }) {
           >
             <Link
               href={`/product/${product.slug}`}
-              className="cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
+              className="inline-flex min-h-11 cursor-pointer items-center break-words focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
             >
               {productName}
             </Link>

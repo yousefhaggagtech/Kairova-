@@ -209,7 +209,7 @@ export default function AdminDashboardClient() {
             <p className="text-caption uppercase text-fg-muted">
               {t("dashboardEyebrow")}
             </p>
-            <h2 className="mt-4 text-h1 leading-heading text-fg-secondary">
+            <h2 className="mt-4 text-3xl leading-heading text-fg-secondary sm:text-h1">
               {t("dashboardGreeting")}
             </h2>
             <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
@@ -221,7 +221,7 @@ export default function AdminDashboardClient() {
             <p className="text-caption uppercase text-fg-muted">
               {t("dashboardToday")}
             </p>
-            <p className="mt-4 text-h2 leading-heading text-fg-secondary">
+            <p className="mt-4 break-words text-3xl leading-heading text-fg-secondary sm:text-h2">
               {loadingValue ??
                 t("dashboardOrdersToday", {
                   count: dashboard.todayOrders.length.toLocaleString(locale),
@@ -430,15 +430,15 @@ export default function AdminDashboardClient() {
                   href={`/admin/products/${product._id}/edit`}
                   className="flex min-h-16 items-center justify-between gap-4 border border-border-light px-4 py-3 transition-colors hover:bg-surface-light focus-visible:bg-surface-light focus-visible:outline-none"
                 >
-                  <span>
-                    <span className="block text-body">
+                  <span className="min-w-0">
+                    <span className="block break-words text-body">
                       {product.name[locale] || product.name.en}
                     </span>
-                    <span className="block font-mono text-caption text-fg-muted">
+                    <span className="block break-words font-mono text-caption text-fg-muted">
                       {product.sku}
                     </span>
                   </span>
-                  <span className="shrink-0 text-caption text-fg-muted">
+                  <span className="shrink-0 text-end text-caption text-fg-muted">
                     {t("dashboardUnits", {
                       count: product.stockQuantity.toLocaleString(locale),
                     })}
@@ -496,7 +496,7 @@ export default function AdminDashboardClient() {
                       <td className="border-b border-border-light px-3 py-4 font-mono text-caption">
                         <Link
                           href={`/admin/orders/${order._id}`}
-                          className="underline-offset-4 group-hover:underline"
+                          className="inline-flex min-h-11 items-center underline-offset-4 group-hover:underline"
                         >
                           {order.orderNumber}
                         </Link>

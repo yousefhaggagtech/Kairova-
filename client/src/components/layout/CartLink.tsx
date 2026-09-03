@@ -13,7 +13,7 @@ export default function CartLink() {
   return (
     <Link
       href="/cart"
-      className="inline-flex h-10 min-w-10 items-center justify-center border border-border-light ps-3 pe-3 text-caption font-medium transition-colors hover:bg-surface-light"
+      className="inline-flex h-11 min-w-11 items-center justify-center border border-border-light ps-3 pe-3 text-caption font-medium transition-colors hover:bg-surface-light"
       aria-label={t("yourCart")}
     >
       {hasHydrated ? itemCount : 0}

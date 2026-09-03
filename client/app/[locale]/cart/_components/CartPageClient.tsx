@@ -87,7 +87,7 @@ function LoadingCart({ locale }: CartPageClientProps) {
         >
           {tCheckout("cartPage.eyebrow")}
         </p>
-        <h1 className="mt-5 text-h2 leading-heading sm:text-h1">
+        <h1 className="mt-5 text-3xl leading-heading sm:text-h1">
           {tCheckout("yourCart")}
         </h1>
         <p className="mt-4 text-body-lg leading-body text-fg-muted">
@@ -154,7 +154,7 @@ function EmptyCart({ locale }: CartPageClientProps) {
         </p>
         <h1
           id="empty-cart-heading"
-          className="mt-5 max-w-3xl text-h2 leading-display sm:text-h1 lg:text-display"
+          className="mt-5 max-w-3xl text-4xl leading-display sm:text-h1 lg:text-display"
         >
           {tCheckout("emptyCart")}
         </h1>
@@ -223,7 +223,7 @@ export default function CartPageClient({ locale }: CartPageClientProps) {
             </p>
             <h1
               id="cart-heading"
-              className="mt-5 max-w-4xl text-h2 leading-heading sm:text-h1"
+              className="mt-5 max-w-4xl text-3xl leading-heading sm:text-h1"
             >
               {tCheckout("yourCart")}
             </h1>
@@ -285,7 +285,7 @@ export default function CartPageClient({ locale }: CartPageClientProps) {
                       <h2 className="mt-3 text-body-lg font-medium leading-heading sm:text-h3">
                         <Link
                           href={`/product/${item.slug}`}
-                          className="transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                          className="inline-flex min-h-11 items-center break-words transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
                         >
                           {productName}
                         </Link>
@@ -322,7 +322,7 @@ export default function CartPageClient({ locale }: CartPageClientProps) {
 
                       <button
                         type="button"
-                        className="text-caption font-medium text-fg-muted underline underline-offset-4 transition-colors hover:text-fg-secondary focus-visible:text-fg-secondary focus-visible:outline-none"
+                        className="inline-flex min-h-11 items-center text-caption font-medium text-fg-muted underline underline-offset-4 transition-colors hover:text-fg-secondary focus-visible:text-fg-secondary focus-visible:outline-none"
                         onClick={() => removeItem(item.productId)}
                       >
                         {tCheckout("remove")}
@@ -347,15 +347,15 @@ export default function CartPageClient({ locale }: CartPageClientProps) {
             </h2>
 
             <dl className="mt-7 space-y-4 border-y border-border-light py-5">
-              <div className="flex items-center justify-between gap-4 text-body">
+              <div className="grid grid-cols-1 gap-1 text-body sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">{tCheckout("subtotal")}</dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(total, locale, egpLabel)}
                 </dd>
               </div>
-              <div className="flex items-center justify-between gap-4 text-body-lg">
+              <div className="grid grid-cols-1 gap-1 text-body-lg sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt>{tCheckout("total")}</dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(total, locale, egpLabel)}
                 </dd>
               </div>
@@ -364,7 +364,7 @@ export default function CartPageClient({ locale }: CartPageClientProps) {
             <button
               type="button"
               onClick={() => router.push("/checkout")}
-              className="mt-6 w-full cursor-pointer bg-fg-secondary px-6 py-4 text-caption font-medium uppercase text-bg-secondary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
+              className="mt-6 min-h-12 w-full cursor-pointer bg-fg-secondary px-6 py-3 text-caption font-medium uppercase text-bg-secondary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
             >
               {tCheckout("proceedToCheckout")}
             </button>

@@ -59,7 +59,7 @@ export default function CategoryPage() {
 
   return (
     <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 md:px-10">
-      <h1 className="mb-2 text-h1 leading-heading">
+      <h1 className="mb-2 break-words text-3xl leading-heading sm:text-h1">
         {category.name[locale] || category.name.en}
       </h1>
       <p className="mb-8 text-body text-fg-muted">

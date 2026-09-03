@@ -207,7 +207,7 @@ export default function AdminSettingsPage() {
           <p className="text-caption uppercase text-fg-muted">
             {t("settingsEyebrow")}
           </p>
-          <h2 className="mt-4 text-h1 leading-heading text-fg-secondary">
+          <h2 className="mt-4 text-3xl leading-heading text-fg-secondary sm:text-h1">
             {t("settings")}
           </h2>
           <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
@@ -260,8 +260,8 @@ export default function AdminSettingsPage() {
 
         <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
           <section className="border border-border-light bg-bg-secondary p-5">
-            <div className="flex items-start justify-between gap-4 border-b border-border-light pb-4">
-              <div>
+            <div className="flex flex-col gap-4 border-b border-border-light pb-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-caption uppercase text-fg-muted">
                   {t("settingsSummary")}
                 </p>

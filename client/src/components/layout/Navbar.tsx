@@ -4,6 +4,7 @@ import type { CSSProperties, FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
 
 import { useAuthMe } from "@/application/hooks/useAuthMe";
 import { useAuthStore } from "@/application/store/authStore";
@@ -190,10 +191,16 @@ const NAV_TREES: Record<MenuKey, NavTree> = {
 };
 
 const navTextClass =
-  "cursor-pointer whitespace-nowrap text-[0.625rem] font-medium uppercase transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none sm:text-xs md:text-caption";
+  "inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-caption font-medium uppercase transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none";
 
 const iconButtonClass =
-  "relative inline-flex h-9 w-9 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none sm:h-10 sm:w-10";
+  "relative inline-flex h-11 w-11 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none";
+
+const mobileMenuLinkClass =
+  "flex min-h-12 w-full cursor-pointer items-center justify-between gap-4 border-b border-border-light py-3 text-start text-body font-medium text-fg-secondary transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none";
+
+const mobileUtilityLinkClass =
+  "inline-flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 border border-border-light px-4 text-body text-fg-secondary transition-colors duration-200 hover:border-fg-secondary hover:bg-bg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary";
 
 function SearchIcon({ title }: { title: string }) {
   return (
@@ -217,7 +224,7 @@ function SearchIcon({ title }: { title: string }) {
   );
 }
 
-function AccountIcon() {
+function AccountIcon({ title }: { title: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -228,7 +235,7 @@ function AccountIcon() {
       focusable="false"
       role="img"
     >
-      <title>Account</title>
+      <title>{title}</title>
       <path
         fill="currentColor"
         fillRule="evenodd"
@@ -239,7 +246,7 @@ function AccountIcon() {
   );
 }
 
-function CartIcon() {
+function CartIcon({ title }: { title: string }) {
   return (
     <svg
       focusable="false"
@@ -249,7 +256,7 @@ function CartIcon() {
       width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>Cart</title>
+      <title>{title}</title>
       <path
         fill="currentColor"
         clipRule="evenodd"
@@ -265,7 +272,7 @@ function CartIcon() {
       <path
         fill="currentColor"
         clipRule="evenodd"
-        d="M28.8198 27.5C28.8198 29.433 27.2528 31 25.3198 31C23.3868 31 21.8198 29.433 21.8198 27.5C21.8198 25.567 23.3868 24 25.3198 24C27.2528 24 28.8198 25.567 28.8198 27.5ZM26.8198 27.5C26.8198 28.3284 26.1483 29 25.3198 29C24.4914 29 23.8198 28.3284 23.8198 27.5C23.8198 26.6716 24.4914 26 25.3198 26C26.1483 26 26.8198 26.6716 26.8198 27.5Z"
+        d="M28.8198 27.5C28.8198 29.433 27.2528 31 25.3198 31C23.3868 31 21.8198 29.433 21.8198 27.5C21.8198 25.567 23.3868 24 25.3198 24C27.2528 24 28.8198 25.567 28.8198 27.5ZM26.8198 27.5C26.8198 28.3284 26.1483 29 25.3198 29C24.4914 29 23.8198 28.3284 23.8198 27.5C23.8198 26.6716 24.4914 26 26.1483 26 26.8198 26.6716 26.8198 27.5Z"
         fillRule="evenodd"
       />
     </svg>
@@ -305,12 +312,14 @@ export default function Navbar() {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const lastScrollYRef = useRef(0);
   const hiddenRef = useRef(false);
+  const previousPathnameRef = useRef(pathname);
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasAuthHydrated = useAuthStore((state) => state.hasHydrated);
   const hasCartHydrated = useCartStore((state) => state.hasHydrated);
   const itemCount = useCartStore((state) => state.getItemCount());
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -325,8 +334,15 @@ export default function Navbar() {
   });
 
   useEffect(() => {
+    if (previousPathnameRef.current === pathname) {
+      return;
+    }
+
+    previousPathnameRef.current = pathname;
+
     const resetTimeout = window.setTimeout(() => {
       setActiveMenu(null);
+      setIsMobileMenuOpen(false);
       setIsSearchOpen(false);
       setIsCartOpen(false);
     }, 0);
@@ -416,6 +432,7 @@ export default function Navbar() {
         !headerRef.current.contains(event.target as Node)
       ) {
         setActiveMenu(null);
+        setIsMobileMenuOpen(false);
         setIsSearchOpen(false);
       }
     }
@@ -423,6 +440,7 @@ export default function Navbar() {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setActiveMenu(null);
+        setIsMobileMenuOpen(false);
         setIsSearchOpen(false);
       }
     }
@@ -456,7 +474,8 @@ export default function Navbar() {
       : t("login");
   const nextLocale: Locale = locale === "ar" ? "en" : "ar";
   const nextLocaleLabel = nextLocale === "ar" ? t("arabic") : t("english");
-  const isPanelOpen = activeMenu !== null || isSearchOpen || isCartOpen;
+  const isPanelOpen =
+    activeMenu !== null || isMobileMenuOpen || isSearchOpen || isCartOpen;
   const isSolid = isPanelOpen || !isHomeRoute || !scrollState.atTop;
   const isHidden = !isPanelOpen && scrollState.hidden;
   const logoStyle = {
@@ -467,12 +486,30 @@ export default function Navbar() {
   const activeMenuTree = activeMenu ? NAV_TREES[activeMenu] : null;
 
   function toggleMenu(menu: MenuKey) {
+    setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
     setActiveMenu((currentMenu) => (currentMenu === menu ? null : menu));
   }
 
+  function toggleMobileMenu() {
+    setActiveMenu(null);
+    setIsSearchOpen(false);
+    setIsMobileMenuOpen((currentValue) => !currentValue);
+  }
+
+  function toggleMobileCollection(menu: MenuKey) {
+    setActiveMenu((currentMenu) => (currentMenu === menu ? null : menu));
+  }
+
+  function closeNavigationPanels() {
+    setActiveMenu(null);
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+  }
+
   function toggleSearch() {
     setActiveMenu(null);
+    setIsMobileMenuOpen(false);
     setIsSearchOpen((currentValue) => !currentValue);
   }
 
@@ -487,12 +524,14 @@ export default function Navbar() {
     }
 
     setActiveMenu(null);
+    setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
     router.push(`/search?q=${encodeURIComponent(query)}`);
   }
 
   function openCart() {
     setActiveMenu(null);
+    setIsMobileMenuOpen(false);
     setIsSearchOpen(false);
     setIsCartOpen(true);
   }
@@ -510,45 +549,61 @@ export default function Navbar() {
         }`}
         style={logoStyle}
       >
-        <div className="relative mx-auto flex min-h-20 w-full max-w-[var(--max-content)] items-center justify-between ps-4 pe-4 sm:ps-6 sm:pe-6 md:ps-10 md:pe-10">
-          <nav
-            className="flex flex-1 basis-0 items-center justify-start gap-3 sm:gap-5 md:gap-8"
-            aria-label={t("primary")}
-          >
+        <div className="relative mx-auto grid min-h-20 w-full max-w-[var(--max-content)] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 ps-3 pe-3 sm:ps-6 sm:pe-6 md:ps-10 md:pe-10">
+          <div className="flex min-w-0 items-center justify-start">
             <button
               type="button"
-              className={navTextClass}
-              aria-expanded={activeMenu === "men"}
-              aria-controls="navbar-menu-panel"
-              onClick={() => toggleMenu("men")}
+              className="inline-flex h-11 w-11 cursor-pointer items-center justify-center transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none lg:hidden"
+              aria-label={t(isMobileMenuOpen ? "closeMenu" : "openMenu")}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="navbar-mobile-menu"
+              onClick={toggleMobileMenu}
             >
-              {t("men")}
+              {isMobileMenuOpen ? (
+                <X aria-hidden="true" className="h-5 w-5 stroke-[1.7]" />
+              ) : (
+                <Menu aria-hidden="true" className="h-5 w-5 stroke-[1.7]" />
+              )}
             </button>
-            <button
-              type="button"
-              className={navTextClass}
-              aria-expanded={activeMenu === "women"}
-              aria-controls="navbar-menu-panel"
-              onClick={() => toggleMenu("women")}
-            >
-              {t("women")}
-            </button>
-            <Link href="/about" className={navTextClass}>
-              {t("ourStory")}
-            </Link>
-          </nav>
 
-          <div className="pointer-events-none absolute top-1/2 flex -translate-y-1/2 justify-center [inset-inline:0]">
-            <Link
-              href="/"
-              aria-label={t("home")}
-              className="kairova-nav-logo-link pointer-events-auto inline-flex cursor-pointer items-center justify-center transition-colors duration-200 focus-visible:outline-none"
+            <nav
+              className="hidden min-w-0 items-center justify-start gap-6 lg:flex xl:gap-8"
+              aria-label={t("primary")}
             >
-              <Logo className="kairova-nav-logo h-auto w-[74px] sm:w-24 md:w-[132px]" />
-            </Link>
+              <button
+                type="button"
+                className={navTextClass}
+                aria-expanded={activeMenu === "men"}
+                aria-controls="navbar-menu-panel"
+                onClick={() => toggleMenu("men")}
+              >
+                {t("men")}
+              </button>
+              <button
+                type="button"
+                className={navTextClass}
+                aria-expanded={activeMenu === "women"}
+                aria-controls="navbar-menu-panel"
+                onClick={() => toggleMenu("women")}
+              >
+                {t("women")}
+              </button>
+              <Link href="/about" className={navTextClass}>
+                {t("ourStory")}
+              </Link>
+            </nav>
           </div>
 
-          <div className="flex flex-1 basis-0 items-center justify-end gap-1 sm:gap-2 md:gap-3">
+          <Link
+            href="/"
+            aria-label={t("home")}
+            className="kairova-nav-logo-link inline-flex cursor-pointer items-center justify-center justify-self-center transition-colors duration-200 focus-visible:outline-none"
+            onClick={closeNavigationPanels}
+          >
+            <Logo className="kairova-nav-logo h-auto w-[82px] sm:w-24 md:w-[120px] lg:w-[132px]" />
+          </Link>
+
+          <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-2 md:gap-3">
             <Link
               href={pathname}
               locale={nextLocale}
@@ -556,7 +611,7 @@ export default function Navbar() {
                 router.prefetch(pathname, { locale: nextLocale })
               }
               onFocus={() => router.prefetch(pathname, { locale: nextLocale })}
-              className={`${iconButtonClass} gap-1 sm:w-12`}
+              className="relative hidden h-11 w-11 cursor-pointer items-center justify-center gap-1 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none lg:inline-flex lg:w-14"
               aria-label={t("switchLanguage", { locale: nextLocaleLabel })}
               title={t("switchLanguage", { locale: nextLocaleLabel })}
             >
@@ -577,11 +632,11 @@ export default function Navbar() {
             </button>
             <Link
               href={accountHref}
-              className={iconButtonClass}
+              className={`${iconButtonClass} hidden sm:inline-flex`}
               aria-label={accountLabel}
               title={accountLabel}
             >
-              <AccountIcon />
+              <AccountIcon title={accountLabel} />
             </Link>
             <button
               type="button"
@@ -592,7 +647,7 @@ export default function Navbar() {
               title={t("cart")}
               onClick={openCart}
             >
-              <CartIcon />
+              <CartIcon title={t("cart")} />
               {hasCartHydrated && itemCount > 0 ? (
                 <span className="absolute end-0 top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-fg-secondary px-1 text-[0.625rem] leading-none text-bg-secondary">
                   {itemCount}
@@ -603,8 +658,151 @@ export default function Navbar() {
         </div>
 
         <div
+          id="navbar-mobile-menu"
+          className={`overflow-hidden border-border-light bg-surface-light text-fg-secondary shadow-[0_18px_52px_rgba(10,10,10,0.10)] transition-[max-height,opacity] duration-300 ease-out lg:hidden ${
+            isMobileMenuOpen
+              ? "max-h-[calc(100svh-5rem)] border-t opacity-100"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="max-h-[calc(100svh-5rem)] overflow-y-auto">
+            <nav
+              aria-label={t("primary")}
+              className="mx-auto w-full max-w-[var(--max-content)] px-4 py-6 text-start sm:px-6 md:px-10"
+            >
+              <div className="space-y-2">
+                {(["men", "women"] as const).map((menuKey) => {
+                  const tree = NAV_TREES[menuKey];
+                  const isExpanded = activeMenu === menuKey;
+
+                  return (
+                    <div key={menuKey}>
+                      <button
+                        type="button"
+                        className={mobileMenuLinkClass}
+                        aria-expanded={isExpanded}
+                        aria-controls={`navbar-mobile-${menuKey}-panel`}
+                        onClick={() => toggleMobileCollection(menuKey)}
+                      >
+                        <span>{t(menuKey)}</span>
+                        <span
+                          aria-hidden="true"
+                          className="text-h3 leading-none text-fg-muted"
+                        >
+                          {isExpanded ? "-" : "+"}
+                        </span>
+                      </button>
+
+                      <div
+                        id={`navbar-mobile-${menuKey}-panel`}
+                        className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${
+                          isExpanded
+                            ? "max-h-[90rem] opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="border-b border-border-light pb-5 ps-4">
+                          <Link
+                            href={tree.allHref}
+                            className="flex min-h-11 cursor-pointer items-center text-caption font-medium uppercase text-fg-muted transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                            onClick={closeNavigationPanels}
+                          >
+                            {t(tree.allLabelKey)}
+                          </Link>
+
+                          <ul className="mt-3 grid gap-4">
+                            {tree.branches.map((branch) => (
+                              <li
+                                key={branch.href}
+                                className="border-s border-border-light ps-4"
+                              >
+                                <Link
+                                  href={branch.href}
+                                  className="flex min-h-11 cursor-pointer items-center text-body font-medium text-fg-secondary transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                  onClick={closeNavigationPanels}
+                                >
+                                  {t(branch.labelKey)}
+                                </Link>
+
+                                {branch.products?.length ? (
+                                  <ul className="mt-2 grid gap-2">
+                                    {branch.products.map((product) => (
+                                      <li key={product.href}>
+                                        <Link
+                                          href={product.href}
+                                          className="group grid min-h-16 cursor-pointer grid-cols-[56px_minmax(0,1fr)] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                          onClick={closeNavigationPanels}
+                                        >
+                                          <span className="relative block aspect-[4/5] overflow-hidden bg-surface-light">
+                                            <Image
+                                              src={product.image}
+                                              alt={product.name}
+                                              fill
+                                              sizes="56px"
+                                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                          </span>
+                                          <span className="break-words text-caption leading-body">
+                                            {product.name}
+                                          </span>
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <Link
+                  href="/about"
+                  className={mobileMenuLinkClass}
+                  onClick={closeNavigationPanels}
+                >
+                  <span>{t("ourStory")}</span>
+                </Link>
+              </div>
+
+              <div className="mt-6 grid gap-3 border-t border-border-light pt-5 sm:grid-cols-2">
+                <Link
+                  href={accountHref}
+                  className={mobileUtilityLinkClass}
+                  onClick={closeNavigationPanels}
+                >
+                  <span>{accountLabel}</span>
+                  <AccountIcon title={accountLabel} />
+                </Link>
+                <Link
+                  href={pathname}
+                  locale={nextLocale}
+                  onMouseEnter={() =>
+                    router.prefetch(pathname, { locale: nextLocale })
+                  }
+                  onFocus={() => router.prefetch(pathname, { locale: nextLocale })}
+                  className={mobileUtilityLinkClass}
+                  aria-label={t("switchLanguage", {
+                    locale: nextLocaleLabel,
+                  })}
+                  onClick={closeNavigationPanels}
+                >
+                  <span>{t("switchLanguage", { locale: nextLocaleLabel })}</span>
+                  <span className="text-caption font-semibold uppercase">
+                    {nextLocale.toUpperCase()}
+                  </span>
+                </Link>
+              </div>
+            </nav>
+          </div>
+        </div>
+
+        <div
           id="navbar-menu-panel"
-          className={`overflow-hidden border-border-light bg-surface-light text-fg-secondary shadow-[0_18px_52px_rgba(10,10,10,0.10)] transition-[max-height,opacity] duration-300 ease-out ${
+          className={`hidden overflow-hidden border-border-light bg-surface-light text-fg-secondary shadow-[0_18px_52px_rgba(10,10,10,0.10)] transition-[max-height,opacity] duration-300 ease-out lg:block ${
             activeMenu
               ? "max-h-[calc(100svh-5rem)] border-t opacity-100"
               : "max-h-0 opacity-0"

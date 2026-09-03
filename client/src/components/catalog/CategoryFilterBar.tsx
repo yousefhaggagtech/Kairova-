@@ -166,16 +166,16 @@ export default function CategoryFilterBar({ gender }: CategoryFilterBarProps) {
       aria-label={t("categoryFilterLabel", {
         collection: t(gender === "men" ? "menCollection" : "womenCollection"),
       })}
-      className={`mb-20 w-full overflow-hidden px-4 py-7 sm:px-6 md:px-10 ${
+      className={`mb-20 w-full max-w-full overflow-hidden px-4 py-7 sm:px-6 md:px-10 ${
         isRtl ? "font-display-ar" : "font-display-en"
       }`}
       dir="ltr"
     >
       <ul
-        className={`grid w-full gap-x-4 gap-y-6 text-center text-body-lg font-medium leading-heading text-black lg:text-h3 ${
+        className={`mx-auto flex w-auto max-w-full flex-wrap justify-center gap-x-4 gap-y-3 text-center text-body-lg font-medium leading-heading text-black sm:grid sm:w-full sm:flex-nowrap sm:gap-x-4 sm:gap-y-6 lg:text-h3 ${
           categoryFilters.length === 4
-            ? "grid-cols-2 sm:grid-cols-4"
-            : "grid-cols-3 sm:grid-cols-6"
+            ? "sm:grid-cols-4"
+            : "sm:grid-cols-6"
         }`}
         dir="ltr"
       >
@@ -183,10 +183,13 @@ export default function CategoryFilterBar({ gender }: CategoryFilterBarProps) {
           const isActive = category.value === activeCategory;
 
           return (
-            <li key={category.value} className="min-w-0 overflow-hidden">
+            <li
+              key={category.value}
+              className="w-auto min-w-0 sm:overflow-hidden"
+            >
               <a
                 aria-current={isActive ? "location" : undefined}
-                className={`group inline-flex min-w-0 w-full cursor-pointer justify-center text-center transition-[color] duration-300 ease-out focus-visible:outline-none ${
+                className={`group inline-flex min-h-11 w-auto min-w-0 cursor-pointer items-center justify-center px-1 text-center transition-[color] duration-300 ease-out focus-visible:outline-none sm:w-full ${
                   isActive
                     ? "text-black"
                     : "hover:text-hover-muted focus-visible:text-hover-muted"

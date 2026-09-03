@@ -54,6 +54,7 @@ function getCurrentRedirect() {
 export default function LoginPage() {
   const locale = useLocale();
   const t = useTranslations("auth");
+  const tSite = useTranslations("site");
   const router = useRouter();
 
   const login = useAuthStore((state) => state.login);
@@ -82,6 +83,7 @@ export default function LoginPage() {
 
   return (
     <AuthPageShell
+      brandLabel={tSite("title")}
       eyebrow={t("loginEyebrow")}
       highlights={[
         t("highlightReservations"),

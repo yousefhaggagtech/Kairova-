@@ -27,10 +27,11 @@ const GATEWAY_ITEMS: GatewayItem[] = [
 ];
 
 const panelClassName =
-  "kairova-dual-gateway-panel group/collection relative flex min-h-[62svh] flex-1 origin-center items-center justify-center overflow-hidden bg-bg-primary text-fg-primary transition-[flex,opacity,transform,filter] duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)] focus-visible:z-10 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-[-8px] focus-visible:outline-fg-primary md:min-h-[86svh]";
+  "kairova-dual-gateway-panel group/collection relative flex min-h-[56svh] flex-1 origin-center items-center justify-center overflow-hidden bg-bg-primary text-fg-primary transition-[flex,opacity,transform,filter] duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)] focus-visible:z-10 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-[-8px] focus-visible:outline-fg-primary sm:min-h-[62svh] md:min-h-[86svh]";
 
 export default async function DualGateway() {
   const t = await getTranslations("home");
+  const tSite = await getTranslations("site");
 
   return (
     <section
@@ -58,11 +59,11 @@ export default async function DualGateway() {
             className="absolute [inset-block:0] [inset-inline:0] bg-[linear-gradient(180deg,rgba(10,10,10,0.18)_0%,rgba(10,10,10,0.34)_46%,rgba(10,10,10,0.78)_100%)] transition-opacity duration-[1200ms] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/collection:opacity-90"
           />
 
-          <span className="relative z-10 flex min-h-56 w-full flex-col items-center justify-center ps-6 pe-6 text-center sm:ps-10 sm:pe-10">
+          <span className="relative z-10 flex min-h-56 w-full flex-col items-center justify-center ps-5 pe-5 text-center sm:ps-10 sm:pe-10">
             <span className="block text-caption font-medium uppercase text-border-light">
-              Kairova
+              {tSite("title")}
             </span>
-            <h2 className="mt-4 max-w-[12ch] text-h2 leading-display text-fg-primary sm:text-h1">
+            <h2 className="mt-4 max-w-[12ch] text-4xl leading-display text-fg-primary sm:text-h1">
               {t(item.titleKey)}
             </h2>
             <span className="kairova-dual-gateway-cta mt-8 inline-flex h-12 min-w-52 items-center justify-center border border-fg-primary/80 bg-transparent ps-8 pe-8 text-caption font-medium uppercase text-fg-primary transition-[opacity,transform,background-color,color,border-color] duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover/collection:border-fg-primary group-hover/collection:bg-fg-primary group-hover/collection:text-fg-secondary group-focus-visible/collection:border-fg-primary group-focus-visible/collection:bg-fg-primary group-focus-visible/collection:text-fg-secondary">

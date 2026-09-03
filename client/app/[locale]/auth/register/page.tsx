@@ -27,6 +27,7 @@ function getErrorMessage(error: unknown, fallback: string) {
 
 export default function RegisterPage() {
   const t = useTranslations("auth");
+  const tSite = useTranslations("site");
   const router = useRouter();
 
   const registerUser = useAuthStore((state) => state.register);
@@ -57,6 +58,7 @@ export default function RegisterPage() {
 
   return (
     <AuthPageShell
+      brandLabel={tSite("title")}
       eyebrow={t("registerEyebrow")}
       highlights={[
         t("highlightReservations"),

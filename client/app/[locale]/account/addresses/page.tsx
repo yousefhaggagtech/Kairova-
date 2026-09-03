@@ -142,7 +142,7 @@ export default function AccountAddressesPage() {
             <p className="text-caption uppercase text-fg-muted">
               {t("addressesEyebrow")}
             </p>
-            <h1 className="mt-3 text-h1 leading-heading">{t("addressBook")}</h1>
+            <h1 className="mt-3 text-3xl leading-heading sm:text-h1">{t("addressBook")}</h1>
             <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
               {t("addressesLead")}
             </p>
@@ -240,12 +240,12 @@ export default function AccountAddressesPage() {
                 key={address._id}
                 className="border border-border-light bg-bg-secondary p-5"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-caption uppercase text-fg-muted">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="break-words text-caption uppercase text-fg-muted">
                       {address.phone}
                     </p>
-                    <h2 className="mt-3 text-h3 leading-heading">
+                    <h2 className="mt-3 break-words text-h3 leading-heading">
                       {getAddressDisplayName(address)}
                     </h2>
                   </div>
@@ -273,7 +273,7 @@ export default function AccountAddressesPage() {
                   <button
                     type="button"
                     onClick={() => openEditForm(address)}
-                    className="inline-flex min-h-10 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light"
+                    className="inline-flex min-h-11 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light"
                   >
                     <Pencil
                       aria-hidden="true"
@@ -285,7 +285,7 @@ export default function AccountAddressesPage() {
                     type="button"
                     onClick={() => void handleDelete(address)}
                     disabled={actionPending}
-                    className="inline-flex min-h-10 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-11 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Trash2
                       aria-hidden="true"
@@ -298,7 +298,7 @@ export default function AccountAddressesPage() {
                       type="button"
                       onClick={() => void handleSetDefault(address)}
                       disabled={actionPending}
-                      className="inline-flex min-h-10 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex min-h-11 items-center gap-2 border border-border-light px-3 text-body transition-colors hover:border-fg-secondary hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <CheckCircle2
                         aria-hidden="true"

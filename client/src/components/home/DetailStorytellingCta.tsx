@@ -11,14 +11,14 @@ export default function DetailStorytellingCta() {
   return (
     <section
       aria-labelledby="detail-storytelling-cta-heading"
-      className="bg-bg-secondary px-6 pb-24 pt-0 text-center text-fg-secondary sm:px-10 sm:pb-32 sm:pt-0"
+      className="bg-bg-secondary px-4 pb-24 pt-0 text-center text-fg-secondary sm:px-10 sm:pb-32 sm:pt-0"
       data-section="detail-storytelling-cta"
       dir={locale === "ar" ? "rtl" : "ltr"}
     >
       <div className="mx-auto flex max-w-2xl flex-col items-center">
         <h2
           id="detail-storytelling-cta-heading"
-          className="text-h2 leading-heading text-fg-primary sm:text-h1"
+          className="text-3xl leading-heading text-fg-secondary sm:text-h1"
         >
           {t("heading")}
         </h2>

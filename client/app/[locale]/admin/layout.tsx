@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: Props) {
               <p className="mb-3 text-caption uppercase text-fg-muted">
                 {t("signedInAs")} {user.name}
               </p>
-              <h1 className="text-h2 leading-heading">{t("title")}</h1>
+              <h1 className="break-words text-3xl leading-heading sm:text-h2">{t("title")}</h1>
               <p className="mt-3 max-w-2xl text-body leading-body text-fg-muted">
                 {t("adminShellLead")}
               </p>

@@ -42,6 +42,20 @@
   --font-body-ar: var(--font-plex-arabic), sans-serif;
 }
 
+html,
+body {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@supports not (overflow-x: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
 html { background: var(--color-bg-secondary); color: var(--color-fg-secondary); }
 html.dark { background: var(--color-bg-primary); color: var(--color-fg-primary); }
 

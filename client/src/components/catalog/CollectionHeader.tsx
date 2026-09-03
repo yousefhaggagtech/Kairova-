@@ -130,7 +130,7 @@ export default function CollectionHeader({
             variants={copyRevealVariants}
           />
           <motion.h1
-            className={`max-w-5xl text-h2 leading-display text-fg-primary sm:text-h1 lg:text-display ${
+            className={`max-w-5xl text-4xl leading-display text-fg-primary sm:text-h1 lg:text-display ${
               isRtl ? "font-display-ar" : "font-display-en"
             }`}
             id={headingId}

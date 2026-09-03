@@ -81,7 +81,7 @@ function LoadingCheckout({ locale }: CheckoutPageClientProps) {
         >
           {t("checkoutPage.eyebrow")}
         </p>
-        <h1 className="mt-5 max-w-3xl text-h2 leading-heading sm:text-h1">
+        <h1 className="mt-5 max-w-3xl text-3xl leading-heading sm:text-h1">
           {t("checkoutPage.loadingTitle")}
         </h1>
         <p className="mt-4 max-w-xl text-body-lg leading-body text-fg-secondary/68">
@@ -154,7 +154,7 @@ function CompactLineItem({
       </div>
 
       <div className="min-w-0">
-        <p className="truncate text-body font-medium leading-heading">
+        <p className="break-words text-body font-medium leading-heading">
           {productName}
         </p>
         <p className="mt-2 text-caption text-fg-muted">
@@ -195,12 +195,12 @@ function SavedAddressOption({
         onChange={onSelect}
         className="sr-only"
       />
-      <span className="flex items-start justify-between gap-4">
-        <span>
-          <span className="block text-body-lg font-medium">
+      <span className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <span className="min-w-0">
+          <span className="block break-words text-body-lg font-medium">
             {getAddressDisplayName(address)}
           </span>
-          <span className="mt-2 block text-caption text-fg-muted">
+          <span className="mt-2 block break-words text-caption text-fg-muted">
             {address.fullName} / {address.phone}
           </span>
         </span>
@@ -374,7 +374,7 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
             </p>
             <h1
               id="checkout-heading"
-              className="mt-5 max-w-4xl text-h2 leading-heading sm:text-h1"
+              className="mt-5 max-w-4xl text-3xl leading-heading sm:text-h1"
             >
               {t("checkoutPage.title")}
             </h1>
@@ -473,7 +473,7 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
               {shouldUseNewAddress && (
                 <div className="mt-7 border-t border-border-light pt-7">
                   <div className="mb-6 flex items-start gap-4">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-border-light bg-bg-secondary">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-border-light bg-bg-secondary">
                       <MapPinned
                         aria-hidden="true"
                         className="h-5 w-5 stroke-[1.5]"
@@ -570,7 +570,7 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
                   <p className="text-caption font-medium text-fg-muted">
                     {t("checkoutPage.paymentNumberTitle")}
                   </p>
-                  <p className="mt-3 font-mono text-h3 leading-heading">
+                  <p className="mt-3 break-words font-mono text-body-lg font-semibold leading-heading sm:text-h3">
                     {selectedPaymentNumber || t("paymentNumberMissing")}
                   </p>
                 </div>
@@ -613,31 +613,31 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
             </div>
 
             <dl className="mt-6 space-y-4">
-              <div className="flex items-center justify-between gap-4 text-body">
+              <div className="grid grid-cols-1 gap-1 text-body sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">{t("subtotal")}</dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(total, locale, egpLabel)}
                 </dd>
               </div>
-              <div className="flex items-center justify-between gap-4 text-body">
+              <div className="grid grid-cols-1 gap-1 text-body sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">
                   {t("checkoutPage.depositDueNow")}
                 </dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(depositAmount, locale, egpLabel)}
                 </dd>
               </div>
-              <div className="flex items-center justify-between gap-4 text-body">
+              <div className="grid grid-cols-1 gap-1 text-body sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt className="text-fg-muted">
                   {t("checkoutPage.remainingLater")}
                 </dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(remainingAmount, locale, egpLabel)}
                 </dd>
               </div>
-              <div className="flex items-center justify-between gap-4 border-t border-border-light pt-5 text-body-lg">
+              <div className="grid grid-cols-1 gap-1 border-t border-border-light pt-5 text-body-lg sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                 <dt>{t("checkoutPage.fullTotal")}</dt>
-                <dd className="font-medium">
+                <dd className="break-words font-medium sm:text-end">
                   {formatCurrency(total, locale, egpLabel)}
                 </dd>
               </div>
@@ -655,7 +655,7 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-6 w-full cursor-pointer bg-fg-secondary px-6 py-4 text-caption font-medium uppercase text-bg-secondary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-6 min-h-12 w-full cursor-pointer bg-fg-secondary px-6 py-3 text-caption font-medium uppercase text-bg-secondary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting
                 ? t("checkoutPage.processingTitle")

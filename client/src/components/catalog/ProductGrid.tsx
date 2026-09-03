@@ -45,7 +45,7 @@ const luxuryEase: [number, number, number, number] = [0.19, 1, 0.22, 1];
 const gridClassName =
   "grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 xl:gap-16";
 const carouselItemClassName =
-  "min-w-[min(82vw,21rem)] snap-start sm:min-w-[19rem] md:min-w-[20rem] xl:min-w-[22rem]";
+  "min-w-[min(86vw,21rem)] snap-start sm:min-w-[19rem] md:min-w-[20rem] xl:min-w-[22rem]";
 
 function getParentCategoryId(parentCategory: Category["parentCategory"]) {
   if (!parentCategory) {
@@ -194,7 +194,7 @@ function ProductSectionsSkeleton({ gender }: { gender: Product["gender"] }) {
                 delay={sectionIndex * 0.08}
               />
             </div>
-            <div className="flex gap-6 overflow-hidden px-10 md:gap-8 md:px-16">
+            <div className="flex gap-6 overflow-hidden px-0 sm:px-10 md:gap-8 md:px-16">
               {Array.from({ length: 4 }, (_, index) => (
                 <div className={carouselItemClassName} key={index}>
                   <ProductCardSkeleton index={index + sectionIndex} />
@@ -329,7 +329,7 @@ function ProductCarouselSection({
     >
       <div className="mb-10 flex justify-center text-center">
         <h2
-          className={`inline-flex max-w-full items-center justify-center gap-5 py-5 text-center text-h2 font-semibold leading-heading text-black/90 before:h-px before:w-20 before:shrink-0 before:bg-black/25 after:h-px after:w-20 after:shrink-0 after:bg-black/25 sm:gap-7 sm:py-6 sm:text-h1 sm:before:w-36 sm:after:w-36 lg:before:w-52 lg:after:w-52 ${
+          className={`inline-flex max-w-full items-center justify-center gap-4 py-4 text-center text-3xl font-semibold leading-heading text-black/90 before:hidden before:h-px before:w-20 before:shrink-0 before:bg-black/25 after:hidden after:h-px after:w-20 after:shrink-0 after:bg-black/25 sm:gap-7 sm:py-6 sm:text-h1 sm:before:block sm:before:w-36 sm:after:block sm:after:w-36 lg:before:w-52 lg:after:w-52 ${
             isRtl ? "font-display-ar" : "font-display-en"
           }`}
         >
@@ -342,10 +342,10 @@ function ProductCarouselSection({
           {t("noPiecesFound")}
         </p>
       ) : (
-        <div className="relative px-10 md:px-16">
+        <div className="relative px-0 sm:px-10 md:px-16">
           <button
             aria-label={t("carouselPrevious", { category: title })}
-            className="absolute top-[43%] left-0 z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black"
+            className="absolute top-[43%] left-0 z-20 hidden h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black sm:inline-flex"
             dir="ltr"
             onClick={() => scrollCarousel("previous")}
             type="button"
@@ -354,7 +354,7 @@ function ProductCarouselSection({
           </button>
           <button
             aria-label={t("carouselNext", { category: title })}
-            className="absolute top-[43%] right-0 z-20 inline-flex h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black"
+            className="absolute top-[43%] right-0 z-20 hidden h-24 w-12 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent text-h1 leading-none text-black/35 transition-colors duration-300 hover:text-black focus-visible:text-black focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black sm:inline-flex"
             dir="ltr"
             onClick={() => scrollCarousel("next")}
             type="button"
@@ -363,11 +363,11 @@ function ProductCarouselSection({
           </button>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-10 z-10 w-12 bg-gradient-to-r from-bg-secondary to-transparent md:left-16"
+            className="pointer-events-none absolute inset-y-0 left-10 z-10 hidden w-12 bg-gradient-to-r from-bg-secondary to-transparent sm:block md:left-16"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-10 z-10 w-12 bg-gradient-to-l from-bg-secondary to-transparent md:right-16"
+            className="pointer-events-none absolute inset-y-0 right-10 z-10 hidden w-12 bg-gradient-to-l from-bg-secondary to-transparent sm:block md:right-16"
           />
           <div
             aria-label={t("productCarouselLabel", { category: title })}

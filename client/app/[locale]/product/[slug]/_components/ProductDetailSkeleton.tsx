@@ -11,11 +11,11 @@ export default function ProductDetailSkeleton() {
   return (
     <div className="bg-bg-absolute text-fg-primary">
       <section className="mx-auto grid w-full max-w-[var(--max-content)] gap-10 px-4 py-10 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.72fr)] lg:items-start lg:gap-16 lg:py-20">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:gap-8">
-          <SkeletonBlock className="aspect-[4/5] md:col-span-2 lg:aspect-[6/7] lg:min-h-[72svh]" />
-          <SkeletonBlock className="aspect-[4/5]" />
-          <SkeletonBlock className="aspect-[4/5]" />
-          <SkeletonBlock className="aspect-[16/11] md:col-span-2" />
+        <div className="-mx-4 flex max-w-[100vw] snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:max-w-none md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 md:gap-6 lg:gap-8 [&::-webkit-scrollbar]:hidden">
+          <SkeletonBlock className="aspect-[4/5] w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:col-span-2 md:w-auto md:shrink lg:aspect-[6/7] lg:min-h-[72svh]" />
+          <SkeletonBlock className="aspect-[4/5] w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:w-auto md:shrink" />
+          <SkeletonBlock className="aspect-[4/5] w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:w-auto md:shrink" />
+          <SkeletonBlock className="aspect-[16/11] w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:col-span-2 md:w-auto md:shrink" />
         </div>
 
         <aside className="lg:sticky lg:top-28 lg:self-start">

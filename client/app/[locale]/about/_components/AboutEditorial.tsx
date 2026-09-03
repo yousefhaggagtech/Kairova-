@@ -108,7 +108,7 @@ export default async function AboutEditorial({ locale }: AboutEditorialProps) {
             <p className={getEyebrowClassName(isRtl, "light")}>{t("eyebrow")}</p>
             <h1
               id="about-hero-heading"
-              className="mt-5 max-w-5xl text-h2 leading-display text-fg-primary sm:text-h1 lg:text-display"
+              className="mt-5 max-w-5xl text-4xl leading-display text-fg-primary sm:text-h1 lg:text-display"
             >
               {t("title")}
             </h1>
@@ -135,7 +135,7 @@ export default async function AboutEditorial({ locale }: AboutEditorialProps) {
           <div className="text-start">
             <div className="mb-8 h-px w-20 bg-fg-secondary/18" />
             <p className={getEyebrowClassName(isRtl)}>{t("statementEyebrow")}</p>
-            <h2 className="mt-5 max-w-2xl text-h2 leading-heading text-fg-secondary sm:text-h1">
+            <h2 className="mt-5 max-w-2xl text-3xl leading-heading text-fg-secondary sm:text-h1">
               {t("statementTitle")}
             </h2>
           </div>
@@ -155,7 +155,7 @@ export default async function AboutEditorial({ locale }: AboutEditorialProps) {
               <p className={getEyebrowClassName(isRtl, "light")}>
                 {t("principlesEyebrow")}
               </p>
-              <h2 className="mt-5 max-w-2xl text-h2 leading-heading text-fg-primary sm:text-h1">
+              <h2 className="mt-5 max-w-2xl text-3xl leading-heading text-fg-primary sm:text-h1">
                 {t("principlesTitle")}
               </h2>
               <p className="mt-6 max-w-xl text-body-lg leading-body text-border-light/72">
@@ -207,7 +207,7 @@ export default async function AboutEditorial({ locale }: AboutEditorialProps) {
 
           <div className="text-start">
             <p className={getEyebrowClassName(isRtl)}>{t("craftEyebrow")}</p>
-            <h2 className="mt-5 max-w-2xl text-h2 leading-heading text-fg-secondary sm:text-h1">
+            <h2 className="mt-5 max-w-2xl text-3xl leading-heading text-fg-secondary sm:text-h1">
               {t("craftTitle")}
             </h2>
             <p className="mt-6 max-w-2xl text-body-lg leading-body text-fg-secondary/72">
@@ -236,7 +236,7 @@ export default async function AboutEditorial({ locale }: AboutEditorialProps) {
       <section className="bg-bg-secondary px-4 py-24 text-fg-secondary sm:px-6 sm:py-32 md:px-10">
         <div className="mx-auto w-full max-w-[var(--max-content)] border-t border-fg-secondary/10 pt-16 text-center">
           <p className={getEyebrowClassName(isRtl)}>{t("ctaEyebrow")}</p>
-          <h2 className="mx-auto mt-5 max-w-3xl text-h2 leading-heading sm:text-h1">
+          <h2 className="mx-auto mt-5 max-w-3xl text-3xl leading-heading sm:text-h1">
             {t("ctaTitle")}
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-body-lg leading-body text-fg-secondary/68">

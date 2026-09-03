@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Link } from "@/src/i18n/navigation";
 
 type AuthPageShellProps = {
+  brandLabel: string;
   children: ReactNode;
   eyebrow: string;
   highlights: string[];
@@ -40,6 +41,7 @@ export function AuthFieldLabel({ children }: { children: ReactNode }) {
 }
 
 export default function AuthPageShell({
+  brandLabel,
   children,
   eyebrow,
   highlights,
@@ -79,7 +81,7 @@ export default function AuthPageShell({
 
           <div className="relative z-20 flex w-full flex-col justify-between gap-12 p-6 text-start sm:p-8 lg:p-10">
             <p className="text-body-lg font-medium text-border-light/82">
-              Kairova
+              {brandLabel}
             </p>
 
             <div className="max-w-2xl">
@@ -88,7 +90,7 @@ export default function AuthPageShell({
               </p>
               <h1
                 id="auth-page-heading"
-                className="mt-5 text-h2 leading-heading sm:text-h1"
+                className="mt-5 text-3xl leading-heading sm:text-h1"
               >
                 {title}
               </h1>
@@ -132,7 +134,7 @@ export default function AuthPageShell({
               {switchPrompt}{" "}
               <Link
                 href={switchHref}
-                className="font-medium text-fg-secondary underline underline-offset-4 transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none dark:text-fg-primary"
+                className="inline-flex min-h-11 items-center font-medium text-fg-secondary underline underline-offset-4 transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none dark:text-fg-primary"
               >
                 {switchLabel}
               </Link>

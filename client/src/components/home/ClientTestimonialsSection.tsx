@@ -135,7 +135,7 @@ export default function ClientTestimonialsSection() {
             </p>
             <h2
               id="client-testimonials-heading"
-              className="mt-5 text-h2 leading-heading text-fg-secondary sm:text-h1"
+              className="mt-5 text-3xl leading-heading text-fg-secondary sm:text-h1"
             >
               {t("title")}
             </h2>
@@ -167,7 +167,7 @@ export default function ClientTestimonialsSection() {
                       {(activeIndex + 1).toString().padStart(2, "0")}
                     </span>
                   </div>
-                  <h3 className="max-w-[13ch] text-h2 leading-heading text-fg-secondary sm:text-h1">
+                  <h3 className="max-w-[13ch] text-3xl leading-heading text-fg-secondary sm:text-h1">
                     {t(`items.${activeReview.id}.title`)}
                   </h3>
                   <p className="mt-7 max-w-lg text-body-lg leading-body text-fg-secondary/70">

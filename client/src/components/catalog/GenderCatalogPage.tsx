@@ -43,7 +43,7 @@ function CollectionMarketingIntro({
           {t("eyebrow")}
         </p>
         <h2
-          className={`text-h2 leading-heading text-black sm:text-h1 ${
+          className={`text-4xl leading-heading text-black sm:text-h1 ${
             isRtl ? "font-display-ar" : "font-display-en"
           }`}
         >

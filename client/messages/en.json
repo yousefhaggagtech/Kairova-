@@ -10,6 +10,8 @@
   "nav": {
     "home": "Kairova home",
     "primary": "Primary navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "menuTree": "{collection} catalog menu",
     "men": "Men",
     "women": "Women",

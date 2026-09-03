@@ -11,7 +11,7 @@ export default async function ProductNotFound() {
         <p className="text-caption font-medium uppercase tracking-normal text-fg-muted">
           {t("notFoundEyebrow")}
         </p>
-        <h1 className="mt-5 break-words text-h2 leading-heading text-fg-primary sm:text-h1">
+        <h1 className="mt-5 break-words text-3xl leading-heading text-fg-primary sm:text-h1">
           {t("notFoundTitle")}
         </h1>
         <p className="mt-5 max-w-2xl text-body-lg leading-body text-fg-muted">

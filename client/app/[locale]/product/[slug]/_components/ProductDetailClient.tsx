@@ -309,7 +309,7 @@ function SameCategorySuggestions({
               {t("suggestionsEyebrow")}
             </p>
             <h2
-              className={`mt-5 max-w-3xl break-words text-h2 leading-heading text-fg-primary ${
+              className={`mt-5 max-w-3xl break-words text-3xl leading-heading text-fg-primary sm:text-h2 ${
                 isRtl ? "font-display-ar" : "font-display-en"
               }`}
               id="same-category-suggestions-heading"
@@ -323,7 +323,7 @@ function SameCategorySuggestions({
           />
         </motion.div>
 
-        <div className="mt-10 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-5 md:mt-12 md:grid-cols-4 md:gap-7">
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 md:mt-12 md:grid-cols-4 md:gap-7">
           {isLoading ? (
             Array.from({ length: 4 }, (_, index) => (
               <SuggestionCardSkeleton key={index} />
@@ -454,7 +454,7 @@ export default function ProductDetailClient({
           <p className="text-caption font-medium uppercase tracking-normal text-fg-muted">
             {t("notFoundEyebrow")}
           </p>
-          <h1 className="mt-5 break-words text-h2 leading-heading text-fg-primary">
+          <h1 className="mt-5 break-words text-3xl leading-heading text-fg-primary">
             {t("notFoundTitle")}
           </h1>
           <p className="mt-5 max-w-2xl text-body-lg leading-body text-fg-muted">
@@ -475,13 +475,15 @@ export default function ProductDetailClient({
         <section className="mx-auto grid w-full max-w-[var(--max-content)] gap-10 px-4 py-10 md:px-10 md:py-14 lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.72fr)] lg:items-start lg:gap-16 lg:py-20">
           <div
             aria-label={t("galleryLabel", { product: productName })}
-            className="grid gap-4 md:grid-cols-2 md:gap-6 lg:gap-8"
+            className="-mx-4 flex max-w-[100vw] snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:max-w-none md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 md:gap-6 lg:gap-8 [&::-webkit-scrollbar]:hidden"
             role="group"
           >
             {images.length > 0 ? (
               images.map((image, index) => (
                 <ZoomableGalleryImage
-                  className={getGalleryFrameClassName(index)}
+                  className={`w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:w-auto md:shrink ${getGalleryFrameClassName(
+                    index,
+                  )}`}
                   image={image}
                   index={index}
                   key={image._id}
@@ -491,7 +493,7 @@ export default function ProductDetailClient({
               ))
             ) : (
               <EmptyGalleryFrame
-                className="aspect-[4/5] md:col-span-2 lg:aspect-[6/7] lg:min-h-[72svh]"
+                className="aspect-[4/5] w-[min(86vw,24rem)] max-w-full shrink-0 snap-center md:col-span-2 md:w-auto md:shrink lg:aspect-[6/7] lg:min-h-[72svh]"
                 label={tCatalog("noImage")}
               />
             )}
@@ -508,7 +510,7 @@ export default function ProductDetailClient({
                 {collectionName}
               </p>
               <h1
-                className={`mt-5 break-words text-h2 leading-heading text-fg-primary sm:text-h1 ${
+                className={`mt-5 break-words text-4xl leading-heading text-fg-primary sm:text-h1 ${
                   isRtl ? "font-display-ar" : "font-display-en"
                 }`}
               >
@@ -530,31 +532,31 @@ export default function ProductDetailClient({
                   {t("paymentBreakdown")}
                 </p>
                 <dl className="space-y-4">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4">
+                  <div className="grid grid-cols-1 items-baseline gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                     <dt className="min-w-0 text-body text-fg-muted">
                       {t("totalPrice")}
                     </dt>
-                    <dd className="text-end text-body font-medium">
+                    <dd className="break-words text-start text-body font-medium sm:text-end">
                       {formatCurrency(totalPrice, locale, currencyLabel)}
                     </dd>
                   </div>
                   <div className="border-y border-border-subtle py-4">
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4">
+                    <div className="grid grid-cols-1 items-baseline gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                       <dt className="min-w-0 text-body font-semibold text-fg-primary">
                         {t("depositDue", {
                           percentage: depositPercentage,
                         })}
                       </dt>
-                      <dd className="text-end text-body-lg font-semibold text-fg-primary">
+                      <dd className="break-words text-start text-body-lg font-semibold text-fg-primary sm:text-end">
                         {formatCurrency(depositAmount, locale, currencyLabel)}
                       </dd>
                     </div>
                   </div>
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4">
+                  <div className="grid grid-cols-1 items-baseline gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4">
                     <dt className="min-w-0 text-body text-fg-muted">
                       {t("remainingBalance")}
                     </dt>
-                    <dd className="text-end text-body font-medium">
+                    <dd className="break-words text-start text-body font-medium sm:text-end">
                       {formatCurrency(remainingBalance, locale, currencyLabel)}
                     </dd>
                   </div>
@@ -562,7 +564,7 @@ export default function ProductDetailClient({
               </div>
 
               <button
-                className="mt-7 w-full cursor-pointer border border-fg-primary bg-fg-primary px-6 py-4 text-center text-body font-semibold text-bg-absolute transition-colors hover:bg-transparent hover:text-fg-primary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-primary disabled:cursor-not-allowed disabled:border-fg-muted disabled:bg-fg-muted disabled:text-bg-absolute"
+                className="mt-7 min-h-12 w-full cursor-pointer border border-fg-primary bg-fg-primary px-6 py-3 text-center text-body font-semibold text-bg-absolute transition-colors hover:bg-transparent hover:text-fg-primary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-primary disabled:cursor-not-allowed disabled:border-fg-muted disabled:bg-fg-muted disabled:text-bg-absolute"
                 data-testid="reserve-piece-button"
                 disabled={!inStock}
                 onClick={handleReserve}
@@ -587,7 +589,7 @@ export default function ProductDetailClient({
                 {t("storyEyebrow")}
               </p>
               <h2
-                className={`mt-5 break-words text-h2 leading-heading text-fg-primary ${
+                className={`mt-5 break-words text-3xl leading-heading text-fg-primary sm:text-h2 ${
                   isRtl ? "font-display-ar" : "font-display-en"
                 }`}
               >
@@ -613,7 +615,7 @@ export default function ProductDetailClient({
                 {t("specsEyebrow")}
               </p>
               <h2
-                className={`mt-5 break-words text-h2 leading-heading text-fg-primary ${
+                className={`mt-5 break-words text-3xl leading-heading text-fg-primary sm:text-h2 ${
                   isRtl ? "font-display-ar" : "font-display-en"
                 }`}
               >

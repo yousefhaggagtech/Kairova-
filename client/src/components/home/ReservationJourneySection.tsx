@@ -85,7 +85,7 @@ export default function ReservationJourneySection() {
           </p>
           <h2
             id="reservation-journey-heading"
-            className={`mt-5 text-h2 leading-heading sm:text-h1 ${headingClassName}`}
+            className={`mt-5 text-3xl leading-heading sm:text-h1 ${headingClassName}`}
           >
             {t("title")}
           </h2>

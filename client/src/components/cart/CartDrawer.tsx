@@ -105,14 +105,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           <button
             type="button"
             aria-label={tCheckout("closeCart")}
-            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+            className="inline-flex h-11 w-11 cursor-pointer items-center justify-center transition-colors hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
             onClick={onClose}
           >
             <CloseIcon />
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-6">
+        <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-5">
           {!hasHydrated ? (
             <p className="text-body text-fg-muted">{t("loading")}</p>
           ) : items.length === 0 ? (
@@ -120,7 +120,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <p className="mb-5 text-body-lg">{tCheckout("emptyCart")}</p>
               <button
                 type="button"
-                className="text-body text-fg-muted underline transition-colors hover:text-hover-muted"
+                className="inline-flex min-h-11 items-center justify-center px-3 text-body text-fg-muted underline transition-colors hover:text-hover-muted"
                 onClick={onClose}
               >
                 {tCheckout("continueShopping")}
@@ -131,11 +131,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               {items.map((item) => (
                 <article
                   key={item.productId}
-                  className="grid grid-cols-[88px_1fr] gap-4 border-b border-border-light pb-5"
+                  className="grid grid-cols-[5.25rem_minmax(0,1fr)] gap-3 border-b border-border-light pb-5 sm:grid-cols-[88px_minmax(0,1fr)] sm:gap-4"
                 >
                   <Link
                     href={`/product/${item.slug}`}
-                    className="relative h-[88px] bg-surface-light"
+                    className="relative h-[84px] bg-surface-light sm:h-[88px]"
                     onClick={onClose}
                   >
                     {item.imageUrl ? (
@@ -155,17 +155,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </Link>
 
                   <div className="min-w-0">
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-3">
                       <Link
                         href={`/product/${item.slug}`}
-                        className="text-body transition-colors hover:text-hover-muted"
+                        className="break-words text-body transition-colors hover:text-hover-muted"
                         onClick={onClose}
                       >
                         {item.name[locale] || item.name.en}
                       </Link>
                       <button
                         type="button"
-                        className="text-caption text-fg-muted underline transition-colors hover:text-hover-muted"
+                        className="inline-flex min-h-11 items-center text-caption text-fg-muted underline transition-colors hover:text-hover-muted"
                         onClick={() => removeItem(item.productId)}
                       >
                         {tCheckout("remove")}
@@ -176,26 +176,26 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {item.price.toLocaleString(locale)} {t("egp")}
                     </p>
 
-                    <div className="mt-4 flex items-center justify-between gap-4">
-                      <div className="flex items-center">
+                    <div className="mt-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                      <div className="inline-grid h-11 grid-cols-[2.75rem_3rem_2.75rem] overflow-hidden border border-border-light">
                         <button
                           type="button"
                           aria-label={tCheckout("decreaseQuantity")}
-                          className="h-8 w-8 border border-border-light transition-colors hover:bg-surface-light"
+                          className="h-full border-e border-border-light transition-colors hover:bg-surface-light"
                           onClick={() =>
                             updateQuantity(item.productId, item.quantity - 1)
                           }
                         >
                           -
                         </button>
-                        <span className="h-8 w-10 border-y border-border-light text-center text-body leading-8">
+                        <span className="flex h-full items-center justify-center text-center text-body">
                           {item.quantity}
                         </span>
                         <button
                           type="button"
                           aria-label={tCheckout("increaseQuantity")}
                           disabled={item.quantity >= item.stockQuantity}
-                          className="h-8 w-8 border border-border-light transition-colors hover:bg-surface-light disabled:opacity-50"
+                          className="h-full border-s border-border-light transition-colors hover:bg-surface-light disabled:opacity-50"
                           onClick={() =>
                             updateQuantity(item.productId, item.quantity + 1)
                           }
@@ -225,7 +225,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             </div>
             <button
               type="button"
-              className="w-full cursor-pointer bg-fg-secondary py-4 text-bg-secondary transition-opacity hover:opacity-90"
+              className="min-h-12 w-full cursor-pointer bg-fg-secondary px-4 py-3 text-bg-secondary transition-opacity hover:opacity-90"
               onClick={handleCheckout}
             >
               {tCheckout("proceedToCheckout")}

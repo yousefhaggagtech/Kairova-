@@ -128,7 +128,7 @@ function GenderFilterDropdown({
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`block min-h-10 w-full px-3 py-2 text-start text-body transition-colors hover:bg-bg-secondary focus-visible:bg-bg-secondary focus-visible:outline-none ${
+                  className={`block min-h-11 w-full px-3 py-2 text-start text-body transition-colors hover:bg-bg-secondary focus-visible:bg-bg-secondary focus-visible:outline-none ${
                     isSelected ? "font-medium text-fg-secondary" : "text-fg-muted"
                   }`}
                 >
@@ -182,7 +182,7 @@ export default function AdminProductsPage() {
     <section>
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-h2 leading-heading">{t("products")}</h2>
+          <h2 className="text-3xl leading-heading sm:text-h2">{t("products")}</h2>
           <p className="mt-2 text-body text-fg-muted">
             {products.length.toLocaleString(locale)} {t("products")}
           </p>
@@ -190,7 +190,7 @@ export default function AdminProductsPage() {
 
         <Link
           href="/admin/products/new"
-          className="border border-fg-secondary bg-fg-secondary px-4 py-3 text-center text-bg-secondary dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
+          className="inline-flex min-h-12 items-center justify-center border border-fg-secondary bg-fg-secondary px-4 py-3 text-center text-bg-secondary dark:border-fg-primary dark:bg-fg-primary dark:text-bg-primary"
         >
           {t("addProduct")}
         </Link>
@@ -310,7 +310,7 @@ export default function AdminProductsPage() {
                       <div className="flex gap-3">
                         <Link
                           href={`/admin/products/${product._id}/edit`}
-                          className="underline"
+                          className="inline-flex min-h-11 items-center underline"
                         >
                           {t("edit")}
                         </Link>
@@ -318,7 +318,7 @@ export default function AdminProductsPage() {
                           type="button"
                           onClick={() => void handleDelete(product)}
                           disabled={deleteProduct.isPending}
-                          className="text-red-700 underline disabled:opacity-50 dark:text-red-300"
+                          className="inline-flex min-h-11 items-center text-red-700 underline disabled:opacity-50 dark:text-red-300"
                         >
                           {t("delete")}
                         </button>

@@ -79,7 +79,7 @@ export default function AdminOrdersPage() {
     <section>
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-h2 leading-heading">{t("orders")}</h2>
+          <h2 className="text-3xl leading-heading sm:text-h2">{t("orders")}</h2>
           <p className="mt-2 text-body text-fg-muted">
             {filteredOrders.length.toLocaleString(locale)} {t("orders")}
           </p>
@@ -96,7 +96,7 @@ export default function AdminOrdersPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder={t("searchPlaceholder")}
-              className="w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 dark:border-border-subtle"
             />
           </div>
           <div>
@@ -109,7 +109,7 @@ export default function AdminOrdersPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value as OrderStatus | "")
               }
-              className="kairova-select w-full border px-3 py-2"
+              className="kairova-select min-h-12 w-full border px-3 py-2"
             >
               <option value="">{t("allStatuses")}</option>
               {ORDER_STATUSES.map((status) => (
@@ -202,7 +202,7 @@ export default function AdminOrdersPage() {
                   <td className="px-4 py-4">
                     <Link
                       href={`/admin/orders/${order._id}`}
-                      className="underline"
+                      className="inline-flex min-h-11 items-center underline"
                     >
                       {t("view")}
                     </Link>

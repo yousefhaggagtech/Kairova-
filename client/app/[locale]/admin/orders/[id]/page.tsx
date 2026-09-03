@@ -46,11 +46,11 @@ const panelTitleClassName = "text-h3 leading-heading text-fg-secondary";
 const detailLabelClassName = "block text-caption uppercase text-fg-muted";
 const detailValueClassName = "break-words text-body font-medium text-fg-secondary";
 const fieldClassName =
-  "w-full border border-border-light bg-bg-secondary px-3 py-2 text-body text-fg-secondary transition-colors placeholder:text-fg-muted focus:border-fg-secondary focus:outline-none disabled:cursor-not-allowed disabled:opacity-60";
+  "min-h-12 w-full border border-border-light bg-bg-secondary px-3 py-2 text-body text-fg-secondary transition-colors placeholder:text-fg-muted focus:border-fg-secondary focus:outline-none disabled:cursor-not-allowed disabled:opacity-60";
 const primaryButtonClassName =
-  "w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-body font-medium text-bg-secondary transition-colors hover:bg-bg-absolute focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
+  "min-h-12 w-full border border-fg-secondary bg-fg-secondary px-4 py-3 text-body font-medium text-bg-secondary transition-colors hover:bg-bg-absolute focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
 const secondaryButtonClassName =
-  "w-full border border-border-light bg-bg-secondary px-4 py-3 text-body font-medium text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
+  "min-h-12 w-full border border-border-light bg-bg-secondary px-4 py-3 text-body font-medium text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary disabled:cursor-not-allowed disabled:opacity-50";
 
 function getId(idParam: string | string[] | undefined) {
   return Array.isArray(idParam) ? idParam[0] : idParam || "";
@@ -267,7 +267,7 @@ export default function AdminOrderDetailPage() {
     <section className="space-y-8">
       <Link
         href="/admin/orders"
-        className="inline-flex min-h-10 items-center border border-border-light bg-bg-secondary px-4 text-body text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
+        className="inline-flex min-h-11 items-center border border-border-light bg-bg-secondary px-4 text-body text-fg-secondary transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
       >
         {t("backToOrders")}
       </Link>
@@ -284,7 +284,7 @@ export default function AdminOrderDetailPage() {
               <p className="mt-4 font-mono text-body text-fg-muted">
                 {order.orderNumber}
               </p>
-              <h2 className="mt-2 text-h1 leading-heading text-fg-secondary">
+              <h2 className="mt-2 text-3xl leading-heading text-fg-secondary sm:text-h1">
                 {t("order")}
               </h2>
               <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
@@ -292,7 +292,7 @@ export default function AdminOrderDetailPage() {
               </p>
             </div>
             <span
-              className={`inline-flex min-h-10 shrink-0 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
+              className={`inline-flex min-h-11 shrink-0 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
                 order.status,
               )}`}
             >
@@ -509,7 +509,7 @@ export default function AdminOrderDetailPage() {
 
                     <div className="border-t border-border-light pt-4 sm:border-t-0 sm:pt-0 sm:text-end">
                       <p className={detailLabelClassName}>{t("lineTotal")}</p>
-                      <p className="mt-2 text-body-lg font-semibold text-fg-secondary">
+                      <p className="mt-2 break-words text-body-lg font-semibold text-fg-secondary">
                         {formatMoney(item.unitPrice * item.quantity)}
                       </p>
                     </div>
@@ -577,10 +577,10 @@ export default function AdminOrderDetailPage() {
               {orderSummaryItems.map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-start justify-between gap-4 py-4"
+                  className="grid grid-cols-1 gap-1 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4"
                 >
                   <dt className="text-body text-fg-muted">{item.label}</dt>
-                  <dd className="max-w-[55%] break-words text-end text-body font-semibold text-fg-secondary">
+                  <dd className="break-words text-body font-semibold text-fg-secondary sm:text-end">
                     {item.value}
                   </dd>
                 </div>

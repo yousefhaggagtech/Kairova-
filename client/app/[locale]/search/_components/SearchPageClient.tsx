@@ -57,7 +57,7 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
           {t("eyebrow")}
         </p>
         <h1
-          className={`text-h2 leading-heading text-fg-secondary sm:text-h1 ${
+          className={`break-words text-3xl leading-heading text-fg-secondary sm:text-h1 ${
             isRtl ? "font-display-ar" : "font-display-en"
           }`}
         >
@@ -66,7 +66,7 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
             : t("title")}
         </h1>
         <form
-          className="mx-auto mt-8 flex max-w-2xl items-end gap-4 text-start"
+          className="mx-auto mt-8 flex max-w-2xl flex-col items-stretch gap-4 text-start sm:flex-row sm:items-end"
           onSubmit={handleSubmit}
         >
           <div className="min-w-0 flex-1">
@@ -87,7 +87,7 @@ export default function SearchPageClient({ query }: SearchPageClientProps) {
             />
           </div>
           <button
-            className="h-12 shrink-0 cursor-pointer border border-fg-secondary px-6 text-caption font-medium uppercase text-fg-secondary transition-colors duration-200 hover:bg-fg-secondary hover:text-bg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary"
+            className="min-h-12 w-full shrink-0 cursor-pointer border border-fg-secondary px-6 text-caption font-medium uppercase text-fg-secondary transition-colors duration-200 hover:bg-fg-secondary hover:text-bg-secondary focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-fg-secondary sm:w-auto"
             type="submit"
           >
             {t("submit")}

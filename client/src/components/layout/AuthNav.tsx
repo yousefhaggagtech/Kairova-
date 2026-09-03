@@ -84,7 +84,7 @@ function AuthIcon({ name }: { name: IconName }) {
 }
 
 const authControlClass =
-  "inline-flex h-10 w-10 items-center justify-center border border-border-light text-fg-secondary transition-colors hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50 dark:border-border-subtle";
+  "inline-flex h-11 w-11 items-center justify-center border border-border-light text-fg-secondary transition-colors hover:bg-surface-light disabled:cursor-not-allowed disabled:opacity-50 dark:border-border-subtle";
 
 export default function AuthNav() {
   const router = useRouter();

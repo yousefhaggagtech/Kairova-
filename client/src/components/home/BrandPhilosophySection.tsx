@@ -197,7 +197,7 @@ export default function BrandPhilosophySection() {
                 >
                   {t("eyebrow")}
                 </p>
-                <h2 className="mt-5 text-h2 leading-heading text-fg-secondary sm:text-h1">
+                <h2 className="mt-5 text-3xl leading-heading text-fg-secondary sm:text-h1">
                   {t("heading")}
                 </h2>
                 <p className="mt-7 text-body-lg leading-body text-fg-secondary/75">
