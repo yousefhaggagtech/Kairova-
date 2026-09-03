@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 const VIDEO_SRC =
-  "https://jthwx4pge7hvwg3k.private.blob.vercel-storage.com/bracelet-section-video.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfalRIV1g0cGdlN2h2d0czSyIsIm93bmVySWQiOiJ0ZWFtX2V0TUlFWjMxZEhZQ3M1V1l3b3NIYVFkaCIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg4MjI3MTAzODMxLCJpYXQiOjE3ODgxODM5MDQ0MTh9.MLsGdT8nBjPDg5Ca-Dre2TBbOuHWAIFOzgGFzKM6nm0&vercel-blob-signature=Vohk1Syt3djpG94hZzZlArRa0q6a1MmVICdP76NqCTU";
+  "/client/public/bracelet-section-video.mp4";
 
 const editorialEase = [0.19, 1, 0.22, 1] as const;
 

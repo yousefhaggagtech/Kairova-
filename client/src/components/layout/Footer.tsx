@@ -109,12 +109,12 @@ export default function Footer() {
 
   const company = [
     { label: t("company.about"), href: "/about" },
-    { label: t("company.contact"), href: "mailto:hello@kairova.com" },
+    { label: t("company.contact"), href: "/about" },
     { label: t("company.terms"), href: "/about" },
   ];
 
   const social = [
-    { label: t("connect.instagram"), href: "https://instagram.com", external: true },
+    { label: t("connect.instagram"), href: "https://www.instagram.com/kairova_co/", external: true },
     { label: t("connect.facebook"), href: "https://facebook.com", external: true },
     { label: t("connect.email"), href: "mailto:hello@kairova.com", external: true },
   ];
