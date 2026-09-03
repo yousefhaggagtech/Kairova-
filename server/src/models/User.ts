@@ -1,14 +1,20 @@
 import crypto from "node:crypto";
 
 import bcrypt from "bcryptjs";
-import { Schema, model, Document, type Model } from "mongoose";
+import { Schema, model, Document, type Model, type Types } from "mongoose";
 
 export interface IAddress {
-  label: string;
-  street: string;
-  city: string;
-  governorate: string;
+  _id: Types.ObjectId;
+  nickname?: string;
+  fullName: string;
   phone: string;
+  city: string;
+  area?: string;
+  street: string;
+  building?: string;
+  floor?: string;
+  apartment?: string;
+  notes?: string;
   isDefault: boolean;
 }
 
@@ -32,14 +38,19 @@ type UserModel = Model<IUser>;
 
 const addressSchema = new Schema<IAddress>(
   {
-    label: { type: String, required: true },
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    governorate: { type: String, required: true },
-    phone: { type: String, required: true },
+    nickname: { type: String, trim: true, maxlength: 60 },
+    fullName: { type: String, required: true, trim: true, maxlength: 100 },
+    phone: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true, maxlength: 50 },
+    area: { type: String, trim: true, maxlength: 80 },
+    street: { type: String, required: true, trim: true, maxlength: 200 },
+    building: { type: String, trim: true, maxlength: 50 },
+    floor: { type: String, trim: true, maxlength: 50 },
+    apartment: { type: String, trim: true, maxlength: 50 },
+    notes: { type: String, trim: true, maxlength: 500 },
     isDefault: { type: Boolean, default: false },
   },
-  { _id: false },
+  { _id: true },
 );
 
 const userSchema = new Schema<IUser, UserModel>(

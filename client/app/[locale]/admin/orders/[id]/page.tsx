@@ -23,7 +23,11 @@ import type {
   OrderStatus,
   User,
 } from "@/domain/entities/api";
-import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
+import { formatAddressLines } from "@/lib/addressFormat";
+import {
+  getOrderStatusClasses,
+  getOrderStatusIcon,
+} from "@/lib/orderStatusStyles";
 import { getPaymentProofLabelKey } from "@/lib/paymentProofLabels";
 import { Link } from "@/src/i18n/navigation";
 
@@ -62,7 +66,12 @@ function getCustomer(order: Order): User | null {
 }
 
 function getCustomerName(order: Order) {
-  return getCustomer(order)?.name ?? order.shippingAddress.label;
+  return (
+    getCustomer(order)?.name ??
+    order.shippingAddress.fullName ??
+    order.shippingAddress.label ??
+    ""
+  );
 }
 
 function getCustomerPhone(order: Order) {
@@ -235,7 +244,7 @@ export default function AdminOrderDetailPage() {
   const deliveryItems: DetailItem[] = [
     {
       label: t("address"),
-      value: `${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.governorate}`,
+      value: formatAddressLines(shippingAddress).join(", ") || t("notSet"),
     },
     { label: t("phone"), value: shippingAddress.phone },
     { label: t("waybill"), value: order.waybillNumber || t("notSet") },
@@ -283,10 +292,11 @@ export default function AdminOrderDetailPage() {
               </p>
             </div>
             <span
-              className={`inline-flex min-h-10 shrink-0 items-center border px-3 text-body ${getOrderStatusClasses(
+              className={`inline-flex min-h-10 shrink-0 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
                 order.status,
               )}`}
             >
+              {getOrderStatusIcon(order.status)}
               {t(`status.${order.status}`)}
             </span>
           </div>

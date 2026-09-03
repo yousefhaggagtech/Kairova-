@@ -53,7 +53,12 @@ function getCustomer(order: Order): User | null {
 }
 
 function getCustomerName(order: Order) {
-  return getCustomer(order)?.name ?? order.shippingAddress.label;
+  return (
+    getCustomer(order)?.name ??
+    order.shippingAddress.fullName ??
+    order.shippingAddress.label ??
+    ""
+  );
 }
 
 function getActionLabelKey(status: OrderStatus) {

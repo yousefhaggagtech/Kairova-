@@ -25,7 +25,7 @@ const steps = [
 ] as const;
 
 const editorialEase: [number, number, number, number] = [0.19, 1, 0.22, 1];
-const hiddenRouteSegments = new Set(["admin", "auth", "login"]);
+const hiddenRouteSegments = new Set(["account", "admin", "auth", "login"]);
 
 export default function ReservationJourneySection() {
   const t = useTranslations("home.reservationJourney");

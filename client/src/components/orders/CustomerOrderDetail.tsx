@@ -1,10 +1,19 @@
 "use client";
 
 import type { AxiosError } from "axios";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import {
+  AlertTriangle,
+  Check,
+  CloudUpload,
+  Package,
+  ShieldCheck,
+  Truck,
+  WalletCards,
+} from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import type { ChangeEvent } from "react";
-import { useState } from "react";
+import type { ChangeEvent, DragEvent } from "react";
+import { useRef, useState } from "react";
 
 import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import {
@@ -15,18 +24,33 @@ import { usePublicSettings } from "@/application/hooks/useSettings";
 import { useImageUpload } from "@/application/hooks/useImageUpload";
 import type { PaymentMethod } from "@/domain/entities/api";
 import type { PublicSettings } from "@/infrastructure/api/settingsApi";
-import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
 import {
-  getPaymentProofLabelKey,
-  paymentProofLabelKeys,
-  type PaymentProofLabelKey,
-} from "@/lib/paymentProofLabels";
+  getOrderStatusClasses,
+  getOrderStatusIcon,
+} from "@/lib/orderStatusStyles";
+import { paymentProofLabelKeys, type PaymentProofLabelKey } from "@/lib/paymentProofLabels";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
+type JourneyStatus =
+  | "PENDING_DEPOSIT"
+  | "RESERVED"
+  | "PACKED"
+  | "FULLY_PAID"
+  | "CONFIRMED_SHIPPED"
+  | "DELIVERED";
 type ErrorResponse = {
   message?: string;
 };
+
+const journeyStages = [
+  ["PENDING_DEPOSIT", WalletCards],
+  ["RESERVED", ShieldCheck],
+  ["PACKED", Package],
+  ["FULLY_PAID", Check],
+  ["CONFIRMED_SHIPPED", Truck],
+  ["DELIVERED", Check],
+] as const satisfies ReadonlyArray<readonly [JourneyStatus, typeof WalletCards]>;
 
 type CustomerOrderDetailProps = {
   orderId: string;
@@ -35,7 +59,6 @@ type CustomerOrderDetailProps = {
 
 function getErrorMessage(error: unknown, fallback: string) {
   const axiosError = error as AxiosError<ErrorResponse>;
-
   return axiosError.response?.data?.message || fallback;
 }
 
@@ -52,10 +75,6 @@ function getWhatsAppPhone(phone: string) {
   return phone.replace(/\D/g, "");
 }
 
-function getProofKey(url: string, uploadedAt: string, index: number) {
-  return `${url}-${uploadedAt}-${index}`;
-}
-
 export default function CustomerOrderDetail({
   orderId,
   showBackLink = true,
@@ -70,6 +89,7 @@ export default function CustomerOrderDetail({
   const [proofLabel, setProofLabel] =
     useState<PaymentProofLabelKey>("deposit");
   const [actionError, setActionError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: order, isError, isLoading } = useMyOrder(
     orderId,
     !isAuthChecking && user?.role === "customer",
@@ -78,30 +98,11 @@ export default function CustomerOrderDetail({
   const proofUpload = useImageUpload("/api/uploads/payment-proofs/sign");
   const addPaymentProof = useAddPaymentProof();
 
-  const getProofDisplayLabel = (label?: string) => {
-    const labelKey = getPaymentProofLabelKey(label);
-
-    return labelKey
-      ? tOrders(`paymentProofLabels.${labelKey}`)
-      : label || t("paymentProof");
-  };
-
-  const handleProofChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file || !order) {
-      return;
-    }
-
+  const uploadProof = async (file?: File) => {
+    if (!file || !order) return;
     setActionError("");
-
     const uploadResult = await proofUpload.upload(file);
-
-    if (!uploadResult) {
-      event.target.value = "";
-      return;
-    }
-
+    if (!uploadResult) return;
     try {
       await addPaymentProof.mutateAsync({
         id: order._id,
@@ -110,26 +111,32 @@ export default function CustomerOrderDetail({
       });
     } catch (error) {
       setActionError(getErrorMessage(error, t("uploadFailed")));
-    } finally {
-      event.target.value = "";
     }
+  };
+
+  const handleProofChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    await uploadProof(event.target.files?.[0]);
+    event.target.value = "";
+  };
+
+  const handleProofDrop = (event: DragEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    void uploadProof(event.dataTransfer.files?.[0]);
   };
 
   if (isAuthChecking || isLoading || isSettingsLoading) {
     return (
-      <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
+      <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10 text-center">
         {tCatalog("loading")}
       </div>
     );
   }
 
-  if (user?.role !== "customer") {
-    return null;
-  }
+  if (user?.role !== "customer") return null;
 
   if (isError || !order) {
     return (
-      <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10">
+      <div className="mx-auto w-full max-w-[var(--max-content)] px-4 py-12 text-body text-fg-muted md:px-10 text-center">
         {tCheckout("orderNotFound")}
       </div>
     );
@@ -143,199 +150,225 @@ export default function CustomerOrderDetail({
     tOrders("customerWhatsAppMessage", { orderNumber: order.orderNumber }),
   );
   const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
-  const paymentProofs = order.paymentProofs ?? [];
   const proofError = actionError || proofUpload.error;
+  const currentStageIndex = journeyStages.findIndex(
+    ([stage]) => stage === order.status,
+  );
+  const isWaitingForPayment =
+    order.status === "PENDING_DEPOSIT" || order.status === "PACKED";
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12 md:px-6">
       {showBackLink && (
-        <Link href="/account/orders" className="mb-6 inline-block underline">
+        <Link href="/account/orders" className="mb-6 inline-block underline text-sm text-fg-muted hover:text-fg-secondary transition-colors">
           {t("backToOrders")}
         </Link>
       )}
 
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <p className="mb-2 font-mono text-body text-fg-muted">
+      <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <p className="font-mono text-xs tracking-widest text-fg-muted uppercase">
             {order.orderNumber}
           </p>
-          <h1 className="text-h1 leading-heading">{t("orderDetails")}</h1>
+          <h1 className="text-h1 leading-tight">{t("orderDetails")}</h1>
         </div>
         <span
-          className={`inline-block border px-3 py-2 text-body ${
-            getOrderStatusClasses(order.status)
-          }`}
+          className={`inline-flex items-center gap-2 border px-4 py-1.5 text-xs font-medium rounded-full ${getOrderStatusClasses(
+            order.status,
+          )}`}
         >
-          {tAdmin(`status.${order.status}`)}
+          {getOrderStatusIcon(order.status)}
+          {t(`status.${order.status}`)}
         </span>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h2 className="mb-4 text-h3 leading-heading">
-              {tCheckout("paymentInstructions")}
-            </h2>
-            <dl className="grid gap-3 text-body sm:grid-cols-2">
-              <div>
-                <dt className="text-caption text-fg-muted">
-                  {t("paymentMethod")}
-                </dt>
-                <dd>
-                  {paymentMethod === "instapay"
-                    ? tCheckout("instapay")
-                    : tCheckout("vodafoneCash")}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">
-                  {tCheckout("transferTo")}
-                </dt>
-                <dd className="font-mono">
-                  {paymentNumber || tCheckout("paymentNumberMissing")}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">
-                  {tCheckout("depositAmount")}
-                </dt>
-                <dd>
-                  {order.depositAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-fg-muted">{t("remaining")}</dt>
-                <dd>
-                  {order.remainingAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
-                </dd>
-              </div>
-            </dl>
-            <p className="mt-4 text-caption text-fg-muted">
-              {tCheckout("afterTransfer")}
-            </p>
-          </section>
+      {/* JOURNEY SECTION - UPDATED FOR CUT BORDERS */}
+      <section className="mb-12 border border-border-light bg-surface-light p-6 dark:border-border-light dark:bg-bg-secondary md:p-10">
+        <div className="mb-10 flex items-center justify-between">
+          <h2 className="text-h3 leading-heading">{t("journeyTitle")}</h2>
+          <span className="text-caption font-medium text-fg-muted">
+            {order.status === "CANCELLED" ? t(`status.${order.status}`) : t(`journey.${order.status}`)}
+          </span>
+        </div>
+        
+        <div className="flex w-full items-center justify-between overflow-x-auto pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {journeyStages.map(([stage, Icon], index) => {
+            const completed = currentStageIndex >= index;
+            const current = currentStageIndex === index;
+            const isLast = index === journeyStages.length - 1;
 
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h2 className="mb-4 text-h3 leading-heading">{t("items")}</h2>
+            return (
+              <div key={stage} className="flex items-center">
+                {/* Icon and Label Group */}
+                <div className="flex flex-col items-center gap-3 text-center relative z-10">
+                  <span className={`flex h-11 w-11 items-center justify-center border transition-all duration-500 bg-surface-light dark:bg-bg-secondary ${
+                    current 
+                      ? "border-[#C5A059] text-[#C5A059] shadow-[0_0_15px_rgba(197,160,89,0.3)]" 
+                      : completed 
+                        ? "border-[#C5A059] text-[#C5A059]" 
+                        : "border-border-light text-fg-muted dark:border-border-light"
+                  }`}>
+                    {completed && !current ? <Check className="h-5 w-5 stroke-[2.5]" /> : <Icon className="h-5 w-5 stroke-[1.5]" />}
+                  </span>
+                  <span className={`absolute top-14 whitespace-nowrap text-[10px] uppercase tracking-wider leading-tight ${completed ? "text-fg-secondary dark:text-fg-primary font-medium" : "text-fg-muted"}`}>
+                    {t(`journey.${stage}`)}
+                  </span>
+                </div>
+
+                {/* Segmented Line - Only if not last */}
+                {!isLast && (
+                  <div className="flex-1 h-[1.5px] bg-border-light dark:bg-border-subtle mx-[-4px] relative min-w-[60px]">
+                    <motion.div
+                      className="absolute top-0 left-0 h-full bg-[#C5A059]"
+                      initial={{ width: 0 }}
+                      animate={{ width: completed ? "100%" : "0%" }}
+                      transition={{ duration: 0.8, delay: index * 0.2, ease: "easeInOut" }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-8">
+          {isWaitingForPayment && (
+            <motion.section 
+              layout 
+              initial={{ opacity: 0, y: 12 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="border-t-4 border-t-[#C5A059] border-x border-b border-border-light bg-surface-light p-6 dark:border-border-light dark:bg-bg-secondary md:p-8"
+            >
+              <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-fg-muted font-bold">{t("paymentActionEyebrow")}</p>
+              <h2 className="mb-6 text-h3 leading-heading">{tCheckout("paymentInstructions")}</h2>
+              
+              <dl className="grid gap-y-4 text-body sm:grid-cols-2">
+                {[
+                  { label: t("paymentMethod"), value: paymentMethod === "instapay" ? tCheckout("instapay") : tCheckout("vodafoneCash") },
+                  { label: tCheckout("transferTo"), value: paymentNumber || tCheckout("paymentNumberMissing"), isMono: true },
+                  { label: tCheckout("depositAmount"), value: `${order.depositAmount.toLocaleString(locale)} ${tCatalog("egp")}` },
+                  { label: t("remaining"), value: `${order.remainingAmount.toLocaleString(locale)} ${tCatalog("egp")}` },
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    <dt className="text-caption text-fg-muted">{item.label}</dt>
+                    <dd className={`${item.isMono ? "font-mono font-medium" : "font-medium"}`}>{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              
+              <p className="mt-6 text-caption text-fg-muted italic">
+                {tCheckout("afterTransfer")}
+              </p>
+
+              <div className="mt-8 space-y-5">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] uppercase tracking-widest text-fg-muted">{t("proofType")}</label>
+                  <select
+                    value={proofLabel}
+                    onChange={(event) => setProofLabel(event.target.value as PaymentProofLabelKey)}
+                    className="kairova-select w-full border border-border-light px-3 py-3 text-body focus:border-[#C5A059] outline-none transition-colors"
+                  >
+                    {paymentProofLabelKeys.map((labelKey) => (
+                      <option key={labelKey} value={labelKey}>
+                        {tOrders(`paymentProofLabels.${labelKey}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  disabled={proofUpload.uploading || addPaymentProof.isPending}
+                  onChange={(event) => void handleProofChange(event)}
+                  className="sr-only"
+                />
+                
+                <button 
+                  type="button" 
+                  onClick={() => fileInputRef.current?.click()} 
+                  onDragOver={(event) => event.preventDefault()} 
+                  onDrop={handleProofDrop} 
+                  className="group flex min-h-32 w-full flex-col items-center justify-center gap-3 border border-dashed border-border-light bg-bg-secondary text-center transition-all hover:border-[#C5A059] hover:bg-surface-light dark:border-border-light dark:bg-bg-secondary"
+                >
+                  <CloudUpload className="h-8 w-8 stroke-[1.3] text-fg-muted group-hover:text-[#C5A059] transition-colors" />
+                  <div className="space-y-1">
+                    <span className="block text-body font-medium">{t("uploadScreenshot")}</span>
+                    <span className="block text-caption text-fg-muted">{t("dropFile")}</span>
+                  </div>
+                </button>
+
+                {(proofUpload.uploading || addPaymentProof.isPending) && (
+                  <p className="text-center text-caption text-[#C5A059] animate-pulse">{t("uploadingProof")}</p>
+                )}
+                {proofError && (
+                  <p className="border border-red-200 bg-red-50 px-4 py-3 text-caption text-red-600 dark:bg-red-900/20 dark:border-red-900/50 dark:text-red-400">
+                    {proofError}
+                  </p>
+                )}
+
+                {storeWhatsApp && whatsappPhone && (
+                  <a 
+                    href={whatsappUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="block w-full bg-[#C5A059] px-5 py-4 text-center text-white text-body font-medium hover:bg-[#B8860B] transition-colors shadow-sm"
+                  >
+                    {t("whatsappOption")}
+                  </a>
+                )}
+                
+                <p className="mt-6 flex items-start gap-3 border-s-2 border-[#C5A059] px-4 py-3 text-caption leading-relaxed text-fg-muted bg-surface-light dark:bg-bg-secondary">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-[#C5A059]" />
+                  <span>{t("whatsappNotice")}</span>
+                </p>
+              </div>
+            </motion.section>
+          )}
+
+          <section className="border border-border-light p-6 dark:border-border-light">
+            <h2 className="mb-6 text-h3 leading-heading">{t("items")}</h2>
             <div className="space-y-4">
               {order.items.map((item, index) => (
                 <div
                   key={`${order._id}-${index}`}
-                  className="flex justify-between gap-4 border-b border-border-light pb-4 last:border-b-0 last:pb-0 dark:border-border-subtle"
+                  className="flex justify-between items-center gap-4 border-b border-border-light pb-4 last:border-b-0 last:pb-0 dark:border-border-light"
                 >
                   <div>
-                    <p>{item.name[locale] || item.name.en}</p>
+                    <p className="font-medium">{item.name[locale] || item.name.en}</p>
                     <p className="text-caption text-fg-muted">
-                      {item.quantity} x{" "}
-                      {item.unitPrice.toLocaleString(locale)} {tCatalog("egp")}
+                      {item.quantity} x {item.unitPrice.toLocaleString(locale)} {tCatalog("egp")}
                     </p>
                   </div>
-                  <p className="font-medium">
-                    {(item.unitPrice * item.quantity).toLocaleString(locale)}{" "}
-                    {tCatalog("egp")}
+                  <p className="font-mono font-medium">
+                    {(item.unitPrice * item.quantity).toLocaleString(locale)} {tCatalog("egp")}
                   </p>
                 </div>
               ))}
             </div>
           </section>
-
-          <section className="border border-border-light p-5 dark:border-border-subtle">
-            <h2 className="mb-4 text-h3 leading-heading">
-              {t("paymentProofs")}
-            </h2>
-            <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_1.5fr]">
-              <select
-                value={proofLabel}
-                onChange={(event) =>
-                  setProofLabel(event.target.value as PaymentProofLabelKey)
-                }
-                className="kairova-select w-full border px-3 py-3"
-              >
-                {paymentProofLabelKeys.map((labelKey) => (
-                  <option key={labelKey} value={labelKey}>
-                    {tOrders(`paymentProofLabels.${labelKey}`)}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="file"
-                accept="image/*"
-                disabled={proofUpload.uploading || addPaymentProof.isPending}
-                onChange={(event) => void handleProofChange(event)}
-                className="w-full border border-border-light px-3 py-3 text-body file:me-4 file:border-0 file:bg-fg-secondary file:px-4 file:py-2 file:text-bg-secondary disabled:opacity-50 dark:border-border-subtle dark:file:bg-fg-primary dark:file:text-bg-primary"
-              />
-            </div>
-            {(proofUpload.uploading || addPaymentProof.isPending) && (
-              <p className="mb-4 text-body text-fg-muted">
-                {t("uploadingProof")}
-              </p>
-            )}
-            {proofError && (
-              <p className="mb-4 text-body text-red-600">{proofError}</p>
-            )}
-
-            {paymentProofs.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {paymentProofs.map((proof, index) => (
-                  <a
-                    key={getProofKey(proof.url, proof.uploadedAt, index)}
-                    href={proof.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block border border-border-light p-2 hover:bg-surface-light dark:border-border-subtle dark:hover:bg-surface-dark"
-                  >
-                    <div className="relative mb-2 h-32 w-full overflow-hidden bg-surface-light dark:bg-surface-dark">
-                      <Image
-                        src={proof.url}
-                        alt={getProofDisplayLabel(proof.label)}
-                        fill
-                        unoptimized
-                        sizes="(min-width: 640px) 300px, 100vw"
-                        className="object-cover"
-                      />
-                    </div>
-                    <p className="text-body">
-                      {getProofDisplayLabel(proof.label)}
-                    </p>
-                    <p className="text-caption text-fg-muted">
-                      {new Date(proof.uploadedAt).toLocaleString(locale)}
-                    </p>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="text-body text-fg-muted">{t("noPaymentProofs")}</p>
-            )}
-          </section>
         </div>
 
         <aside className="space-y-6">
-          <section className="border border-border-light bg-surface-light p-5 dark:border-border-subtle dark:bg-surface-dark">
-            <h2 className="mb-4 text-h3 leading-heading">{t("summary")}</h2>
-            <dl className="space-y-3 text-body">
+          <section className="border border-border-light bg-surface-light p-6 dark:border-border-light dark:bg-bg-secondary">
+            <h2 className="mb-6 text-h3 leading-heading">{t("financialSummary")}</h2>
+            <dl className="space-y-4 text-body">
               <div className="flex justify-between gap-4">
-                <dt>{tCheckout("subtotal")}</dt>
-                <dd>
-                  {order.subtotal.toLocaleString(locale)} {tCatalog("egp")}
-                </dd>
+                <dt className="text-fg-muted">{tCheckout("subtotal")}</dt>
+                <dd>{order.subtotal.toLocaleString(locale)} {tCatalog("egp")}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt>
-                  {tCheckout("depositRequired")} ({order.depositPercentage}%)
-                </dt>
-                <dd>
-                  {order.depositAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
+                <dt className="text-fg-muted">{tCheckout("depositRequired")} ({order.depositPercentage}%)</dt>
+                <dd className="font-medium text-[#C5A059]">
+                  {order.depositAmount.toLocaleString(locale)} {tCatalog("egp")}
                 </dd>
               </div>
-              <div className="flex justify-between gap-4 font-medium">
+              <div className="flex justify-between gap-4 pt-4 border-t border-border-light font-bold">
                 <dt>{t("remaining")}</dt>
-                <dd>
-                  {order.remainingAmount.toLocaleString(locale)}{" "}
-                  {tCatalog("egp")}
-                </dd>
+                <dd>{order.remainingAmount.toLocaleString(locale)} {tCatalog("egp")}</dd>
               </div>
             </dl>
           </section>
@@ -345,12 +378,12 @@ export default function CustomerOrderDetail({
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-fg-secondary px-5 py-4 text-center text-bg-secondary hover:opacity-90 dark:bg-fg-primary dark:text-bg-primary"
+              className="block w-full bg-[#C5A059] px-5 py-4 text-center text-white font-medium hover:bg-[#B8860B] transition-all shadow-md"
             >
               {tCheckout("contactWhatsApp")}
             </a>
           ) : (
-            <p className="border border-border-light px-5 py-4 text-center text-body text-fg-muted dark:border-border-subtle">
+            <p className="border border-border-light px-5 py-4 text-center text-body text-fg-muted dark:border-border-light">
               {tAdmin("configureSettings")}
             </p>
           )}

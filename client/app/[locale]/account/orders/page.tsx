@@ -5,7 +5,10 @@ import { useMemo } from "react";
 
 import { useMyOrders } from "@/application/hooks/useOrders";
 import type { Order } from "@/domain/entities/api";
-import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
+import {
+  getOrderStatusClasses,
+  getOrderStatusIcon,
+} from "@/lib/orderStatusStyles";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
@@ -13,7 +16,6 @@ type SupportedLocale = "ar" | "en";
 export default function CustomerOrdersPage() {
   const locale = useLocale() as SupportedLocale;
   const t = useTranslations("account");
-  const tAdmin = useTranslations("admin");
   const tCatalog = useTranslations("catalog");
   const { data: orders = [], isError, isLoading } = useMyOrders();
 
@@ -29,15 +31,29 @@ export default function CustomerOrdersPage() {
   }
 
   return (
-    <section>
-      <h1 className="mb-8 text-h1 leading-heading">{t("myOrders")}</h1>
+    <section className="space-y-8">
+      <div className="border-y border-border-light bg-bg-secondary py-8 sm:py-10">
+        <div className="px-5 sm:px-6 lg:px-8">
+          <p className="text-caption uppercase text-fg-muted">
+            {t("ordersEyebrow")}
+          </p>
+          <h1 className="mt-3 text-h1 leading-heading">{t("myOrders")}</h1>
+          <p className="mt-4 max-w-2xl text-body-lg leading-body text-fg-muted">
+            {t("ordersLead")}
+          </p>
+        </div>
+      </div>
 
       {isError && (
-        <p className="py-8 text-body text-red-600">{t("loadOrdersFailed")}</p>
+        <p className="border border-border-light bg-bg-secondary px-5 py-4 text-body text-fg-secondary">
+          {t("loadOrdersFailed")}
+        </p>
       )}
 
       {!isError && sortedOrders.length === 0 && (
-        <p className="py-8 text-body text-fg-muted">{t("noOrders")}</p>
+        <p className="border border-border-light bg-bg-secondary px-5 py-8 text-body text-fg-muted">
+          {t("noOrders")}
+        </p>
       )}
 
       {!isError && sortedOrders.length > 0 && (
@@ -46,9 +62,9 @@ export default function CustomerOrdersPage() {
             <Link
               key={order._id}
               href={`/account/orders/${order._id}`}
-              className="border border-border-light p-5 transition-colors hover:bg-surface-light dark:border-border-subtle dark:hover:bg-surface-dark"
+              className="group border border-border-light bg-bg-secondary p-5 transition-colors hover:border-fg-secondary hover:bg-surface-light focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-fg-secondary"
             >
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="mb-2 font-mono text-body text-fg-muted">
                     {order.orderNumber}
@@ -59,11 +75,12 @@ export default function CustomerOrdersPage() {
                 </div>
                 <div className="flex flex-col gap-3 md:items-end">
                   <span
-                    className={`inline-block border px-3 py-2 text-body ${
-                      getOrderStatusClasses(order.status)
-                    }`}
+                    className={`inline-flex min-h-10 items-center gap-2 border px-3 text-body ${getOrderStatusClasses(
+                      order.status,
+                    )}`}
                   >
-                    {tAdmin(`status.${order.status}`)}
+                    {getOrderStatusIcon(order.status)}
+                    {t(`status.${order.status}`)}
                   </span>
                   <p className="text-body font-medium">
                     {order.subtotal.toLocaleString(locale)} {tCatalog("egp")}

@@ -1,16 +1,32 @@
 "use client";
 
 import type { AxiosError } from "axios";
+import { CheckCircle2, MapPinned, Plus } from "lucide-react";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { useAddresses, useCreateAddress } from "@/application/hooks/useAddresses";
 import { useAuthGuard } from "@/application/hooks/useAuthGuard";
 import { useCreateOrder } from "@/application/hooks/useOrders";
 import { usePublicSettings } from "@/application/hooks/useSettings";
 import { useCartStore, type CartItem } from "@/application/store/cartStore";
+import AddressFormFields, {
+  emptyAddressFormValue,
+  type AddressFormValue,
+  type AddressTextField,
+} from "@/components/account/AddressFormFields";
 import OptimizedProductImage from "@/components/media/OptimizedProductImage";
-import type { PaymentMethod, ShippingAddress } from "@/domain/entities/api";
+import type {
+  Address,
+  PaymentMethod,
+  ShippingAddress,
+} from "@/domain/entities/api";
+import {
+  formatAddressLines,
+  getAddressDisplayName,
+  toShippingAddress,
+} from "@/lib/addressFormat";
 import type { Locale } from "@/src/i18n/config";
 import { useRouter } from "@/src/i18n/navigation";
 
@@ -21,47 +37,6 @@ type CheckoutPageClientProps = {
 type ErrorResponse = {
   message?: string;
 };
-
-type AddressField = keyof ShippingAddress;
-
-type AddressFieldConfig = {
-  id: AddressField;
-  type?: "tel" | "text";
-  inputMode?: "tel";
-  pattern?: string;
-};
-
-const ADDRESS_LABEL_KEYS: Record<
-  AddressField,
-  "addressLabel" | "street" | "city" | "governorate" | "phone"
-> = {
-  label: "addressLabel",
-  street: "street",
-  city: "city",
-  governorate: "governorate",
-  phone: "phone",
-};
-
-const emptyShippingAddress: ShippingAddress = {
-  label: "",
-  street: "",
-  city: "",
-  governorate: "",
-  phone: "",
-};
-
-const ADDRESS_FIELDS: AddressFieldConfig[] = [
-  { id: "label" },
-  { id: "street" },
-  { id: "city" },
-  { id: "governorate" },
-  {
-    id: "phone",
-    type: "tel",
-    inputMode: "tel",
-    pattern: "^\\+?[0-9]{10,15}$",
-  },
-];
 
 const PAYMENT_METHODS: PaymentMethod[] = ["vodafone_cash", "instapay"];
 
@@ -142,40 +117,6 @@ function LoadingCheckout({ locale }: CheckoutPageClientProps) {
   );
 }
 
-function AddressInput({
-  field,
-  value,
-  onChange,
-}: {
-  field: AddressFieldConfig;
-  value: string;
-  onChange: (field: AddressField, value: string) => void;
-}) {
-  const t = useTranslations("checkout");
-  const inputId = `checkout-${field.id}`;
-
-  return (
-    <div className={field.id === "street" ? "sm:col-span-2" : undefined}>
-      <label
-        className="mb-2 block text-caption font-medium text-fg-secondary/62"
-        htmlFor={inputId}
-      >
-        {t(ADDRESS_LABEL_KEYS[field.id])}
-      </label>
-      <input
-        id={inputId}
-        type={field.type || "text"}
-        inputMode={field.inputMode}
-        pattern={field.pattern}
-        value={value}
-        onChange={(event) => onChange(field.id, event.target.value)}
-        required
-        className="h-14 w-full border border-border-light bg-bg-secondary px-4 text-body text-fg-secondary transition-colors placeholder:text-fg-muted focus:border-fg-secondary focus:bg-bg-secondary focus:outline-none"
-      />
-    </div>
-  );
-}
-
 function PaymentMethodLabel({ method }: { method: PaymentMethod }) {
   const t = useTranslations("checkout");
   return method === "vodafone_cash" ? t("vodafoneCash") : t("instapay");
@@ -227,6 +168,65 @@ function CompactLineItem({
   );
 }
 
+function SavedAddressOption({
+  address,
+  checked,
+  onSelect,
+}: {
+  address: Address;
+  checked: boolean;
+  onSelect: () => void;
+}) {
+  const t = useTranslations("checkout");
+  const lines = formatAddressLines(address);
+
+  return (
+    <label
+      className={`cursor-pointer border p-4 transition-colors ${
+        checked
+          ? "border-fg-secondary bg-bg-secondary shadow-[inset_0_0_0_1px_rgba(10,10,10,0.08)]"
+          : "border-border-light bg-bg-secondary hover:border-fg-secondary/45"
+      }`}
+    >
+      <input
+        type="radio"
+        name="shippingAddressId"
+        checked={checked}
+        onChange={onSelect}
+        className="sr-only"
+      />
+      <span className="flex items-start justify-between gap-4">
+        <span>
+          <span className="block text-body-lg font-medium">
+            {getAddressDisplayName(address)}
+          </span>
+          <span className="mt-2 block text-caption text-fg-muted">
+            {address.fullName} / {address.phone}
+          </span>
+        </span>
+        {address.isDefault && (
+          <span className="inline-flex min-h-7 shrink-0 items-center gap-1.5 border border-fg-secondary/18 px-2 text-caption">
+            <CheckCircle2
+              aria-hidden="true"
+              className="h-3.5 w-3.5 stroke-[1.6]"
+            />
+            {t("checkoutPage.defaultAddress")}
+          </span>
+        )}
+      </span>
+      {lines.length > 0 && (
+        <span className="mt-4 block space-y-1 text-caption leading-body text-fg-muted">
+          {lines.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </span>
+      )}
+    </label>
+  );
+}
+
 export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) {
   const t = useTranslations("checkout");
   const tCatalog = useTranslations("catalog");
@@ -236,18 +236,26 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
 
   const items = useCartStore((state) => state.items);
   const cartHydrated = useCartStore((state) => state.hasHydrated);
-  const setShippingAddress = useCartStore((state) => state.setShippingAddress);
   const clearCart = useCartStore((state) => state.clear);
   const total = useCartStore((state) => state.getTotal());
   const itemCount = useCartStore((state) => state.getItemCount());
 
   const createOrder = useCreateOrder();
+  const createAddress = useCreateAddress();
   const { data: settings, isLoading: isSettingsLoading } = usePublicSettings();
+  const {
+    data: addresses = [],
+    isLoading: isAddressesLoading,
+  } = useAddresses(!isAuthChecking && user?.role === "customer");
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState("");
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>("vodafone_cash");
-  const [address, setAddress] = useState<ShippingAddress>(emptyShippingAddress);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState<AddressFormValue>({
+    ...emptyAddressFormValue,
+  });
 
   useEffect(() => {
     if (
@@ -261,8 +269,17 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
     }
   }, [cartHydrated, isAuthChecking, isRedirecting, items.length, router, user]);
 
-  const handleAddressChange = (field: AddressField, value: string) => {
-    setAddress((currentAddress) => ({
+  const defaultAddress = addresses.find((address) => address.isDefault);
+  const selectedSavedAddress =
+    addresses.find((address) => address._id === selectedAddressId) ??
+    defaultAddress ??
+    addresses[0] ??
+    null;
+  const shouldUseNewAddress =
+    isAddingAddress || addresses.length === 0 || !selectedSavedAddress;
+
+  const handleNewAddressChange = (field: AddressTextField, value: string) => {
+    setNewAddress((currentAddress) => ({
       ...currentAddress,
       [field]: value,
     }));
@@ -273,18 +290,37 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
     setError("");
     setIsRedirecting(true);
 
+    let shippingAddress: ShippingAddress | null = null;
+
     try {
+      if (shouldUseNewAddress) {
+        const addressInput = {
+          ...newAddress,
+          isDefault: newAddress.isDefault || addresses.length === 0,
+        };
+
+        await createAddress.mutateAsync(addressInput);
+        shippingAddress = toShippingAddress(addressInput);
+      } else if (selectedSavedAddress) {
+        shippingAddress = toShippingAddress(selectedSavedAddress);
+      }
+
+      if (!shippingAddress) {
+        setIsRedirecting(false);
+        setError(t("checkoutPage.selectAddressRequired"));
+        return;
+      }
+
       const order = await createOrder.mutateAsync({
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
         })),
-        shippingAddress: address,
+        shippingAddress,
         paymentMethod,
-        customerPhone: address.phone,
+        customerPhone: shippingAddress.phone,
       });
 
-      setShippingAddress(address);
       clearCart();
       router.push(`/account/orders/${order._id}`);
     } catch (checkoutError) {
@@ -297,6 +333,7 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
     isAuthChecking ||
     !cartHydrated ||
     isSettingsLoading ||
+    isAddressesLoading ||
     items.length === 0
   ) {
     return <LoadingCheckout locale={locale} />;
@@ -314,7 +351,8 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
     paymentMethod === "instapay"
       ? settings?.instapayNumber
       : settings?.vodafoneCashNumber;
-  const isSubmitting = createOrder.isPending || isRedirecting;
+  const isSubmitting =
+    createOrder.isPending || createAddress.isPending || isRedirecting;
 
   return (
     <div
@@ -397,16 +435,72 @@ export default function CheckoutPageClient({ locale }: CheckoutPageClientProps) 
                 </p>
               </div>
 
-              <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                {ADDRESS_FIELDS.map((field) => (
-                  <AddressInput
-                    key={field.id}
-                    field={field}
-                    value={address[field.id]}
-                    onChange={handleAddressChange}
+              {addresses.length > 0 && (
+                <fieldset className="mt-8">
+                  <legend className="sr-only">
+                    {t("checkoutPage.savedAddressTitle")}
+                  </legend>
+                  <div className="grid gap-3">
+                    {addresses.map((address) => (
+                      <SavedAddressOption
+                        key={address._id}
+                        address={address}
+                        checked={
+                          !shouldUseNewAddress &&
+                          selectedSavedAddress?._id === address._id
+                        }
+                        onSelect={() => {
+                          setSelectedAddressId(address._id);
+                          setIsAddingAddress(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setIsAddingAddress(true)}
+                className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 border border-fg-secondary px-5 text-body transition-colors hover:bg-fg-secondary hover:text-bg-secondary focus-visible:bg-fg-secondary focus-visible:text-bg-secondary focus-visible:outline-none"
+              >
+                <Plus aria-hidden="true" className="h-4 w-4 stroke-[1.6]" />
+                {addresses.length > 0
+                  ? t("checkoutPage.useNewAddress")
+                  : t("checkoutPage.addFirstAddress")}
+              </button>
+
+              {shouldUseNewAddress && (
+                <div className="mt-7 border-t border-border-light pt-7">
+                  <div className="mb-6 flex items-start gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-border-light bg-bg-secondary">
+                      <MapPinned
+                        aria-hidden="true"
+                        className="h-5 w-5 stroke-[1.5]"
+                      />
+                    </span>
+                    <div>
+                      <h3 className="text-body-lg font-medium">
+                        {t("checkoutPage.newAddressTitle")}
+                      </h3>
+                      <p className="mt-2 text-caption leading-body text-fg-muted">
+                        {t("checkoutPage.newAddressBody")}
+                      </p>
+                    </div>
+                  </div>
+                  <AddressFormFields
+                    value={newAddress}
+                    onChange={handleNewAddressChange}
+                    showDefaultField={addresses.length > 0}
+                    onDefaultChange={(isDefault) =>
+                      setNewAddress((currentAddress) => ({
+                        ...currentAddress,
+                        isDefault,
+                      }))
+                    }
                   />
-                ))}
-              </div>
+                </div>
+              )}
             </section>
 
             <section

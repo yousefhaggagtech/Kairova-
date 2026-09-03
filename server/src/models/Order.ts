@@ -38,11 +38,18 @@ export interface IPaymentProof {
 }
 
 export interface IShippingAddress {
-  label: string;
-  street: string;
-  city: string;
-  governorate: string;
+  nickname?: string;
+  fullName?: string;
   phone: string;
+  city: string;
+  area?: string;
+  street: string;
+  building?: string;
+  floor?: string;
+  apartment?: string;
+  notes?: string;
+  label?: string;
+  governorate?: string;
 }
 
 export interface IOrder extends Document {
@@ -102,26 +109,67 @@ const orderItemSchema = new Schema<IOrderItem>(
 
 const shippingAddressSchema = new Schema<IShippingAddress>(
   {
-    label: {
+    nickname: {
       type: String,
-      required: true,
+      trim: true,
+      maxlength: 60,
     },
-    street: {
+    fullName: {
       type: String,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    governorate: {
-      type: String,
-      required: true,
+      trim: true,
+      maxlength: 100,
     },
     phone: {
       type: String,
       required: true,
       trim: true,
+    },
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 50,
+    },
+    area: {
+      type: String,
+      trim: true,
+      maxlength: 80,
+    },
+    street: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200,
+    },
+    building: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    floor: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    apartment: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    notes: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+    label: {
+      type: String,
+      trim: true,
+      maxlength: 60,
+    },
+    governorate: {
+      type: String,
+      trim: true,
+      maxlength: 50,
     },
   },
   { _id: false },

@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: "customer" | "admin";
   phone?: string;
+  addresses?: Address[];
 }
 
 export interface LocalizedString {
@@ -60,13 +61,30 @@ export interface OrderItem {
   quantity: number;
 }
 
-export interface ShippingAddress {
-  label: string;
-  street: string;
-  city: string;
-  governorate: string;
+export interface Address {
+  _id: string;
+  nickname?: string;
+  fullName: string;
   phone: string;
+  city: string;
+  area?: string;
+  street: string;
+  building?: string;
+  floor?: string;
+  apartment?: string;
+  notes?: string;
+  isDefault: boolean;
 }
+
+export type AddressInput = Omit<Address, "_id" | "isDefault"> & {
+  isDefault?: boolean;
+};
+
+export type ShippingAddress = Partial<Omit<Address, "_id" | "isDefault">> &
+  Pick<Address, "phone" | "city" | "street"> & {
+    label?: string;
+    governorate?: string;
+  };
 
 export type OrderStatus =
   | "PENDING_DEPOSIT"

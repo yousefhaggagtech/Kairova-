@@ -80,11 +80,12 @@ describe("auth validation schemas", () => {
       name: "New Name",
       addresses: [
         {
-          label: "home",
+          nickname: "Mom's place",
+          fullName: "Yousef Haggag",
+          phone: "+201001234567",
           street: "123 Nile Street",
           city: "Cairo",
-          governorate: "Cairo",
-          phone: "+201001234567",
+          area: "Zamalek",
         },
       ],
     });
@@ -93,11 +94,12 @@ describe("auth validation schemas", () => {
       name: "New Name",
       addresses: [
         {
-          label: "home",
+          nickname: "Mom's place",
+          fullName: "Yousef Haggag",
+          phone: "+201001234567",
           street: "123 Nile Street",
           city: "Cairo",
-          governorate: "Cairo",
-          phone: "+201001234567",
+          area: "Zamalek",
           isDefault: false,
         },
       ],

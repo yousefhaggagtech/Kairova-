@@ -35,11 +35,16 @@ export const updateProfileSchema = z
     addresses: z
       .array(
         z.object({
-          label: z.string().min(1).max(30),
-          street: z.string().min(1).max(200),
-          city: z.string().min(1).max(50),
-          governorate: z.string().min(1).max(50),
+          nickname: z.string().min(1).max(60).optional(),
+          fullName: z.string().min(1).max(100),
           phone: z.string().regex(phoneRegex),
+          city: z.string().min(1).max(50),
+          area: z.string().min(1).max(80).optional(),
+          street: z.string().min(1).max(200),
+          building: z.string().min(1).max(50).optional(),
+          floor: z.string().min(1).max(50).optional(),
+          apartment: z.string().min(1).max(50).optional(),
+          notes: z.string().min(1).max(500).optional(),
           isDefault: z.boolean().default(false),
         }),
       )

@@ -5,7 +5,10 @@ import { useMemo, useState } from "react";
 
 import { useAdminOrders } from "@/application/hooks/useAdminOrders";
 import type { Order, OrderStatus, User } from "@/domain/entities/api";
-import { getOrderStatusClasses } from "@/lib/orderStatusStyles";
+import {
+  getOrderStatusClasses,
+  getOrderStatusIcon,
+} from "@/lib/orderStatusStyles";
 import { Link } from "@/src/i18n/navigation";
 
 type SupportedLocale = "ar" | "en";
@@ -24,7 +27,12 @@ function getCustomer(order: Order): User | null {
 }
 
 function getCustomerName(order: Order) {
-  return getCustomer(order)?.name ?? order.shippingAddress.label;
+  return (
+    getCustomer(order)?.name ??
+    order.shippingAddress.fullName ??
+    order.shippingAddress.label ??
+    ""
+  );
 }
 
 function getCustomerPhone(order: Order) {
@@ -119,7 +127,7 @@ export default function AdminOrdersPage() {
       )}
 
       {isError && (
-        <p className="py-8 text-body text-red-600">{t("loadFailed")}</p>
+        <p className="py-8 text-body text-fg-secondary">{t("loadFailed")}</p>
       )}
 
       {!isLoading && !isError && filteredOrders.length === 0 && (
@@ -177,10 +185,14 @@ export default function AdminOrdersPage() {
                   </td>
                   <td className="px-4 py-4">
                     <span
-                      className={`inline-block border px-2 py-1 text-caption ${getOrderStatusClasses(
+                      className={`inline-flex min-h-8 items-center gap-2 border px-2 text-caption ${getOrderStatusClasses(
                         order.status,
                       )}`}
                     >
+                      {getOrderStatusIcon(
+                        order.status,
+                        "h-3.5 w-3.5 stroke-[1.6]",
+                      )}
                       {t(`status.${order.status}`)}
                     </span>
                   </td>

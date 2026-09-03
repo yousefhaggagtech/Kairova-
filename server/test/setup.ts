@@ -36,6 +36,8 @@ const needsMongo = () => {
   return (
     testPath.includes("features/auth/controller.test") ||
     testPath.includes("features\\auth\\controller.test") ||
+    testPath.includes("features/account/controller.test") ||
+    testPath.includes("features\\account\\controller.test") ||
     testPath.includes("features/products/service.test") ||
     testPath.includes("features\\products\\service.test") ||
     testPath.includes("scripts/seedFeaturedProducts.test") ||

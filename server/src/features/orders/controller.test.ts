@@ -31,11 +31,13 @@ interface SeedData {
 }
 
 const shippingAddress: IShippingAddress = {
-  label: "Home",
-  street: "12 Nile Street",
-  city: "Cairo",
-  governorate: "Cairo",
+  nickname: "Home",
+  fullName: "Test Customer",
   phone: "+201001234567",
+  city: "Cairo",
+  area: "Zamalek",
+  street: "12 Nile Street",
+  building: "12",
 };
 
 const idOf = (document: { _id: unknown }): string => String(document._id);

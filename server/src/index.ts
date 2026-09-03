@@ -7,6 +7,7 @@ import helmet from "helmet";
 import { fileURLToPath } from "node:url";
 
 import connectDB from "./config/db.js";
+import accountRoutes from "./features/account/routes.js";
 import authRoutes from "./features/auth/routes.js";
 import categoryRoutes from "./features/categories/routes.js";
 import {
@@ -46,6 +47,7 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/account", accountRoutes);
 app.use("/api/settings", settingsPublicRoutes);
 app.use("/api/orders", customerOrdersRouter);
 app.use("/api/admin/orders", adminOrdersRouter);

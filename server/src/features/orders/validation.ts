@@ -3,11 +3,16 @@ import { z } from "zod";
 export const paymentMethodSchema = z.enum(["vodafone_cash", "instapay"]);
 
 export const addressSchema = z.object({
-  label: z.string().min(1, "Label is required").max(30),
-  street: z.string().min(1, "Street is required").max(200),
-  city: z.string().min(1, "City is required").max(50),
-  governorate: z.string().min(1, "Governorate is required").max(50),
-  phone: z.string().regex(/^\+?[0-9]{10,15}$/, "Invalid phone format"),
+  nickname: z.string().trim().max(60).optional(),
+  fullName: z.string().trim().min(1, "Full name is required").max(100),
+  phone: z.string().trim().regex(/^\+?[0-9]{10,15}$/, "Invalid phone format"),
+  city: z.string().trim().min(1, "City is required").max(50),
+  area: z.string().trim().max(80).optional(),
+  street: z.string().trim().min(1, "Street is required").max(200),
+  building: z.string().trim().max(50).optional(),
+  floor: z.string().trim().max(50).optional(),
+  apartment: z.string().trim().max(50).optional(),
+  notes: z.string().trim().max(500).optional(),
 });
 
 export const createOrderSchema = z.object({
@@ -21,7 +26,7 @@ export const createOrderSchema = z.object({
     .min(1, "At least one item is required"),
   shippingAddress: addressSchema,
   paymentMethod: paymentMethodSchema,
-  customerPhone: z.string().regex(/^\+?[0-9]{10,15}$/, "Invalid phone format"),
+  customerPhone: z.string().trim().regex(/^\+?[0-9]{10,15}$/, "Invalid phone format"),
 });
 
 export const addPaymentProofSchema = z.object({

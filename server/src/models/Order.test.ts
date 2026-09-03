@@ -22,11 +22,13 @@ const validOrderInput = (overrides: Record<string, unknown> = {}) => ({
   customerPhone: "+201001234567",
   paymentProofs: [],
   shippingAddress: {
-    label: "Home",
-    street: "12 Nile Street",
-    city: "Cairo",
-    governorate: "Cairo",
+    nickname: "Home",
+    fullName: "Yousef Haggag",
     phone: "+201001234567",
+    city: "Cairo",
+    area: "Zamalek",
+    street: "12 Nile Street",
+    building: "12",
   },
   ...overrides,
 });
@@ -81,6 +83,22 @@ describe("Order model", () => {
     );
 
     expect(order.paymentProofs).toEqual([]);
+  });
+
+  it("accepts legacy shipping address snapshots", async () => {
+    const order = await Order.create(
+      validOrderInput({
+        shippingAddress: {
+          label: "Home",
+          street: "12 Nile Street",
+          city: "Cairo",
+          governorate: "Cairo",
+          phone: "+201001234567",
+        },
+      }),
+    );
+
+    expect(order.shippingAddress.label).toBe("Home");
   });
 
   it("creates a unique index for orderNumber", async () => {

@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { LocalizedString, ShippingAddress } from "@/domain/entities/api";
+import type { LocalizedString } from "@/domain/entities/api";
 
 export interface CartItem {
   productId: string;
@@ -17,14 +17,12 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  shippingAddress: ShippingAddress | null;
   hasHydrated: boolean;
 
   addItem: (item: CartItem) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clear: () => void;
-  setShippingAddress: (address: ShippingAddress) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 
   getTotal: () => number;
@@ -38,7 +36,6 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      shippingAddress: null,
       hasHydrated: false,
 
       addItem: (item) =>
@@ -94,7 +91,6 @@ export const useCartStore = create<CartState>()(
 
       clear: () => set({ items: [] }),
 
-      setShippingAddress: (address) => set({ shippingAddress: address }),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       getTotal: () =>
@@ -110,7 +106,6 @@ export const useCartStore = create<CartState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         items: state.items,
-        shippingAddress: state.shippingAddress,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

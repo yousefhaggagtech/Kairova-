@@ -1,5 +1,3 @@
-import { pathToFileURL } from "node:url";
-
 import mongoose, { Types } from "mongoose";
 
 import { connectDB } from "../config/db.js";
@@ -781,7 +779,11 @@ async function runSeedFeaturedProducts(): Promise<number> {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const exitCode = await runSeedFeaturedProducts();
-  process.exit(exitCode);
+if (
+  process.argv[1]?.endsWith("seedFeaturedProducts.ts") ||
+  process.argv[1]?.endsWith("seedFeaturedProducts.js")
+) {
+  runSeedFeaturedProducts().then((exitCode) => {
+    process.exit(exitCode);
+  });
 }
