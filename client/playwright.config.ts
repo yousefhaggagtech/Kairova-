@@ -16,6 +16,7 @@ export default defineConfig({
       url: "http://localhost:4000/health",
       reuseExistingServer: true,
       timeout: 60_000,
+      env: { PORT: "4000" },
     },
     {
       command: "npm run dev",
