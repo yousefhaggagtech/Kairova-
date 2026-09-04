@@ -63,15 +63,3 @@ jobs:
 
       - name: Test backend
         run: npm test
-
-      - name: Install Railway CLI
-        run: npm install --global @railway/cli@latest
-        working-directory: .
-
-      - name: Deploy to Railway
-        run: railway up . --path-as-root --ci --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT" --service "$RAILWAY_SERVICE_NAME"
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_ENVIRONMENT: ${{ secrets.RAILWAY_ENVIRONMENT }}
-          RAILWAY_SERVICE_NAME: ${{ secrets.RAILWAY_SERVICE_NAME }}
