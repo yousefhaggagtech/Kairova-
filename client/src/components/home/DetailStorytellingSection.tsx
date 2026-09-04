@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 const VIDEO_SRC =
-  "/client/public/bracelet-section-video.mp4";
+  "/bracelet-section-video.mp4";
 
 const editorialEase = [0.19, 1, 0.22, 1] as const;
 
