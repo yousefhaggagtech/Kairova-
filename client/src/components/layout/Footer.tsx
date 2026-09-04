@@ -15,6 +15,12 @@ type FooterLink = {
   external?: boolean;
 };
 
+type SocialIconType = "instagram" | "telegram" | "tiktok" | "support";
+
+type SocialLink = FooterLink & {
+  icon: SocialIconType;
+};
+
 const underlineLinkClass =
   "group relative inline-flex items-center text-sm text-[#A1A1A1] transition-colors duration-300 hover:text-white focus-visible:text-white focus-visible:outline-none";
 
@@ -49,7 +55,7 @@ function FooterLink({ label, href, external = false }: FooterLink) {
   );
 }
 
-function SocialIcon({ type }: { type: "instagram" | "facebook" | "mail" }) {
+function SocialIcon({ type }: { type: SocialIconType }) {
   const commonProps = {
     viewBox: "0 0 24 24",
     fill: "none",
@@ -71,20 +77,35 @@ function SocialIcon({ type }: { type: "instagram" | "facebook" | "mail" }) {
     );
   }
 
-  if (type === "facebook") {
+  if (type === "telegram") {
     return (
       <svg {...commonProps}>
-        <path d="M14.75 8.25h2.5V4.5h-2.5c-3.04 0-4.75 1.79-4.75 4.54V12H6.5v3.75h3.5V21h3.75v-5.25h3.25L17 12h-3.25V9.75c0-.76.5-1.5 1.5-1.5Z" />
+        <path d="M20.5 4.5 3.75 11.25c-.82.33-.79 1.5.05 1.78l4.42 1.47 1.72 4.66c.3.81 1.38.96 1.89.27l2.46-3.3 4.33 3.08c.72.51 1.72.08 1.86-.79L22 5.63c.13-.8-.75-1.44-1.5-1.13Z" />
+        <path d="m8.22 14.5 7.53-5.3-5.81 9.96" />
       </svg>
     );
   }
 
-  return (
-    <svg {...commonProps}>
-      <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" />
-      <path d="m5.75 7 6.25 5 6.25-5" />
-    </svg>
-  );
+  if (type === "tiktok") {
+    return (
+      <svg {...commonProps}>
+        <path d="M14.5 3.75v10.12a4.13 4.13 0 1 1-4.13-4.12c.37 0 .73.05 1.06.14v3.48a1.38 1.38 0 1 0 .95 1.31V3.75h2.12Z" />
+        <path d="M14.5 3.75c.28 2.5 1.95 4.7 4.5 5.25v3.1c-1.75-.05-3.32-.62-4.5-1.58" />
+      </svg>
+    );
+  }
+
+  if (type === "support") {
+    return (
+      <svg {...commonProps}>
+        <path d="M4.25 12a7.75 7.75 0 0 1 13.2-5.55A7.75 7.75 0 0 1 12 19.75a7.65 7.65 0 0 1-3.7-.95l-4.05 1.05 1.08-3.92A7.66 7.66 0 0 1 4.25 12Z" />
+        <path d="M9.25 10.25c.35 1.45 1.55 3.05 3.13 3.87.53.28 1.08.48 1.62.58l1-1.35c.15-.2.42-.27.65-.17l1.15.52" />
+        <path d="m8.25 8.75.55 1.15c.1.23.03.5-.17.65l-1.18.88" />
+      </svg>
+    );
+  }
+
+  return null;
 }
 
 export default function Footer() {
@@ -113,10 +134,31 @@ export default function Footer() {
     { label: t("company.terms"), href: "/about" },
   ];
 
-  const social = [
-    { label: t("connect.instagram"), href: "https://www.instagram.com/kairova_co/", external: true },
-    { label: t("connect.facebook"), href: "https://facebook.com", external: true },
-    { label: t("connect.email"), href: "mailto:hello@kairova.com", external: true },
+  const social: SocialLink[] = [
+    {
+      label: t("connect.instagram"),
+      href: "https://www.instagram.com/kairova_co/",
+      external: true,
+      icon: "instagram",
+    },
+    {
+      label: t("connect.telegram"),
+      href: "https://tr.ee/BPVo2X_Niu",
+      external: true,
+      icon: "telegram",
+    },
+    {
+      label: t("connect.tiktok"),
+      href: "https://tr.ee/d_zP0_ebuK",
+      external: true,
+      icon: "tiktok",
+    },
+    {
+      label: t("connect.support"),
+      href: "https://tr.ee/KaD2Pehgh8",
+      external: true,
+      icon: "support",
+    },
   ];
 
   return (
@@ -191,7 +233,7 @@ export default function Footer() {
                         aria-label={item.label}
                       >
                         <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-[#C7C7C7] transition-colors duration-300 group-hover:border-white/20 group-hover:text-white">
-                          {item.label === t("connect.instagram") ? <SocialIcon type="instagram" /> : item.label === t("connect.facebook") ? <SocialIcon type="facebook" /> : <SocialIcon type="mail" />}
+                          <SocialIcon type={item.icon} />
                         </span>
                         <span className="relative">
                           {item.label}

@@ -792,8 +792,9 @@
     "connect": {
       "title": "Connect",
       "instagram": "Instagram",
-      "facebook": "Facebook",
-      "email": "Email"
+      "telegram": "Telegram",
+      "tiktok": "TikTok",
+      "support": "Support"
     },
     "rights": "All rights reserved"
   }

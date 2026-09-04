@@ -17,6 +17,8 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
+const LOCAL_API_BASE_URL = "http://localhost:4000";
+
 function isSupportedLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
 }
@@ -49,8 +51,16 @@ function getMetadataDescription(
     : description;
 }
 
+function getApiBaseUrl() {
+  return (
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    LOCAL_API_BASE_URL
+  ).replace(/\/+$/, "");
+}
+
 async function getProduct(slug: string, locale: string): Promise<Product | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+  const baseUrl = getApiBaseUrl();
   const response = await fetch(
     `${baseUrl}/api/products/slug/${encodeURIComponent(slug)}`,
     {
@@ -60,14 +70,25 @@ async function getProduct(slug: string, locale: string): Promise<Product | null>
         "Accept-Language": locale,
       },
     },
-  ).catch(() => null);
+  );
 
-  if (!response?.ok) {
+  if (response.status === 404) {
     return null;
   }
 
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load product "${slug}" from API: ${response.status} ${response.statusText}`,
+    );
+  }
+
   const payload = (await response.json()) as ApiResponse<{ product: Product }>;
-  return payload.data?.product ?? null;
+
+  if (!payload.data?.product) {
+    throw new Error(`API response for product "${slug}" did not include data.`);
+  }
+
+  return payload.data.product;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

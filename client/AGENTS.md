@@ -57,6 +57,14 @@ non-React code like axios interceptors — derive the locale correctly
 for that context instead (e.g. from `window.location.pathname` in an
 interceptor, since hooks aren't available there).
 
+## API access
+
+Browser API calls use same-origin `/api/*` URLs and are proxied by
+`next.config.ts` to the backend. Server-rendered client routes that
+need API data should read `API_URL` first, then `NEXT_PUBLIC_API_URL`,
+then the local development fallback. Production deployments must set
+`API_URL` to the deployed backend origin, not to localhost.
+
 ## State
 
 - Zustand: client-only state (auth shape post-fetch, cart contents).
