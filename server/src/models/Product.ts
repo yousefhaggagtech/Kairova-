@@ -25,6 +25,8 @@ export interface IProduct extends Document {
   sku: string;
   stockQuantity: number;
   lowStockThreshold: number;
+  isFeatured: boolean;
+  featuredOrder: number | null;
   images: Types.ObjectId[];
   deletedAt: Date | null;
   createdAt: Date;
@@ -100,6 +102,16 @@ const productSchema = new Schema<
     lowStockThreshold: {
       type: Number,
       default: 5,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    featuredOrder: {
+      type: Number,
+      default: null,
+      min: 0,
     },
     images: [
       {

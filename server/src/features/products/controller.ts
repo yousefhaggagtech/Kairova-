@@ -4,6 +4,7 @@ import { catchError } from "../../utils/catchError.js";
 import {
   addImage,
   createProduct,
+  getFeaturedProducts,
   getProductById,
   getProductBySlug,
   listProducts,
@@ -61,6 +62,17 @@ export const getProductBySlugController = catchError(
     res.status(200).json({
       status: "success",
       data: { product },
+    });
+  },
+);
+
+export const getFeaturedProductsController = catchError(
+  async (_req: Request, res: Response) => {
+    const products = await getFeaturedProducts();
+
+    res.status(200).json({
+      status: "success",
+      data: { products },
     });
   },
 );

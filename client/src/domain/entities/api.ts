@@ -35,11 +35,26 @@ export interface Product {
   sku: string;
   stockQuantity: number;
   lowStockThreshold?: number;
+  isFeatured: boolean;
+  featuredOrder: number | null;
   images: ProductImage[];
   deletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type FeaturedProduct = Pick<
+  Product,
+  | "_id"
+  | "name"
+  | "slug"
+  | "gender"
+  | "category"
+  | "subcategory"
+  | "images"
+  | "isFeatured"
+  | "featuredOrder"
+>;
 
 export interface ProductImage {
   _id: string;

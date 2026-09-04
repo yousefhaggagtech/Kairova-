@@ -16,10 +16,10 @@ describe("seedFeaturedProducts", () => {
 
     expect(firstResult).toEqual({
       productsCreated: featuredProducts.length,
-      productsUpdated: 0,
+      productsSkipped: 0,
     });
 
-    for (const seed of featuredProducts) {
+    for (const [index, seed] of featuredProducts.entries()) {
       const product = await Product.findOne({
         slug: seed.slug,
         deletedAt: null,
@@ -35,6 +35,8 @@ describe("seedFeaturedProducts", () => {
       expect(product.gender).toBe(seed.gender);
       expect(product.price).toBe(seed.price);
       expect(product.stockQuantity).toBe(seed.stockQuantity);
+      expect(product.isFeatured).toBe(true);
+      expect(product.featuredOrder).toBe(index + 1);
 
       const category = await Category.findOne({
         _id: product.category,
@@ -72,7 +74,7 @@ describe("seedFeaturedProducts", () => {
 
     expect(secondResult).toEqual({
       productsCreated: 0,
-      productsUpdated: featuredProducts.length,
+      productsSkipped: featuredProducts.length,
     });
 
     const firstSeed = featuredProducts[0];
@@ -88,16 +90,60 @@ describe("seedFeaturedProducts", () => {
 
     productToPreserve.price = 1234;
     productToPreserve.stockQuantity = 3;
+    productToPreserve.name = {
+      ar: "Admin Arabic name",
+      en: "Admin English name",
+    };
+    productToPreserve.description = {
+      ar: "Admin Arabic description",
+      en: "Admin English description",
+    };
+    productToPreserve.slug = "admin-edited-featured-product";
+    productToPreserve.isFeatured = false;
+    productToPreserve.featuredOrder = 99;
     await productToPreserve.save();
+
+    const seedImage = await ProductImage.findOne({
+      product: productToPreserve._id,
+      publicId: `featured-products/${firstSeed.slug}`,
+      deletedAt: null,
+    });
+
+    expect(seedImage).toBeTruthy();
+    if (!seedImage) {
+      throw new Error(`Missing product image "${firstSeed.slug}"`);
+    }
+
+    seedImage.url = "https://example.com/admin-edited-image.jpg";
+    await seedImage.save();
+
     await seedFeaturedProducts();
 
     const preservedProduct = await Product.findOne({
-      slug: firstSeed.slug,
+      _id: productToPreserve._id,
       deletedAt: null,
     });
 
     expect(preservedProduct?.price).toBe(1234);
     expect(preservedProduct?.stockQuantity).toBe(3);
+    expect(preservedProduct?.name.en).toBe("Admin English name");
+    expect(preservedProduct?.description.en).toBe("Admin English description");
+    expect(preservedProduct?.slug).toBe("admin-edited-featured-product");
+    expect(preservedProduct?.isFeatured).toBe(false);
+    expect(preservedProduct?.featuredOrder).toBe(99);
+    expect(
+      await Product.exists({ slug: firstSeed.slug, deletedAt: null }),
+    ).toBeNull();
+
+    const preservedImage = await ProductImage.findOne({
+      product: productToPreserve._id,
+      publicId: `featured-products/${firstSeed.slug}`,
+      deletedAt: null,
+    });
+
+    expect(preservedImage?.url).toBe(
+      "https://example.com/admin-edited-image.jpg",
+    );
     expect(await Product.countDocuments({ deletedAt: null })).toBe(
       featuredProducts.length,
     );

@@ -38,7 +38,7 @@ type FeaturedProductSeed = {
 
 type SeedResult = {
   productsCreated: number;
-  productsUpdated: number;
+  productsSkipped: number;
 };
 
 const categorySeeds: Record<
@@ -691,39 +691,17 @@ async function ensurePrimaryImage(
   );
 }
 
-async function ensureProduct(seed: FeaturedProductSeed) {
-  const { category, subcategory } = await ensureProductCategories(seed);
+async function ensureProduct(seed: FeaturedProductSeed, featuredOrder: number) {
   const existing =
-    (await Product.findOne({ slug: seed.slug, deletedAt: null })) ||
+    (await Product.findOne({ sku: seed.sku })) ||
     (await Product.findOne({ slug: seed.slug }));
-  const sku = await getAvailableSku(
-    existing?.sku || seed.sku,
-    existing ? getId(existing) : undefined,
-  );
 
   if (existing) {
-    existing.name = seed.name;
-    existing.description = seed.description;
-    existing.slug = seed.slug;
-    existing.gender = seed.gender;
-    existing.category = toObjectId(getId(category));
-    existing.subcategory = toObjectId(getId(subcategory));
-    existing.sku = sku;
-    existing.price =
-      typeof existing.price === "number" ? existing.price : seed.price;
-    existing.stockQuantity =
-      typeof existing.stockQuantity === "number"
-        ? existing.stockQuantity
-        : seed.stockQuantity;
-    existing.lowStockThreshold =
-      typeof existing.lowStockThreshold === "number"
-        ? existing.lowStockThreshold
-        : 5;
-    existing.deletedAt = null;
-    await existing.save();
-    await ensurePrimaryImage(existing, seed);
     return { created: false };
   }
+
+  const { category, subcategory } = await ensureProductCategories(seed);
+  const sku = await getAvailableSku(seed.sku);
 
   const product = await Product.create({
     name: seed.name,
@@ -736,6 +714,8 @@ async function ensureProduct(seed: FeaturedProductSeed) {
     sku,
     stockQuantity: seed.stockQuantity,
     lowStockThreshold: 5,
+    isFeatured: true,
+    featuredOrder,
     images: [],
     deletedAt: null,
   } as unknown as IProduct);
@@ -746,19 +726,19 @@ async function ensureProduct(seed: FeaturedProductSeed) {
 
 export async function seedFeaturedProducts(): Promise<SeedResult> {
   let productsCreated = 0;
-  let productsUpdated = 0;
+  let productsSkipped = 0;
 
-  for (const product of featuredProducts) {
-    const result = await ensureProduct(product);
+  for (let index = 0; index < featuredProducts.length; index += 1) {
+    const result = await ensureProduct(featuredProducts[index], index + 1);
 
     if (result.created) {
       productsCreated += 1;
     } else {
-      productsUpdated += 1;
+      productsSkipped += 1;
     }
   }
 
-  return { productsCreated, productsUpdated };
+  return { productsCreated, productsSkipped };
 }
 
 async function runSeedFeaturedProducts(): Promise<number> {
@@ -768,7 +748,7 @@ async function runSeedFeaturedProducts(): Promise<number> {
     const result = await seedFeaturedProducts();
 
     console.log(
-      `Featured products seeded. Created ${result.productsCreated} products. Updated ${result.productsUpdated} products.`,
+      `Featured products seeded. Created ${result.productsCreated} products. Skipped ${result.productsSkipped} existing products.`,
     );
     return 0;
   } catch (error) {

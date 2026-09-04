@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, FormEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -10,6 +10,12 @@ import { useAuthMe } from "@/application/hooks/useAuthMe";
 import { useAuthStore } from "@/application/store/authStore";
 import { useCartStore } from "@/application/store/cartStore";
 import CartDrawer from "@/components/cart/CartDrawer";
+import type {
+  Category,
+  FeaturedProduct,
+  LocalizedString,
+  ProductImage,
+} from "@/domain/entities/api";
 import type { Locale } from "@/src/i18n/config";
 import { Link, usePathname, useRouter } from "@/src/i18n/navigation";
 
@@ -19,14 +25,23 @@ type MenuKey = "men" | "women";
 
 type NavProduct = {
   href: string;
-  image: string;
-  name: string;
+  image: ProductImage | null;
+  name: LocalizedString;
 };
 
-type NavBranch = {
+type NavBranchStructure = {
   href: string;
   labelKey: string;
-  products?: NavProduct[];
+};
+
+type NavBranch = NavBranchStructure & {
+  products: NavProduct[];
+};
+
+type NavTreeStructure = {
+  allHref: string;
+  allLabelKey: string;
+  branches: NavBranchStructure[];
 };
 
 type NavTree = {
@@ -35,7 +50,11 @@ type NavTree = {
   branches: NavBranch[];
 };
 
-const NAV_TREES: Record<MenuKey, NavTree> = {
+type NavbarProps = {
+  featuredProducts?: FeaturedProduct[];
+};
+
+const NAV_TREE_STRUCTURE: Record<MenuKey, NavTreeStructure> = {
   men: {
     allHref: "/men",
     allLabelKey: "allMens",
@@ -43,68 +62,14 @@ const NAV_TREES: Record<MenuKey, NavTree> = {
       {
         href: "/category/men-watches",
         labelKey: "watches",
-        products: [
-          {
-            href: "/product/kairova-royal-automatic-silver-men-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-royal-automatic-silver-men-watch.jpeg?updatedAt=1787938134070",
-            name: "Kairova Royal Automatic",
-          },
-          {
-            href: "/product/kairova-legacy-automatic-silver-men-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-legacy-automatic-silver-men-watch.jpeg?updatedAt=1787938287575",
-            name: "Kairova Legacy Automatic",
-          },
-          {
-            href: "/product/kairova-apex-chronograph-silver-men-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-apex-chronograph-silver-men-watch.jpeg?updatedAt=1787938287884",
-            name: "Kairova Apex Chronograph",
-          },
-        ],
       },
       {
         href: "/category/men-perfume",
         labelKey: "perfume",
-        products: [
-          {
-            href: "/product/kairova-sovereign-oud-eau-de-parfum-men-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-sovereign-oud-eau-de-parfum-men-perfume.jpeg?updatedAt=1787938411787",
-            name: "Kairova Sovereign Oud",
-          },
-          {
-            href: "/product/kairova-noir-leather-100ml-men-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-noir-leather-100ml-men-perfume.jpeg?updatedAt=1787938412049",
-            name: "Kairova Noir Leather",
-          },
-          {
-            href: "/product/kairova-bloom-vanilla-100ml-women-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-bloom-vanilla-100ml-women-perfume.jpeg?updatedAt=1787938411471",
-            name: "Kairova Bloom Vanilla",
-          },
-        ],
       },
       {
         href: "/category/men-accessories",
         labelKey: "accessories",
-        products: [
-          {
-            href: "/product/kairova-titan-braided-leather-silver-men-bracelet",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/accessories/kairova-titan-braided-leather-silver-men-bracelet.jpeg?updatedAt=1787938525463",
-            name: "Kairova Titan Braided Leather",
-          },
-          {
-            href: "/product/kairova-monarch-silver-onyx-men-cufflinks",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/accessories/kairova-monarch-silver-onyx-men-cufflinks.jpeg?updatedAt=1787938525725",
-            name: "Kairova Monarch Onyx Cufflinks",
-          },
-        ],
       },
       { href: "/category/men-belts", labelKey: "belts" },
       { href: "/category/men-wallets", labelKey: "wallets" },
@@ -117,78 +82,89 @@ const NAV_TREES: Record<MenuKey, NavTree> = {
       {
         href: "/category/women-watches",
         labelKey: "watches",
-        products: [
-          {
-            href: "/product/kairova-aura-mesh-gold-women-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-aura-mesh-gold-women-watch.jpeg?updatedAt=1787938288552",
-            name: "Kairova Aura Mesh",
-          },
-          {
-            href: "/product/kairova-elise-diamond-gold-women-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-elise-diamond-gold-women-watch.jpeg?updatedAt=1787938288475",
-            name: "Kairova Elise Diamond",
-          },
-          {
-            href: "/product/kairova-celeste-petite-gold-women-watch",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/watches/kairova-celeste-petite-gold-women-watch.jpeg?updatedAt=1787938288174",
-            name: "Kairova Celeste Petite",
-          },
-        ],
       },
       {
         href: "/category/women-perfume",
         labelKey: "perfume",
-        products: [
-          {
-            href: "/product/kairova-elixir-jasmine-intense-women-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-elixir-jasmine-intense-women-perfume.jpeg?updatedAt=1787938412858",
-            name: "Kairova Elixir Jasmine",
-          },
-          {
-            href: "/product/kairova-velvet-rose-eau-de-parfum-women-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-velvet-rose-eau-de-parfum-women-perfume.jpeg?updatedAt=1787938412471",
-            name: "Kairova Velvet Rose",
-          },
-          {
-            href: "/product/kairova-absolute-amber-intense-men-perfume",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/kairova-absolute-amber-intense-men-perfume.jpeg?updatedAt=1787938411136",
-            name: "Kairova Absolute Amber",
-          },
-        ],
       },
       {
         href: "/category/women-accessories",
         labelKey: "accessories",
-        products: [
-          {
-            href: "/product/kairova-luna-crystal-pendant-gold-women-necklace",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/accessories/kairova-luna-crystal-pendant-gold-women-necklace.jpeg?updatedAt=1787938525283",
-            name: "Kairova Luna Crystal Pendant",
-          },
-          {
-            href: "/product/kairova-verona-pearl-charm-silver-women-bracelet",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/accessories/kairova-verona-pearl-charm-silver-women-bracelet.jpeg?updatedAt=1787938525041",
-            name: "Kairova Verona Pearl Charm",
-          },
-          {
-            href: "/product/kairova-solaris-hoop-gold-women-earrings",
-            image:
-              "https://ik.imagekit.io/1pscfy7oah/kiarova/accessories/kairova-solaris-hoop-gold-women-earrings.jpeg?updatedAt=1787938524934",
-            name: "Kairova Solaris Hoop",
-          },
-        ],
       },
     ],
   },
 };
+
+function isProductImage(
+  image: FeaturedProduct["images"][number],
+): image is ProductImage {
+  return typeof image === "object" && image !== null && "url" in image;
+}
+
+function getLocalizedText(value: LocalizedString, locale: Locale) {
+  return value[locale] || value.en || value.ar;
+}
+
+function getRelationSlug(relation: Category | string | null | undefined) {
+  if (!relation || typeof relation === "string") {
+    return "";
+  }
+
+  return relation.slug;
+}
+
+function getCategorySlugFromHref(href: string) {
+  return href.replace(/^\/category\//, "");
+}
+
+function getPrimaryImage(product: FeaturedProduct) {
+  const images = [...product.images].filter(isProductImage).sort((first, second) => {
+    if (first.isPrimary !== second.isPrimary) {
+      return first.isPrimary ? -1 : 1;
+    }
+
+    return first.order - second.order;
+  });
+
+  return images[0] ?? null;
+}
+
+function buildNavTrees(featuredProducts: FeaturedProduct[]) {
+  const productsByCategory = new Map<string, NavProduct[]>();
+
+  for (const product of featuredProducts) {
+    const categorySlug = getRelationSlug(product.category);
+
+    if (!categorySlug) {
+      continue;
+    }
+
+    const products = productsByCategory.get(categorySlug) ?? [];
+    products.push({
+      href: `/product/${product.slug}`,
+      image: getPrimaryImage(product),
+      name: product.name,
+    });
+    productsByCategory.set(categorySlug, products);
+  }
+
+  return {
+    men: {
+      ...NAV_TREE_STRUCTURE.men,
+      branches: NAV_TREE_STRUCTURE.men.branches.map((branch) => ({
+        ...branch,
+        products: productsByCategory.get(getCategorySlugFromHref(branch.href)) ?? [],
+      })),
+    },
+    women: {
+      ...NAV_TREE_STRUCTURE.women,
+      branches: NAV_TREE_STRUCTURE.women.branches.map((branch) => ({
+        ...branch,
+        products: productsByCategory.get(getCategorySlugFromHref(branch.href)) ?? [],
+      })),
+    },
+  } satisfies Record<MenuKey, NavTree>;
+}
 
 const navTextClass =
   "inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-caption font-medium uppercase transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none";
@@ -302,7 +278,47 @@ function LanguageIcon() {
   );
 }
 
-export default function Navbar() {
+function NavProductLink({
+  imageFrameClassName,
+  imageSizes,
+  linkClassName,
+  locale,
+  nameClassName,
+  onClick,
+  product,
+}: {
+  imageFrameClassName: string;
+  imageSizes: string;
+  linkClassName: string;
+  locale: Locale;
+  nameClassName: string;
+  onClick: () => void;
+  product: NavProduct;
+}) {
+  const productName = getLocalizedText(product.name, locale);
+  const imageAlt = product.image
+    ? getLocalizedText(product.image.alt, locale) || productName
+    : "";
+
+  return (
+    <Link href={product.href} className={linkClassName} onClick={onClick}>
+      <span className={imageFrameClassName}>
+        {product.image ? (
+          <Image
+            src={product.image.url}
+            alt={imageAlt}
+            fill
+            sizes={imageSizes}
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : null}
+      </span>
+      <span className={nameClassName}>{productName}</span>
+    </Link>
+  );
+}
+
+export default function Navbar({ featuredProducts = [] }: NavbarProps) {
   const t = useTranslations("nav");
   const locale = useLocale() as Locale;
   const pathname = usePathname();
@@ -483,7 +499,11 @@ export default function Navbar() {
       ? "brightness(0)"
       : "brightness(0) invert(1)",
   } as CSSProperties;
-  const activeMenuTree = activeMenu ? NAV_TREES[activeMenu] : null;
+  const navTrees = useMemo(
+    () => buildNavTrees(featuredProducts),
+    [featuredProducts],
+  );
+  const activeMenuTree = activeMenu ? navTrees[activeMenu] : null;
 
   function toggleMenu(menu: MenuKey) {
     setIsMobileMenuOpen(false);
@@ -672,7 +692,7 @@ export default function Navbar() {
             >
               <div className="space-y-2">
                 {(["men", "women"] as const).map((menuKey) => {
-                  const tree = NAV_TREES[menuKey];
+                  const tree = navTrees[menuKey];
                   const isExpanded = activeMenu === menuKey;
 
                   return (
@@ -728,24 +748,15 @@ export default function Navbar() {
                                   <ul className="mt-2 grid gap-2">
                                     {branch.products.map((product) => (
                                       <li key={product.href}>
-                                        <Link
-                                          href={product.href}
-                                          className="group grid min-h-16 cursor-pointer grid-cols-[56px_minmax(0,1fr)] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                        <NavProductLink
+                                          imageFrameClassName="relative block aspect-[4/5] overflow-hidden bg-surface-light"
+                                          imageSizes="56px"
+                                          linkClassName="group grid min-h-16 cursor-pointer grid-cols-[56px_minmax(0,1fr)] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                          locale={locale}
+                                          nameClassName="break-words text-caption leading-body"
                                           onClick={closeNavigationPanels}
-                                        >
-                                          <span className="relative block aspect-[4/5] overflow-hidden bg-surface-light">
-                                            <Image
-                                              src={product.image}
-                                              alt={product.name}
-                                              fill
-                                              sizes="56px"
-                                              className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                            />
-                                          </span>
-                                          <span className="break-words text-caption leading-body">
-                                            {product.name}
-                                          </span>
-                                        </Link>
+                                          product={product}
+                                        />
                                       </li>
                                     ))}
                                   </ul>
@@ -844,24 +855,15 @@ export default function Navbar() {
                           <ul className="mt-4 grid gap-3">
                             {branch.products.map((product) => (
                               <li key={product.href}>
-                                <Link
-                                  href={product.href}
-                                  className="group grid cursor-pointer grid-cols-[72px_1fr] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                <NavProductLink
+                                  imageFrameClassName="relative block aspect-[4/5] overflow-hidden bg-surface-light"
+                                  imageSizes="72px"
+                                  linkClassName="group grid cursor-pointer grid-cols-[72px_1fr] items-center gap-3 transition-colors duration-200 hover:text-hover-muted focus-visible:text-hover-muted focus-visible:outline-none"
+                                  locale={locale}
+                                  nameClassName="text-caption leading-body"
                                   onClick={() => setActiveMenu(null)}
-                                >
-                                  <span className="relative block aspect-[4/5] overflow-hidden bg-surface-light">
-                                    <Image
-                                      src={product.image}
-                                      alt={product.name}
-                                      fill
-                                      sizes="72px"
-                                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                  </span>
-                                  <span className="text-caption leading-body">
-                                    {product.name}
-                                  </span>
-                                </Link>
+                                  product={product}
+                                />
                               </li>
                             ))}
                           </ul>

@@ -22,6 +22,8 @@ interface CreateProductInput {
   price: number;
   stockQuantity: number;
   lowStockThreshold?: number;
+  isFeatured?: boolean;
+  featuredOrder?: number | null;
 }
 
 interface ProductListFilters {
@@ -42,6 +44,8 @@ type ProductUpdates = Partial<{
   price: number;
   stockQuantity: number;
   lowStockThreshold: number;
+  isFeatured: boolean;
+  featuredOrder: number | null;
 }>;
 
 interface ProductImageInput {
@@ -61,6 +65,17 @@ const productPopulate = [
     match: { deletedAt: null },
     select: "url publicId isPrimary order alt",
     options: { sort: { order: 1, createdAt: 1 } },
+  },
+];
+const featuredProductPopulate = [
+  { path: "category", select: categorySelect },
+  { path: "subcategory", select: categorySelect },
+  {
+    path: "images",
+    match: { deletedAt: null },
+    select: "url publicId isPrimary order alt",
+    options: { sort: { isPrimary: -1, order: 1, createdAt: 1 } },
+    perDocumentLimit: 1,
   },
 ];
 
@@ -167,6 +182,20 @@ const validateSubcategory = async (
   return subcategoryObjectId;
 };
 
+const validateFeaturedOrder = (
+  featuredOrder: number | null | undefined,
+): number | null | undefined => {
+  if (featuredOrder === null || featuredOrder === undefined) {
+    return featuredOrder;
+  }
+
+  if (!Number.isInteger(featuredOrder) || featuredOrder < 0) {
+    throw new AppError("Featured order must be a non-negative integer", 400);
+  }
+
+  return featuredOrder;
+};
+
 const categoryCodeFromSlug = (slug: string): string => {
   const code = slug.replace(/[^a-z0-9]/gi, "").slice(0, 3).toUpperCase();
 
@@ -235,6 +264,12 @@ export const createProduct = async (
   );
   const sku = await generateSku(input.gender, input.categoryId, category.slug);
   const slug = await generateUniqueSlug(input.name.en);
+  const isFeatured = input.isFeatured ?? false;
+  const featuredOrder = validateFeaturedOrder(input.featuredOrder) ?? null;
+
+  if (isFeatured && featuredOrder === null) {
+    throw new AppError("Featured order is required for featured products", 400);
+  }
 
   return Product.create({
     name: input.name,
@@ -247,6 +282,8 @@ export const createProduct = async (
     sku,
     stockQuantity: input.stockQuantity,
     lowStockThreshold: input.lowStockThreshold,
+    isFeatured,
+    featuredOrder: isFeatured ? featuredOrder : null,
   } as unknown as IProduct);
 };
 
@@ -300,6 +337,16 @@ export const getProductBySlug = async (slug: string): Promise<IProduct> => {
   }
 
   return product;
+};
+
+export const getFeaturedProducts = async (): Promise<IProduct[]> => {
+  return Product.find({
+    isFeatured: true,
+    deletedAt: null,
+  })
+    .select("slug name gender category subcategory images isFeatured featuredOrder")
+    .sort({ featuredOrder: 1, createdAt: 1 })
+    .populate(featuredProductPopulate);
 };
 
 export const updateProduct = async (
@@ -356,6 +403,30 @@ export const updateProduct = async (
 
   if (updates.lowStockThreshold !== undefined) {
     update.lowStockThreshold = updates.lowStockThreshold;
+  }
+
+  const shouldValidateFeaturedPlacement =
+    updates.isFeatured !== undefined || updates.featuredOrder !== undefined;
+  const nextFeaturedOrder =
+    updates.featuredOrder !== undefined
+      ? validateFeaturedOrder(updates.featuredOrder) ?? null
+      : product.featuredOrder;
+  const nextIsFeatured = updates.isFeatured ?? product.isFeatured;
+
+  if (shouldValidateFeaturedPlacement && nextIsFeatured && nextFeaturedOrder === null) {
+    throw new AppError("Featured order is required for featured products", 400);
+  }
+
+  if (updates.isFeatured !== undefined) {
+    update.isFeatured = updates.isFeatured;
+
+    if (updates.isFeatured === false && updates.featuredOrder === undefined) {
+      update.featuredOrder = null;
+    }
+  }
+
+  if (updates.featuredOrder !== undefined) {
+    update.featuredOrder = nextFeaturedOrder;
   }
 
   const updatedProduct = await Product.findOneAndUpdate(

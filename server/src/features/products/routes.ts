@@ -4,6 +4,7 @@ import {
   addImageController,
   createProductController,
   deleteProductController,
+  getFeaturedProductsController,
   getProductBySlugController,
   getProductController,
   listProductsController,
@@ -17,6 +18,7 @@ const router = Router();
 export const adminRouter = Router();
 
 router.get("/", listProductsController);
+router.get("/featured", getFeaturedProductsController);
 router.get("/slug/:slug", getProductBySlugController);
 router.get("/:id", getProductController);
 

@@ -65,7 +65,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const result = await seedFeaturedProducts();
 
       console.log(
-        `Featured products ready. Created ${result.productsCreated} products. Updated ${result.productsUpdated} products.`,
+        `Featured products ready. Created ${result.productsCreated} products. Skipped ${result.productsSkipped} existing products.`,
       );
 
       app.listen(port, () => {

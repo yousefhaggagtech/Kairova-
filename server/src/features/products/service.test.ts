@@ -6,6 +6,7 @@ import ProductImage from "../../models/ProductImage.js";
 import {
   addImage,
   createProduct,
+  getFeaturedProducts,
   getProductById,
   listProducts,
   setPrimaryImage,
@@ -238,6 +239,64 @@ describe("product service", () => {
     expect(skuResults).toHaveLength(1);
     expect(skuResults[0]?._id.toString()).toBe(classic._id.toString());
     expect(escapedResults).toHaveLength(0);
+  });
+
+  it("getFeaturedProducts returns featured products in navbar order", async () => {
+    const categories = await seedCategories();
+    const firstProduct = await createSeedProduct(categories, {
+      name: { ar: "First Watch AR", en: "First Watch" },
+    });
+    const secondProduct = await createSeedProduct(categories, {
+      name: { ar: "Second Watch AR", en: "Second Watch" },
+    });
+    const hiddenProduct = await createSeedProduct(categories, {
+      name: { ar: "Hidden Watch AR", en: "Hidden Watch" },
+    });
+
+    await Product.findByIdAndUpdate(firstProduct._id, {
+      isFeatured: true,
+      featuredOrder: 2,
+    });
+    await Product.findByIdAndUpdate(secondProduct._id, {
+      isFeatured: true,
+      featuredOrder: 1,
+    });
+    await Product.findByIdAndUpdate(hiddenProduct._id, {
+      isFeatured: false,
+      featuredOrder: 3,
+    });
+    await addImage(firstProduct._id.toString(), {
+      url: "https://example.com/first-secondary.jpg",
+      publicId: "first-secondary",
+    });
+    await addImage(firstProduct._id.toString(), {
+      url: "https://example.com/first-primary.jpg",
+      publicId: "first-primary",
+      isPrimary: true,
+    });
+    await addImage(secondProduct._id.toString(), {
+      url: "https://example.com/second-fallback.jpg",
+      publicId: "second-fallback",
+      order: 4,
+    });
+
+    const featuredProducts = await getFeaturedProducts();
+
+    expect(featuredProducts.map((product) => product._id.toString())).toEqual([
+      secondProduct._id.toString(),
+      firstProduct._id.toString(),
+    ]);
+    expect((featuredProducts[0]?.category as unknown as ICategory).slug).toBe(
+      "watches",
+    );
+    expect(featuredProducts[0]?.images).toHaveLength(1);
+    expect(
+      (featuredProducts[0]?.images[0] as unknown as { url: string }).url,
+    ).toBe("https://example.com/second-fallback.jpg");
+    expect(featuredProducts[1]?.images).toHaveLength(1);
+    expect(
+      (featuredProducts[1]?.images[0] as unknown as { url: string }).url,
+    ).toBe("https://example.com/first-primary.jpg");
   });
 
   it("getProductById populates images and category", async () => {

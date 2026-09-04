@@ -74,6 +74,13 @@ any new bilingual field. Don't invent a new shape (e.g. separate
 `nameAr`/`nameEn` fields) — the embedded `{ar, en}` object was a
 deliberate decision, not an oversight.
 
+## Featured products
+
+Navbar-featured products are regular `Product` records marked with
+`isFeatured: true`. Lower `featuredOrder` values render earlier inside
+their category branch; gaps are fine, and duplicate order values fall
+back to creation order.
+
 ## Environment / tooling
 
 - Native ESM (`"type": "module"` in package.json). Dev server runs

@@ -93,6 +93,14 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
   const [stockQuantity, setStockQuantity] = useState(() =>
     product ? String(product.stockQuantity) : "",
   );
+  const [isFeatured, setIsFeatured] = useState(
+    () => product?.isFeatured ?? false,
+  );
+  const [featuredOrder, setFeaturedOrder] = useState(() =>
+    product?.featuredOrder !== null && product?.featuredOrder !== undefined
+      ? String(product.featuredOrder)
+      : "",
+  );
   const [newImages, setNewImages] = useState<UploadedImage[]>([]);
   const [formError, setFormError] = useState("");
 
@@ -228,6 +236,8 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
 
     const priceValue = Number(price);
     const stockValue = Number(stockQuantity);
+    const featuredOrderValue =
+      featuredOrder.trim() === "" ? null : Number(featuredOrder);
 
     if (!Number.isFinite(priceValue) || priceValue < 0) {
       setFormError(t("invalidPrice"));
@@ -236,6 +246,15 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
 
     if (!Number.isInteger(stockValue) || stockValue < 0) {
       setFormError(t("invalidStock"));
+      return;
+    }
+
+    if (
+      (isFeatured && featuredOrderValue === null) ||
+      (featuredOrderValue !== null &&
+        (!Number.isInteger(featuredOrderValue) || featuredOrderValue < 0))
+    ) {
+      setFormError(t("invalidFeaturedOrder"));
       return;
     }
 
@@ -258,6 +277,8 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
       subcategoryId,
       price: priceValue,
       stockQuantity: stockValue,
+      isFeatured,
+      featuredOrder: isFeatured ? featuredOrderValue : null,
     };
 
     try {
@@ -496,6 +517,38 @@ export default function ProductForm({ mode, product }: ProductFormProps) {
             />
           </div>
         </div>
+
+        <section className="space-y-4 border border-border-light p-4 dark:border-border-subtle">
+          <h3 className="text-h3 leading-heading">{t("featuredPlacement")}</h3>
+
+          <label className="flex min-h-11 items-center gap-3">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(event) => setIsFeatured(event.target.checked)}
+            />
+            <span>{t("showInNavbar")}</span>
+          </label>
+
+          <div>
+            <label className="mb-2 block text-caption" htmlFor="featured-order">
+              {t("featuredOrder")}
+            </label>
+            <input
+              id="featured-order"
+              type="number"
+              value={featuredOrder}
+              onChange={(event) => setFeaturedOrder(event.target.value)}
+              disabled={!isFeatured}
+              min={0}
+              step={1}
+              className="min-h-12 w-full border border-border-light bg-transparent px-3 py-2 disabled:opacity-50 dark:border-border-subtle"
+            />
+            <p className="mt-2 text-caption text-fg-muted">
+              {t("featuredOrderHint")}
+            </p>
+          </div>
+        </section>
 
         <section className="space-y-4 border border-border-light p-4 dark:border-border-subtle">
           <h3 className="text-h3 leading-heading">{t("images")}</h3>

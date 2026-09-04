@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
         hostname: "ik.imagekit.io",
         pathname: "/1pscfy7oah/kiarova/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };

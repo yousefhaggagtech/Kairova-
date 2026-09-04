@@ -20,6 +20,8 @@ export type ProductPayload = {
   subcategoryId: string;
   price: number;
   stockQuantity: number;
+  isFeatured: boolean;
+  featuredOrder: number | null;
 };
 
 export type ProductUpdatePayload = Partial<ProductPayload>;
