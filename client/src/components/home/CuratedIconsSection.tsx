@@ -16,13 +16,13 @@ const PRODUCT_ITEMS = [
   {
     id: "aura",
     image:
-      "https://ik.imagekit.io/1pscfy7oah/kiarova/kairova-aura-vanilla-amber-women-perfume.png",
+      "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/Kayali%20Vanilla%2028%20Hard%20Cover.png",
     layout: "md:col-span-5 md:row-span-1 min-h-[18rem] md:min-h-[14rem]",
   },
   {
     id: "monarch",
     image:
-      "https://ik.imagekit.io/1pscfy7oah/kiarova/kairova-monarch-oud-wood-men-perfume.png",
+      "https://ik.imagekit.io/1pscfy7oah/kiarova/perfumes/Dior%20Sauvage%20Parfum.png",
     layout: "md:col-span-5 md:row-span-1 min-h-[18rem] md:min-h-[14rem]",
   },
   {

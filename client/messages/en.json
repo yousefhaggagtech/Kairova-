@@ -52,24 +52,24 @@
       "subtitle": "A curated dialogue between timeless precision and olfactory art. Pieces designed to define your presence before a word is spoken.",
       "items": {
         "phantom": {
-          "name": "Phantom Chronograph",
-          "price": "EGP 26,400",
-          "feature": "Black Ceramic"
+          "name": "Mini Focus Black Edition",
+          "price": "EGP 1,950",
+          "feature": "Black Edition"
         },
         "aura": {
-          "name": "Aura Vanilla Amber",
-          "price": "EGP 9,300",
-          "feature": "Vanilla Amber"
+          "name": "Kayali Vanilla | 28 Hard Cover",
+          "price": "EGP 1,100",
+          "feature": "Vanilla 28"
         },
         "monarch": {
-          "name": "Monarch Oud Wood",
-          "price": "EGP 8,950",
-          "feature": "Oud Wood"
+          "name": "Dior Sauvage Parfum",
+          "price": "EGP 750",
+          "feature": "Sauvage Parfum"
         },
         "starlight": {
-          "name": "Starlight Diamond",
-          "price": "EGP 33,600",
-          "feature": "Diamond Gold"
+          "name": "Chanel Mirror Women Watch Gold",
+          "price": "EGP 600",
+          "feature": "Mirror Gold"
         }
       }
     },
